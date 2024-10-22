@@ -9,7 +9,7 @@ import (
 
 func StartAll() {
 	//пропарсим все .proto
-	MassProto, err := protobuf.FindProtobufAll(config.Settings.DIRECTORY_PROTOBUF)
+	MassProto, err := protobuf.FindProtobufAll(config.Settings.PROTOBUF_DIRECTORY)
 	if err != nil {
 		log.Errorln(err)
 		return

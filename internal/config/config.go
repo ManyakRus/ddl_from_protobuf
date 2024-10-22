@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/ManyakRus/ddl_from_protobuf/internal/load_configs"
 	"github.com/ManyakRus/starter/log"
 	"os"
 )
@@ -12,8 +13,11 @@ var Settings SettingsINI
 
 // SettingsINI - структура для хранения всех нужных переменных окружения
 type SettingsINI struct {
-	DIRECTORY_PROTOBUF string
-	DIRECTORY_DDL      string
+	PROTOBUF_DIRECTORY    string
+	DDL_DIRECTORY         string
+	CONFIG_DIRECTORY_NAME string
+	MapMappings           map[string]load_configs.SQLMapping
+	ColumnsEveryTable     string
 }
 
 // FillSettings загружает переменные окружения в структуру из переменных окружения
@@ -23,17 +27,24 @@ func FillSettings() {
 
 	//
 	Settings = SettingsINI{}
-	Settings.DIRECTORY_PROTOBUF = os.Getenv("DIRECTORY_PROTOBUF")
-	Settings.DIRECTORY_DDL = os.Getenv("DIRECTORY_DDL")
+	Settings.PROTOBUF_DIRECTORY = os.Getenv("PROTOBUF_DIRECTORY")
+	Settings.DDL_DIRECTORY = os.Getenv("DDL_DIRECTORY")
 
-	if Settings.DIRECTORY_PROTOBUF == "" {
-		Settings.DIRECTORY_PROTOBUF = CurrentDirectory()
-		//log.Panicln("Need fill DIRECTORY_PROTOBUF ! in os.ENV ")
+	if Settings.PROTOBUF_DIRECTORY == "" {
+		Settings.PROTOBUF_DIRECTORY = CurrentDirectory()
 	}
 
-	if Settings.DIRECTORY_DDL == "" {
-		Settings.DIRECTORY_DDL = DIRECTORY_DDL_DEFAULT
+	if Settings.DDL_DIRECTORY == "" {
+		Settings.DDL_DIRECTORY = DIRECTORY_DDL_DEFAULT
 	}
+
+	Name := ""
+	s := ""
+
+	//
+	Name = "// Getenv - возвращает переменную окружения\n"
+	s = Getenv(Name, true)
+	Settings.CONFIG_DIRECTORY_NAME = s
 
 	//
 }
@@ -72,9 +83,20 @@ func FillFlags() {
 	}
 
 	if len(Args) > 0 {
-		Settings.DIRECTORY_PROTOBUF = Args[0]
+		Settings.PROTOBUF_DIRECTORY = Args[0]
 	}
 	if len(Args) > 1 {
-		Settings.DIRECTORY_DDL = Args[1]
+		Settings.DDL_DIRECTORY = Args[1]
 	}
+}
+
+// Getenv - возвращает переменную окружения
+func Getenv(Name string, IsRequired bool) string {
+	TextError := "Need fill OS environment variable: "
+	Otvet := os.Getenv(Name)
+	if IsRequired == true && Otvet == "" {
+		log.Error(TextError + Name)
+	}
+
+	return Otvet
 }
