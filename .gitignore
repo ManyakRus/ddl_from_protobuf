@@ -1,0 +1,13 @@
+/.env
+.env
+.env*
+/cover.out
+
+/.idea/
+.vscode
+/log.txt
+
+/bin/.env
+/bin/ddl_from_protobuf
+
+
