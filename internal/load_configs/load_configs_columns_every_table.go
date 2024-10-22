@@ -2,6 +2,7 @@ package load_configs
 
 import (
 	"fmt"
+	"github.com/ManyakRus/starter/log"
 	"os"
 )
 
@@ -12,7 +13,8 @@ func LoadColumnsEveryTable(Filename string) (string, error) {
 
 	byteValue, err := os.ReadFile(Filename)
 	if err != nil {
-		fmt.Printf("ReadFile(%s) error: %v", Filename, err)
+		err = fmt.Errorf("ReadFile(%s) error: %w", Filename, err)
+		log.Error(err)
 		return Otvet, err
 	}
 

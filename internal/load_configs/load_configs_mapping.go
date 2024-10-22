@@ -3,6 +3,7 @@ package load_configs
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/ManyakRus/starter/log"
 	"os"
 )
 
@@ -42,14 +43,16 @@ func LoadMappings(Filename string) (map[string]SQLMapping, error) {
 
 	byteValue, err := os.ReadFile(Filename)
 	if err != nil {
-		fmt.Printf("Error loading mapping file %s error: %v\n", Filename, err)
+		err = fmt.Errorf("Error loading mapping file %s error: %w", Filename, err)
+		log.Error(err)
 		return Otvet, err
 	}
 
 	var Mappings = &SQLMappings{}
 	err = json.Unmarshal(byteValue, Mappings)
 	if err != nil {
-		fmt.Printf("Unmarshal() error: %v\n", err)
+		err = fmt.Errorf("Unmarshal() error: %w", err)
+		log.Error(err)
 		return Otvet, err
 	}
 
