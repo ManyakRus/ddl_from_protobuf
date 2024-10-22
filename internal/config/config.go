@@ -18,6 +18,7 @@ type SettingsINI struct {
 	CONFIG_DIRECTORY_NAME string
 	MapMappings           map[string]load_configs.SQLMapping
 	ColumnsEveryTable     string
+	DB_SCHEMA_NAME        string
 }
 
 // FillSettings загружает переменные окружения в структуру из переменных окружения
@@ -42,11 +43,15 @@ func FillSettings() {
 	s := ""
 
 	//
-	Name = "// Getenv - возвращает переменную окружения\n"
+	Name = "CONFIG_DIRECTORY_NAME"
 	s = Getenv(Name, true)
 	Settings.CONFIG_DIRECTORY_NAME = s
 
 	//
+	Name = "DB_SCHEMA_NAME"
+	s = Getenv(Name, true)
+	Settings.CONFIG_DIRECTORY_NAME = s
+
 }
 
 // ChangeCurrentDirectory - устанавливает текущую директорию на директорию откуда запущена программа

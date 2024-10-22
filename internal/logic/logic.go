@@ -7,7 +7,7 @@ import (
 	"github.com/ManyakRus/starter/log"
 )
 
-func StartAll() {
+func StartAll(Settings config.SettingsINI) {
 	//пропарсим все .proto
 	MassProto, err := protobuf.FindProtobufAll(config.Settings.PROTOBUF_DIRECTORY)
 	if err != nil {
@@ -16,5 +16,5 @@ func StartAll() {
 	}
 
 	//
-	ddl.StartAll(MassProto)
+	ddl.StartAll(Settings, MassProto)
 }

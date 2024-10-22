@@ -57,7 +57,7 @@ func LoadMappings(Filename string) (map[string]SQLMapping, error) {
 	}
 
 	for _, value := range Mappings.SQLMappings {
-		Otvet[value.SQLType] = *value
+		Otvet[value.ProtobufType] = *value
 	}
 
 	return Otvet, err
