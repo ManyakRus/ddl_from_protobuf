@@ -2,6 +2,8 @@ github.com/ManyakRus/logrus v0.0.0-20231019115155-9e6fede0d792 h1:bxwxD0H3kSUAH3
 github.com/ManyakRus/logrus v0.0.0-20231019115155-9e6fede0d792/go.mod h1:OUyxCVbPW/2lC1e6cM7Am941SJiC88BhNnb24x2R3a8=
 github.com/ManyakRus/starter v1.0.64 h1:RYgsoO5m0dEr2ArYL0MT1El3rN1vXEuDh9PYwxzh+H8=
 github.com/ManyakRus/starter v1.0.64/go.mod h1:U9WyHWnavyxu4+J5D6VpF3G2yZ4KagfSNM2Soo9O+7c=
+github.com/ManyakRus/starter v1.0.65 h1:3TvYfrO2N55qUziPFxuLCVZI3nGKmKupTb4v7zMbNqo=
+github.com/ManyakRus/starter v1.0.65/go.mod h1:U9WyHWnavyxu4+J5D6VpF3G2yZ4KagfSNM2Soo9O+7c=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -17,6 +19,8 @@ github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/stretchr/testify v1.9.0 h1:HtqpIVDClZ4nwg75+f6Lvsy/wHu+3BoSGCbBAcpTsTg=
 github.com/stretchr/testify v1.9.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
+github.com/tallstoat/pbparser v0.2.0 h1:lsFH4mdiOv1MIQVmge/idThSTd2uByNodWVfbtysjzg=
+github.com/tallstoat/pbparser v0.2.0/go.mod h1:aUC6W9uQLeAXZkknve8ZDO6InhRYpYHlJ9kvsQh1i2k=
 golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.25.0 h1:r+8e+loiHxRqhXVl6ML1nO3l1+oFoWbnlu2Ehimmi34=
 golang.org/x/sys v0.25.0/go.mod h1:/VUhepiaJMQUp4+oa/7Zr1D23ma6VTLIYjOOTFZPUcA=
