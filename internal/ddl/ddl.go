@@ -72,6 +72,8 @@ CREATE TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" (
 `
 	Otvet = Otvet + Settings.ColumnsEveryTable
 
+	TextPrimaryKey := ""
+
 	//fields
 	for _, field1 := range message1.Fields {
 		FieldType := field1.Type.Name()
@@ -92,18 +94,36 @@ CREATE TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" (
 		FieldName := FindFieldName(field1)
 		IsIdentifier := IsIdentifierField(field1)
 		isFoundID = isFoundID || IsIdentifier
-		ForignTableName, ForeignTableColumnName := FindForignTableNameAndColumnName(Settings, field1)
 
 		//добавим колонку
 		Otvet = Otvet + "\t" + `"` + FieldName + `"` + " " + SQLType + " " + TextNullable + ",\n"
 
 		if IsIdentifier {
-			//добавим CONSTRAINT
-			if ForignTableName != "" {
-				Otvet = Otvet + "\t" + "CONSTRAINT " + TableName + "_" + FieldName + "_fk FOREIGN KEY (" + FieldName + ") REFERENCES " + Settings.DB_SCHEMA_NAME + "." + ForignTableName + " (" + ForeignTableColumnName + ")" + ",\n"
-			}
+			TextPrimaryKey = TextPrimaryKey + "\t" + "CONSTRAINT " + TableName + "_pk PRIMARY KEY (" + FieldName + "),\n"
 		}
 	}
+
+	//PRIMARY KEY
+	Otvet = Otvet + TextPrimaryKey
+
+	//добавим CONSTRAINT
+	for _, field1 := range message1.Fields {
+		FieldName := FindFieldName(field1)
+		IsIdentifier := IsIdentifierField(field1)
+		if IsIdentifier == false {
+			continue
+		}
+
+		ForignTableName, ForeignTableColumnName := FindForignTableNameAndColumnName(Settings, field1)
+		if ForignTableName != "" {
+			Otvet = Otvet + "\t" + "CONSTRAINT " + TableName + "_" + FieldName + "_fk FOREIGN KEY (" + FieldName + ") REFERENCES " + Settings.DB_SCHEMA_NAME + "." + ForignTableName + " (" + ForeignTableColumnName + ")" + ",\n"
+		}
+	}
+
+	//удалим лишние запятые
+	Otvet = strings.TrimRight(Otvet, ",\n")
+	Otvet = Otvet + "\n"
+	Otvet = Otvet + ");\n"
 
 	//таблицы без идентификаторов не создаем
 	if isFoundID == false {
@@ -111,12 +131,6 @@ CREATE TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" (
 		log.Warn(err)
 		return "", nil
 	}
-
-	//удалим лишние запятые
-	Otvet = strings.TrimRight(Otvet, ",\n")
-	Otvet = Otvet + "\n"
-
-	Otvet = Otvet + ");\n"
 
 	//CREATE INDEX
 	for _, field1 := range message1.Fields {
