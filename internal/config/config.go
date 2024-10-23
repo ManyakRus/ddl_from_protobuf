@@ -3,6 +3,7 @@ package config
 import (
 	"github.com/ManyakRus/ddl_from_protobuf/internal/load_configs"
 	"github.com/ManyakRus/starter/log"
+	"github.com/tallstoat/pbparser"
 	"os"
 )
 
@@ -19,6 +20,20 @@ type SettingsINI struct {
 	MapMappings           map[string]load_configs.SQLMapping
 	ColumnsEveryTable     string
 	DB_SCHEMA_NAME        string
+	MapMessages           map[string]pbparser.MessageElement
+	MapEnums              map[string]pbparser.EnumElement
+	MassIndexNames        []string
+	INDEX_NAMES_FILENAME  string
+}
+
+// CreateSettings - создает структуру типа SettingsINI
+func CreateSettings() SettingsINI {
+	Otvet := SettingsINI{}
+	Otvet.MapMappings = make(map[string]load_configs.SQLMapping)
+	Otvet.MapMessages = make(map[string]pbparser.MessageElement)
+	Otvet.MapEnums = make(map[string]pbparser.EnumElement)
+	Otvet.MassIndexNames = make([]string, 0)
+	return Otvet
 }
 
 // FillSettings загружает переменные окружения в структуру из переменных окружения
@@ -27,7 +42,7 @@ func FillSettings() {
 	ChangeCurrentDirectory()
 
 	//
-	Settings = SettingsINI{}
+	Settings = CreateSettings()
 	Settings.PROTOBUF_DIRECTORY = os.Getenv("PROTOBUF_DIRECTORY")
 	Settings.DDL_DIRECTORY = os.Getenv("DDL_DIRECTORY")
 
@@ -49,6 +64,11 @@ func FillSettings() {
 
 	//
 	Name = "DB_SCHEMA_NAME"
+	s = Getenv(Name, true)
+	Settings.CONFIG_DIRECTORY_NAME = s
+
+	//
+	Name = "INDEX_NAMES_FILENAME"
 	s = Getenv(Name, true)
 	Settings.CONFIG_DIRECTORY_NAME = s
 

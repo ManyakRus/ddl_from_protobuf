@@ -22,10 +22,10 @@ func StartApp() {
 
 	//заполняем настройки из файла .env
 	config.FillSettings()
-	Settings := config.Settings
+	Settings := &config.Settings
 
 	//загружаем настройки из файлов
-	load_configs.StartAll(&Settings)
+	load_configs.StartAll(Settings)
 
 	//запускаем логику
 	logic.StartAll(Settings)

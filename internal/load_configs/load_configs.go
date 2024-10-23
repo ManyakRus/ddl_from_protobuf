@@ -13,7 +13,7 @@ func StartAll(Settings *config.SettingsINI) {
 
 	dir := micro.ProgramDir_bin()
 
-	//
+	//MapMappings
 	Filename := Settings.PROTOBUF_DIRECTORY + micro.SeparatorFile() + constants.DATEBASE_TYPES_FILENAME
 	MapMappings, err := LoadMappings(Filename)
 	if err != nil {
@@ -22,7 +22,7 @@ func StartAll(Settings *config.SettingsINI) {
 	}
 	Settings.MapMappings = MapMappings
 
-	//
+	//ColumnsEveryTable
 	Filename = dir + Settings.CONFIG_DIRECTORY_NAME + micro.SeparatorFile() + constants.COLUMNS_EVERY_TABLE_FILENAME
 	s, err := LoadColumnsEveryTable(Filename)
 	if err != nil {
@@ -30,4 +30,14 @@ func StartAll(Settings *config.SettingsINI) {
 		log.Panic(err)
 	}
 	Settings.ColumnsEveryTable = s
+
+	//MassIndexNames
+	Filename = dir + Settings.CONFIG_DIRECTORY_NAME + micro.SeparatorFile() + Settings.INDEX_NAMES_FILENAME
+	MassIndexNames, err := Load_IndexNames(Filename)
+	if err != nil {
+		err = fmt.Errorf("LoadMappings(%s) error: %w", Filename, err)
+		log.Panic(err)
+	}
+	Settings.MassIndexNames = MassIndexNames
+
 }

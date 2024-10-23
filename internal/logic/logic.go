@@ -7,7 +7,8 @@ import (
 	"github.com/ManyakRus/starter/log"
 )
 
-func StartAll(Settings config.SettingsINI) {
+// StartAll - запускает всю логику приложения
+func StartAll(Settings *config.SettingsINI) {
 	//пропарсим все .proto
 	MassProto, err := protobuf.FindProtobufAll(config.Settings.PROTOBUF_DIRECTORY)
 	if err != nil {

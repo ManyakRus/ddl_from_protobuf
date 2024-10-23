@@ -9,14 +9,27 @@ import (
 )
 
 // StartAll - создание всех файлов ddl .sql
-func StartAll(Settings config.SettingsINI, MassProto []pbparser.ProtoFile) {
-	for _, proto := range MassProto {
-		Start1(Settings, proto)
+func StartAll(Settings *config.SettingsINI, MassProto []pbparser.ProtoFile) {
+
+	FillMapMessages(Settings, MassProto)
+	FillMapEnums(Settings, MassProto)
+
+	//создадим 1 общий текст SQL
+	TextSQL := ""
+	for _, proto1 := range MassProto {
+		TextSQL1, err := Start1(Settings, proto1, TextSQL)
+		if err != nil {
+			log.Panic(err)
+		}
+		TextSQL = TextSQL + TextSQL1
 	}
+
+	//запишем в файл
 }
 
 // Start1 - создание много файлов ddl .sql, для одного .proto
-func Start1(Settings config.SettingsINI, Proto pbparser.ProtoFile) (string, error) {
+// возвращает текст SQL для одного .proto
+func Start1(Settings *config.SettingsINI, Proto pbparser.ProtoFile, TextSQL string) (string, error) {
 	Otvet := ""
 	var err error
 
@@ -44,15 +57,17 @@ func Start1(Settings config.SettingsINI, Proto pbparser.ProtoFile) (string, erro
 }
 
 // CreateFiles_Message - создание одного файла ddl .sql, для message
-func CreateFiles_Message(Settings config.SettingsINI, message1 pbparser.MessageElement) (string, error) {
+func CreateFiles_Message(Settings *config.SettingsINI, message1 pbparser.MessageElement) (string, error) {
 	Otvet := ""
 	var err error
 
-	MessageName := message1.Name
+	TableName := message1.Name
+	TableComments := message1.Documentation
 
 	Otvet = `
-CREATE TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + MessageName + `" (
+CREATE TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" (
 `
+	Otvet = Otvet + Settings.ColumnsEveryTable
 
 	//fields
 	for _, field1 := range message1.Fields {
@@ -67,16 +82,35 @@ CREATE TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + MessageName + `" (
 		isNullabe := IsNullableField(field1)
 		TextNullable := TextNullable(isNullabe)
 		Comments := field1.Documentation
-		//FieldName := field1.Name
 		FieldName := FindFieldName(field1)
+		IsIdentifier := IsIdentifierField(field1)
+		ForignTableName, ForeignTableColumnName := FindForignTableNameAndColumnName(Settings, field1)
+
+		//добавим колонку
 		Otvet = Otvet + "\t" + FieldName + " " + SQLType + " " + TextNullable + " --" + Comments + "\n"
+
+		if IsIdentifier {
+			//добавим CONSTRAINT
+			if ForignTableName != "" {
+				Otvet = Otvet + "\t" + "CONSTRAINT " + TableName + "_" + FieldName + "_fk FOREIGN KEY (" + FieldName + ") REFERENCES " + Settings.DB_SCHEMA_NAME + "." + ForignTableName + " (" + ForeignTableColumnName + ")" + "\n"
+			}
+
+			//CREATE INDEX
+			Otvet = Otvet + "\t" + "CREATE INDEX " + TableName + "_" + FieldName + "_idx ON " + Settings.DB_SCHEMA_NAME + "." + TableName + " USING btree (" + FieldName + ");" + "\n"
+		}
+
+		//COMMENT ON COLUMN
+		Otvet = Otvet + "\t" + "COMMENT ON COLUMN " + Settings.DB_SCHEMA_NAME + "." + TableName + "." + FieldName + " IS '" + Comments + "';" + "\n"
 	}
+
+	//COMMENT ON TABLE
+	Otvet = Otvet + "\t" + "COMMENT ON TABLE " + Settings.DB_SCHEMA_NAME + "." + TableName + " IS '" + TableComments + "';" + "\n"
 
 	return Otvet, err
 }
 
 // CreateFiles_Enum - создание одного файла ddl .sql, для enum
-func CreateFiles_Enum(Settings config.SettingsINI, message1 pbparser.EnumElement) (string, error) {
+func CreateFiles_Enum(Settings *config.SettingsINI, message1 pbparser.EnumElement) (string, error) {
 	Otvet := ""
 	var err error
 
@@ -149,6 +183,90 @@ func AddText_id(Text string) string {
 
 	if strings.HasSuffix(Otvet, "_id") == true {
 		Otvet = Otvet + "_id"
+	}
+
+	return Otvet
+}
+
+// FindForignTableNameAndColumnName - возвращает имя таблицы и столбца внешней связанной таблицы
+func FindForignTableNameAndColumnName(Settings *config.SettingsINI, Field pbparser.FieldElement) (ForignTableName string, ForignTableColumnName string) {
+
+	Category := Field.Type.Category()
+
+	//ИД
+	if Category != pbparser.NamedDataTypeCategory {
+		return
+	}
+
+	ForignTableName = Field.Type.Name()
+
+	Map1, ok := Settings.MapMessages[ForignTableName]
+	if ok == false {
+		return
+	}
+	ForignTableColumnName = Find_ID_Name_from_Fields(Settings, Map1.Fields)
+
+	return
+}
+
+// FillMapMessages - создаёт единый map messages
+func FillMapMessages(Settings *config.SettingsINI, MassProto []pbparser.ProtoFile) {
+
+	MapMessages := make(map[string]pbparser.MessageElement)
+	for _, proto1 := range MassProto {
+		for _, message1 := range proto1.Messages {
+			_, ok := MapMessages[message1.Name]
+			if ok == true {
+				log.Warnf("warning: message %s already exists", message1.Name)
+			}
+			MapMessages[message1.Name] = message1
+		}
+	}
+	Settings.MapMessages = MapMessages
+
+}
+
+// FillMapEnums - создаёт единый map enums
+func FillMapEnums(Settings *config.SettingsINI, MassProto []pbparser.ProtoFile) {
+
+	MapEnums := make(map[string]pbparser.EnumElement)
+	for _, proto1 := range MassProto {
+		for _, enum1 := range proto1.Enums {
+			_, ok := MapEnums[enum1.Name]
+			if ok == true {
+				log.Warnf("warning: enum %s already exists", enum1.Name)
+			}
+			MapEnums[enum1.Name] = enum1
+		}
+	}
+	Settings.MapEnums = MapEnums
+
+}
+
+// Find_ID_from_Fields - возвращает колонку с идентификатором таблицы (ID), или nil
+func Find_ID_from_Fields(Settings *config.SettingsINI, Fields []pbparser.FieldElement) *pbparser.FieldElement {
+	var Otvet *pbparser.FieldElement
+
+	MassIndexNames := Settings.MassIndexNames
+	for _, IndexName1 := range MassIndexNames {
+		for _, Field1 := range Fields {
+			if Field1.Name == IndexName1 {
+				Otvet = &Field1
+				return Otvet
+			}
+		}
+	}
+
+	return Otvet
+}
+
+// Find_ID_Name_from_Fields - возвращает имя колонки с идентификатором таблицы (ID)
+func Find_ID_Name_from_Fields(Settings *config.SettingsINI, Fields []pbparser.FieldElement) string {
+	Otvet := ""
+
+	Field1 := Find_ID_from_Fields(Settings, Fields)
+	if Field1 != nil {
+		Otvet = Field1.Name
 	}
 
 	return Otvet
