@@ -5,12 +5,14 @@ import (
 	"github.com/ManyakRus/ddl_from_protobuf/internal/ddl"
 	"github.com/ManyakRus/ddl_from_protobuf/internal/protobuf"
 	"github.com/ManyakRus/starter/log"
+	"github.com/ManyakRus/starter/micro"
 )
 
 // StartAll - запускает всю логику приложения
 func StartAll(Settings *config.SettingsINI) {
 	//пропарсим все .proto
-	MassProto, err := protobuf.FindProtobufAll(config.Settings.PROTOBUF_DIRECTORY)
+	dir := micro.ProgramDir()
+	MassProto, err := protobuf.FindProtobufAll(dir + config.Settings.PROTOBUF_DIRECTORY)
 	if err != nil {
 		log.Errorln(err)
 		return

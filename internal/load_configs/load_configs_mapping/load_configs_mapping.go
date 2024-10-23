@@ -1,4 +1,4 @@
-package load_configs
+package load_configs_mapping
 
 import (
 	"encoding/json"

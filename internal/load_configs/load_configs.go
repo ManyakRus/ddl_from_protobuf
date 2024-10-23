@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/ManyakRus/ddl_from_protobuf/internal/config"
 	"github.com/ManyakRus/ddl_from_protobuf/internal/constants"
+	"github.com/ManyakRus/ddl_from_protobuf/internal/load_configs/load_configs_mapping"
 	"github.com/ManyakRus/starter/micro"
 	"log"
 )
@@ -14,8 +15,8 @@ func StartAll(Settings *config.SettingsINI) {
 	dir := micro.ProgramDir_bin()
 
 	//MapMappings
-	Filename := Settings.PROTOBUF_DIRECTORY + micro.SeparatorFile() + constants.DATEBASE_TYPES_FILENAME
-	MapMappings, err := LoadMappings(Filename)
+	Filename := dir + Settings.CONFIG_DIRECTORY_NAME + micro.SeparatorFile() + constants.DATEBASE_TYPES_FILENAME
+	MapMappings, err := load_configs_mapping.LoadMappings(Filename)
 	if err != nil {
 		err = fmt.Errorf("LoadMappings(%s) error: %w", Filename, err)
 		log.Panic(err)

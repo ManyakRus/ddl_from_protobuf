@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/ManyakRus/ddl_from_protobuf/internal/load_configs"
+	"github.com/ManyakRus/ddl_from_protobuf/internal/load_configs/load_configs_mapping"
 	"github.com/ManyakRus/starter/log"
 	"github.com/tallstoat/pbparser"
 	"os"
@@ -17,7 +17,7 @@ type SettingsINI struct {
 	PROTOBUF_DIRECTORY    string
 	DDL_DIRECTORY         string
 	CONFIG_DIRECTORY_NAME string
-	MapMappings           map[string]load_configs.SQLMapping
+	MapMappings           map[string]load_configs_mapping.SQLMapping
 	ColumnsEveryTable     string
 	DB_SCHEMA_NAME        string
 	MapMessages           map[string]pbparser.MessageElement
@@ -29,7 +29,7 @@ type SettingsINI struct {
 // CreateSettings - создает структуру типа SettingsINI
 func CreateSettings() SettingsINI {
 	Otvet := SettingsINI{}
-	Otvet.MapMappings = make(map[string]load_configs.SQLMapping)
+	Otvet.MapMappings = make(map[string]load_configs_mapping.SQLMapping)
 	Otvet.MapMessages = make(map[string]pbparser.MessageElement)
 	Otvet.MapEnums = make(map[string]pbparser.EnumElement)
 	Otvet.MassIndexNames = make([]string, 0)
@@ -65,12 +65,12 @@ func FillSettings() {
 	//
 	Name = "DB_SCHEMA_NAME"
 	s = Getenv(Name, true)
-	Settings.CONFIG_DIRECTORY_NAME = s
+	Settings.DB_SCHEMA_NAME = s
 
 	//
 	Name = "INDEX_NAMES_FILENAME"
 	s = Getenv(Name, true)
-	Settings.CONFIG_DIRECTORY_NAME = s
+	Settings.INDEX_NAMES_FILENAME = s
 
 }
 

@@ -19,6 +19,7 @@ func StartAll(Settings *config.SettingsINI, MassProto []pbparser.ProtoFile) {
 	for _, proto1 := range MassProto {
 		TextSQL1, err := Start1(Settings, proto1, TextSQL)
 		if err != nil {
+			err = fmt.Errorf("Start1() error: %w", err)
 			log.Panic(err)
 		}
 		TextSQL = TextSQL + TextSQL1
@@ -34,7 +35,7 @@ func Start1(Settings *config.SettingsINI, Proto pbparser.ProtoFile, TextSQL stri
 	var err error
 
 	//
-	for _, message1 := range Proto.Messages {
+	for _, message1 := range Settings.MapMessages {
 		Otvet1, err := CreateFiles_Message(Settings, message1)
 		if err != nil {
 			err = fmt.Errorf("CreateFiles_Message(%s) error: %w", message1.Name, err)
@@ -44,7 +45,7 @@ func Start1(Settings *config.SettingsINI, Proto pbparser.ProtoFile, TextSQL stri
 	}
 
 	//
-	for _, enum1 := range Proto.Enums {
+	for _, enum1 := range Settings.MapEnums {
 		Otvet1, err := CreateFiles_Enum(Settings, enum1)
 		if err != nil {
 			err = fmt.Errorf("CreateFiles_Enum(%s) error: %w", enum1.Name, err)
@@ -64,6 +65,8 @@ func CreateFiles_Message(Settings *config.SettingsINI, message1 pbparser.Message
 	TableName := message1.Name
 	TableComments := message1.Documentation
 
+	isFoundID := false
+
 	Otvet = `
 CREATE TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" (
 `
@@ -72,39 +75,70 @@ CREATE TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" (
 	//fields
 	for _, field1 := range message1.Fields {
 		FieldType := field1.Type.Name()
-		Map1, ok := Settings.MapMappings[FieldType]
-		if ok == false {
-			err = fmt.Errorf("MapMappings(%s) error: %w", FieldType, err)
-			log.Error(err)
-			return Otvet, err
+		SQLType := FieldType
+		MapMappings1, ok := Settings.MapMappings[FieldType]
+		Category := field1.Type.Category()
+		if Category == pbparser.ScalarDataTypeCategory {
+			if ok == false {
+				err = fmt.Errorf("MapMappings() error: not found field type: %s", FieldType)
+				log.Error(err)
+				return Otvet, err
+			}
+			SQLType = MapMappings1.SQLType
 		}
-		SQLType := Map1.SQLType
 		isNullabe := IsNullableField(field1)
 		TextNullable := TextNullable(isNullabe)
-		Comments := field1.Documentation
+		//Comments := field1.Documentation
 		FieldName := FindFieldName(field1)
 		IsIdentifier := IsIdentifierField(field1)
+		isFoundID = isFoundID || IsIdentifier
 		ForignTableName, ForeignTableColumnName := FindForignTableNameAndColumnName(Settings, field1)
 
 		//добавим колонку
-		Otvet = Otvet + "\t" + FieldName + " " + SQLType + " " + TextNullable + " --" + Comments + "\n"
+		Otvet = Otvet + "\t" + `"` + FieldName + `"` + " " + SQLType + " " + TextNullable + ",\n"
 
 		if IsIdentifier {
 			//добавим CONSTRAINT
 			if ForignTableName != "" {
-				Otvet = Otvet + "\t" + "CONSTRAINT " + TableName + "_" + FieldName + "_fk FOREIGN KEY (" + FieldName + ") REFERENCES " + Settings.DB_SCHEMA_NAME + "." + ForignTableName + " (" + ForeignTableColumnName + ")" + "\n"
+				Otvet = Otvet + "\t" + "CONSTRAINT " + TableName + "_" + FieldName + "_fk FOREIGN KEY (" + FieldName + ") REFERENCES " + Settings.DB_SCHEMA_NAME + "." + ForignTableName + " (" + ForeignTableColumnName + ")" + ",\n"
 			}
+		}
+	}
 
-			//CREATE INDEX
-			Otvet = Otvet + "\t" + "CREATE INDEX " + TableName + "_" + FieldName + "_idx ON " + Settings.DB_SCHEMA_NAME + "." + TableName + " USING btree (" + FieldName + ");" + "\n"
+	//таблицы без идентификаторов не создаем
+	if isFoundID == false {
+		err = fmt.Errorf("CreateFiles_Message() message: %s warning: not found ID field", TableName)
+		log.Warn(err)
+		return "", nil
+	}
+
+	//удалим лишние запятые
+	Otvet = strings.TrimRight(Otvet, ",\n")
+	Otvet = Otvet + "\n"
+
+	Otvet = Otvet + ");\n"
+
+	//CREATE INDEX
+	for _, field1 := range message1.Fields {
+		FieldName := FindFieldName(field1)
+		IsIdentifier := IsIdentifierField(field1)
+		if IsIdentifier == false {
+			continue
 		}
 
-		//COMMENT ON COLUMN
-		Otvet = Otvet + "\t" + "COMMENT ON COLUMN " + Settings.DB_SCHEMA_NAME + "." + TableName + "." + FieldName + " IS '" + Comments + "';" + "\n"
+		Otvet = Otvet + "\t" + "CREATE INDEX " + TableName + "_" + FieldName + "_idx ON " + Settings.DB_SCHEMA_NAME + "." + TableName + " USING btree (" + FieldName + ");" + "\n"
 	}
 
 	//COMMENT ON TABLE
-	Otvet = Otvet + "\t" + "COMMENT ON TABLE " + Settings.DB_SCHEMA_NAME + "." + TableName + " IS '" + TableComments + "';" + "\n"
+	Otvet = Otvet + "\t" + `COMMENT ON TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" IS '` + TableComments + `';` + "\n"
+
+	//COMMENT ON COLUMN
+	for _, field1 := range message1.Fields {
+		FieldName := FindFieldName(field1)
+		Comments := field1.Documentation
+
+		Otvet = Otvet + "\t" + `COMMENT ON COLUMN "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `"."` + FieldName + `" IS '` + Comments + `';` + "\n"
+	}
 
 	return Otvet, err
 }
@@ -217,7 +251,7 @@ func FillMapMessages(Settings *config.SettingsINI, MassProto []pbparser.ProtoFil
 		for _, message1 := range proto1.Messages {
 			_, ok := MapMessages[message1.Name]
 			if ok == true {
-				log.Warnf("warning: message %s already exists", message1.Name)
+				//log.Warnf("warning: message %s already exists", message1.Name)
 			}
 			MapMessages[message1.Name] = message1
 		}
@@ -234,7 +268,7 @@ func FillMapEnums(Settings *config.SettingsINI, MassProto []pbparser.ProtoFile) 
 		for _, enum1 := range proto1.Enums {
 			_, ok := MapEnums[enum1.Name]
 			if ok == true {
-				log.Warnf("warning: enum %s already exists", enum1.Name)
+				//log.Warnf("warning: enum %s already exists", enum1.Name)
 			}
 			MapEnums[enum1.Name] = enum1
 		}

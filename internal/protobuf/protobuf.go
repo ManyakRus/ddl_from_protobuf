@@ -24,7 +24,7 @@ func FindProtobufFiles(dir string) ([]string, error) {
 	}
 
 	//
-	Otvet, err = folders.FindFiles_FromDirectory(dir, ".go")
+	Otvet, err = folders.FindFiles_FromDirectory(dir, ".proto")
 	if err != nil {
 		err = fmt.Errorf("FindFiles_FromDirectory(%s) error: %w", dir, err)
 		return Otvet, err
