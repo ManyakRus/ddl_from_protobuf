@@ -13,7 +13,7 @@ import "google/protobuf/timestamp.proto";
 
 //Тип инструмента.
 enum InstrumentType {
-  INSTRUMENT_TYPE_UNSPECIFIED = 0; //коммент1
+  INSTRUMENT_TYPE_UNSPECIFIED = 0;
   INSTRUMENT_TYPE_BOND = 1; //Облигация.
   INSTRUMENT_TYPE_SHARE	= 2; //Акция.
   INSTRUMENT_TYPE_CURRENCY = 3; //Валюта.
@@ -27,7 +27,8 @@ enum InstrumentType {
 //Денежная сумма в определенной валюте
 message MoneyValue {
 
-  string currency = 1; //коммент2
+  // строковый ISO-код валюты
+  string currency = 1; 
 
   // целая часть суммы, может быть отрицательным числом
   int64 units = 2;

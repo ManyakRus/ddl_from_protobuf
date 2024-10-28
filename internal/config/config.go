@@ -4,7 +4,9 @@ import (
 	"github.com/ManyakRus/ddl_from_protobuf/internal/load_configs/load_configs_mapping"
 	"github.com/ManyakRus/starter/log"
 	"github.com/tallstoat/pbparser"
+	"io/fs"
 	"os"
+	"strconv"
 )
 
 const DIRECTORY_DDL_DEFAULT = "ddl"
@@ -15,7 +17,7 @@ var Settings SettingsINI
 // SettingsINI - структура для хранения всех нужных переменных окружения
 type SettingsINI struct {
 	PROTOBUF_DIRECTORY    string
-	DDL_DIRECTORY         string
+	DDL_FILENAME          string
 	CONFIG_DIRECTORY_NAME string
 	MapMappings           map[string]load_configs_mapping.SQLMapping
 	ColumnsEveryTable     string
@@ -24,6 +26,7 @@ type SettingsINI struct {
 	MapEnums              map[string]pbparser.EnumElement
 	MassIndexNames        []string
 	INDEX_NAMES_FILENAME  string
+	FILE_PERMISSIONS      fs.FileMode //= 0666
 }
 
 // CreateSettings - создает структуру типа SettingsINI
@@ -44,14 +47,14 @@ func FillSettings() {
 	//
 	Settings = CreateSettings()
 	Settings.PROTOBUF_DIRECTORY = os.Getenv("PROTOBUF_DIRECTORY")
-	Settings.DDL_DIRECTORY = os.Getenv("DDL_DIRECTORY")
+	Settings.DDL_FILENAME = os.Getenv("DDL_FILENAME")
 
 	if Settings.PROTOBUF_DIRECTORY == "" {
 		Settings.PROTOBUF_DIRECTORY = CurrentDirectory()
 	}
 
-	if Settings.DDL_DIRECTORY == "" {
-		Settings.DDL_DIRECTORY = DIRECTORY_DDL_DEFAULT
+	if Settings.DDL_FILENAME == "" {
+		Settings.DDL_FILENAME = DIRECTORY_DDL_DEFAULT
 	}
 
 	Name := ""
@@ -71,6 +74,16 @@ func FillSettings() {
 	Name = "INDEX_NAMES_FILENAME"
 	s = Getenv(Name, true)
 	Settings.INDEX_NAMES_FILENAME = s
+
+	//
+	Name = "FILE_PERMISSIONS"
+	s = Getenv(Name, true)
+	x, err := strconv.Atoi(s)
+	if err != nil {
+		x = 0666
+		log.Error("FILE_PERMISSIONS error: ", err)
+	}
+	Settings.FILE_PERMISSIONS = fs.FileMode(x)
 
 }
 
@@ -111,7 +124,7 @@ func FillFlags() {
 		Settings.PROTOBUF_DIRECTORY = Args[0]
 	}
 	if len(Args) > 1 {
-		Settings.DDL_DIRECTORY = Args[1]
+		Settings.DDL_FILENAME = Args[1]
 	}
 }
 

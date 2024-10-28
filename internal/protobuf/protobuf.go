@@ -4,8 +4,16 @@ import (
 	"fmt"
 	"github.com/ManyakRus/starter/folders"
 	"github.com/ManyakRus/starter/micro"
-	"github.com/tallstoat/pbparser"
+	"github.com/emicklei/proto"
+	"os"
 )
+
+type optionLister struct {
+	proto.NoopVisitor
+}
+
+// messagesAll - хранит все message из всех .proto
+var messagesAll []*proto.Message
 
 // FindProtobufFiles - возвращает список файлов .proto
 func FindProtobufFiles(dir string) ([]string, error) {
@@ -34,8 +42,8 @@ func FindProtobufFiles(dir string) ([]string, error) {
 }
 
 // FindProtobufAll - возвращает массив описания .proto файлов в формате []pbparser.ProtoFile
-func FindProtobufAll(dir string) ([]pbparser.ProtoFile, error) {
-	Otvet := make([]pbparser.ProtoFile, 0)
+func FindProtobufAll(dir string) ([]*proto.Message, error) {
+	Otvet := make([]*proto.Message, 0)
 	var err error
 
 	//найдём все файлы .proto
@@ -51,13 +59,28 @@ func FindProtobufAll(dir string) ([]pbparser.ProtoFile, error) {
 
 	//пропарсим файлы
 	for _, File := range Files {
-		ProtoFile, err := pbparser.ParseFile(File)
+		reader, err := os.Open(File)
+		defer reader.Close()
 		if err != nil {
-			err = fmt.Errorf("ParseFile(%s) error: %w", File, err)
+			err = fmt.Errorf("Open(%s) error: %w", File, err)
 			return Otvet, err
 		}
-		Otvet = append(Otvet, ProtoFile)
+
+		parser := proto.NewParser(reader)
+		definition, _ := parser.Parse()
+
+		proto.Walk(definition,
+			proto.WithMessage(handleMessage))
+
 	}
 
 	return Otvet, err
+}
+
+func handleMessage(m *proto.Message) {
+	lister := new(optionLister)
+	for _, each := range m.Elements {
+		each.Accept(lister)
+	}
+	fmt.Println(m.Name)
 }

@@ -4,38 +4,49 @@ import (
 	"fmt"
 	"github.com/ManyakRus/ddl_from_protobuf/internal/config"
 	"github.com/ManyakRus/starter/log"
+	"github.com/ManyakRus/starter/micro"
 	"github.com/tallstoat/pbparser"
+	"os"
 	"strings"
 )
 
 // StartAll - создание всех файлов ddl .sql
 func StartAll(Settings *config.SettingsINI, MassProto []pbparser.ProtoFile) {
+	var err error
 
 	FillMapMessages(Settings, MassProto)
 	FillMapEnums(Settings, MassProto)
 
 	//создадим 1 общий текст SQL
 	TextSQL := ""
-	for _, proto1 := range MassProto {
-		TextSQL1, err := Start1(Settings, proto1, TextSQL)
-		if err != nil {
-			err = fmt.Errorf("Start1() error: %w", err)
-			log.Panic(err)
-		}
-		TextSQL = TextSQL + TextSQL1
+	//for _, proto1 := range MassProto {
+	TextSQL1, err := Start1(Settings)
+	if err != nil {
+		err = fmt.Errorf("Start1() error: %w", err)
+		log.Panic(err)
 	}
+	TextSQL = TextSQL + TextSQL1 + "\n"
+	//}
 
 	//запишем в файл
+	Filename := Settings.DDL_FILENAME
+	err = os.WriteFile(Filename, []byte(TextSQL), config.Settings.FILE_PERMISSIONS)
+	if err != nil {
+		err = fmt.Errorf("WriteFile() filename: %s error: %w", Filename, err)
+		log.Panic(err)
+	}
+
 }
 
 // Start1 - создание много файлов ddl .sql, для одного .proto
 // возвращает текст SQL для одного .proto
-func Start1(Settings *config.SettingsINI, Proto pbparser.ProtoFile, TextSQL string) (string, error) {
+func Start1(Settings *config.SettingsINI) (string, error) {
 	Otvet := ""
 	var err error
 
-	//
-	for _, message1 := range Settings.MapMessages {
+	//отсортированно
+	MassMessages := micro.MassFrom_Map(Settings.MapMessages)
+	for _, message1 := range MassMessages {
 		Otvet1, err := CreateFiles_Message(Settings, message1)
 		if err != nil {
 			err = fmt.Errorf("CreateFiles_Message(%s) error: %w", message1.Name, err)
@@ -44,8 +55,9 @@ func Start1(Settings *config.SettingsINI, Proto pbparser.ProtoFile, TextSQL stri
 		Otvet = Otvet + Otvet1
 	}
 
-	//
-	for _, enum1 := range Settings.MapEnums {
+	//отсортированно
+	MassEnums := micro.MassFrom_Map(Settings.MapEnums)
+	for _, enum1 := range MassEnums {
 		Otvet1, err := CreateFiles_Enum(Settings, enum1)
 		if err != nil {
 			err = fmt.Errorf("CreateFiles_Enum(%s) error: %w", enum1.Name, err)
@@ -62,6 +74,11 @@ func CreateFiles_Message(Settings *config.SettingsINI, message1 pbparser.Message
 	Otvet := ""
 	var err error
 
+	//сообщения с 1 полем не нужны
+	if len(message1.Fields) <= 1 {
+		return Otvet, err
+	}
+
 	TableName := message1.Name
 	TableComments := message1.Documentation
 
@@ -72,7 +89,7 @@ CREATE TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" (
 `
 	Otvet = Otvet + Settings.ColumnsEveryTable
 
-	TextPrimaryKey := ""
+	IdentifierName := ""
 
 	//fields
 	for _, field1 := range message1.Fields {
@@ -98,13 +115,18 @@ CREATE TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" (
 		//добавим колонку
 		Otvet = Otvet + "\t" + `"` + FieldName + `"` + " " + SQLType + " " + TextNullable + ",\n"
 
-		if IsIdentifier {
-			TextPrimaryKey = TextPrimaryKey + "\t" + "CONSTRAINT " + TableName + "_pk PRIMARY KEY (" + FieldName + "),\n"
+		//добавим PRIMARY KEY
+		if IsIdentifier == true {
+			IdentifierName = FieldName
 		}
 	}
 
+	if IdentifierName != "" {
+		TextPrimaryKey := "\t" + "CONSTRAINT " + TableName + "_pk PRIMARY KEY (" + IdentifierName + "),\n"
+		Otvet = Otvet + TextPrimaryKey
+	}
+
 	//PRIMARY KEY
-	Otvet = Otvet + TextPrimaryKey
 
 	//добавим CONSTRAINT
 	for _, field1 := range message1.Fields {
@@ -115,7 +137,7 @@ CREATE TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" (
 		}
 
 		ForignTableName, ForeignTableColumnName := FindForignTableNameAndColumnName(Settings, field1)
-		if ForignTableName != "" {
+		if ForignTableName != "" && ForeignTableColumnName != "" {
 			Otvet = Otvet + "\t" + "CONSTRAINT " + TableName + "_" + FieldName + "_fk FOREIGN KEY (" + FieldName + ") REFERENCES " + Settings.DB_SCHEMA_NAME + "." + ForignTableName + " (" + ForeignTableColumnName + ")" + ",\n"
 		}
 	}
@@ -265,7 +287,7 @@ func FillMapMessages(Settings *config.SettingsINI, MassProto []pbparser.ProtoFil
 		for _, message1 := range proto1.Messages {
 			_, ok := MapMessages[message1.Name]
 			if ok == true {
-				//log.Warnf("warning: message %s already exists", message1.Name)
+				log.Warnf("warning: message %s already exists", message1.Name)
 			}
 			MapMessages[message1.Name] = message1
 		}
@@ -319,3 +341,5 @@ func Find_ID_Name_from_Fields(Settings *config.SettingsINI, Fields []pbparser.Fi
 
 	return Otvet
 }
+
+// MapMessages           map[string]pbparser.MessageElement
