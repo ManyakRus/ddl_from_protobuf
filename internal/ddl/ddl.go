@@ -66,7 +66,7 @@ func Start1(Settings *config.SettingsINI) (string, error) {
 			err = fmt.Errorf("CreateFiles_Message(%s) error: %w", message1.Name, err)
 			return Otvet, err
 		}
-		Otvet = Otvet + Otvet1 + "\n"
+		Otvet = Otvet + Otvet1
 	}
 
 	return Otvet, err

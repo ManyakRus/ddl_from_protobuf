@@ -29,12 +29,12 @@ CREATE TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" (
 	Name_Name := "name"
 	Name_SQL_Type := "text"
 	//
-	Otvet = Otvet + "\t" + `"` + ID_Name + `"` + " " + ID_SQL_TYPE + " " + ",\n"
-	Otvet = Otvet + "\t" + `"` + Name_Name + `"` + " " + Name_SQL_Type + " " + ",\n"
+	Otvet = Otvet + "\t" + `"` + ID_Name + `"` + " " + ID_SQL_TYPE + "" + ",\n"
+	Otvet = Otvet + "\t" + `"` + Name_Name + `"` + " " + Name_SQL_Type + "" + ",\n"
 
 	//
 	TextPrimaryKey := "\t" + "CONSTRAINT " + TableName + "_pk PRIMARY KEY (" + ID_Name + ")\n"
-	Otvet = Otvet + TextPrimaryKey + "\n)\n"
+	Otvet = Otvet + TextPrimaryKey + ");\n"
 
 	//CREATE INDEX
 	Otvet = Otvet + "CREATE INDEX " + TableName + "_" + ID_Name + "_idx ON " + Settings.DB_SCHEMA_NAME + "." + TableName + " USING btree (" + ID_Name + ");" + "\n"
@@ -43,11 +43,18 @@ CREATE TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" (
 	Otvet = Otvet + `COMMENT ON TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" IS '` + TableComments + `';` + "\n"
 
 	//insert
-	for _, constant1 := range enum1.EnumConstants {
+	Otvet = Otvet + "INSERT INTO \" + TableName + \"(id, name) VALUES\n"
+	//Otvet1 := ""
+	Comma := ","
+	len1 := len(enum1.EnumConstants)
+	for i, constant1 := range enum1.EnumConstants {
 		ID := constant1.ID
 		sID := strconv.Itoa(ID)
 		Name := constant1.Name
-		Otvet1 := "INSERT INTO " + TableName + "(id, name) VALUES (" + sID + ", '" + Name + "');\n"
+		if i == len1-1 {
+			Comma = ";"
+		}
+		Otvet1 := "(" + sID + ", '" + Name + "')" + Comma + "\n"
 
 		//добавим колонку
 		Otvet = Otvet + Otvet1
