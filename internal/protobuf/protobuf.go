@@ -120,7 +120,7 @@ func handleMessage(m *proto.Message) {
 	Message1.Name = m.Name
 	Message1.Documentation = documentation
 
-	MassFields := make([]types.FieldElement, 0)
+	MassFields := make([]*types.FieldElement, 0)
 
 	// цикл по полям message
 	for _, field1 := range m.Elements {
@@ -156,7 +156,7 @@ func handleMessage(m *proto.Message) {
 		Field.Repeated = NormalField.Repeated
 		Field.Required = NormalField.Required
 		Field.Options = Options
-		MassFields = append(MassFields, Field)
+		MassFields = append(MassFields, &Field)
 
 	}
 	Message1.Fields = MassFields
@@ -177,7 +177,7 @@ func handleEnum(e *proto.Enum) {
 	Enum1.Name = e.Name
 	Enum1.Documentation = documentation
 
-	MassConstants := make([]types.EnumConstantElement, 0)
+	MassConstants := make([]*types.EnumConstantElement, 0)
 
 	// цикл по полям message
 	for _, constant1 := range e.Elements {
@@ -201,7 +201,7 @@ func handleEnum(e *proto.Enum) {
 		Field.Name = EnumField.Name
 		Field.Documentation = documentation
 		Field.ID = EnumField.Integer
-		MassConstants = append(MassConstants, Field)
+		MassConstants = append(MassConstants, &Field)
 
 	}
 	Enum1.EnumConstants = MassConstants

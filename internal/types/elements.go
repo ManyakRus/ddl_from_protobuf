@@ -15,7 +15,7 @@ type OptionElement struct {
 type EnumConstantElement struct {
 	Name          string
 	Documentation string
-	Options       []OptionElement
+	Options       []*OptionElement
 	//Tag           int
 	ID int
 }
@@ -27,8 +27,8 @@ type EnumElement struct {
 	Name          string
 	QualifiedName string
 	Documentation string
-	Options       []OptionElement
-	EnumConstants []EnumConstantElement
+	Options       []*OptionElement
+	EnumConstants []*EnumConstantElement
 }
 
 // RPCElement is a datastructure which models
@@ -106,9 +106,9 @@ type MessageElement struct {
 	Name string
 	//QualifiedName      string
 	Documentation string
-	Options       []OptionElement
-	Fields        []FieldElement
-	Enums         []EnumElement
+	Options       []*OptionElement
+	Fields        []*FieldElement
+	Enums         []*EnumElement
 	//MapMessages           []MessageElement
 	//OneOfs             []OneOfElement
 	//ExtendDeclarations []ExtendElement

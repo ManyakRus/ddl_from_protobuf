@@ -110,8 +110,8 @@ CREATE TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" (
 		TextNullable := TextNullable(isNullabe)
 		//Comments := field1.Documentation
 		FieldName := FindFieldName(field1)
-		IsIdentifier := IsIdentifierField(field1)
-		isFoundID = isFoundID || IsIdentifier
+		//IsIdentifier := IsIdentifierField(field1)
+		//isFoundID = isFoundID || IsIdentifier
 
 		//добавим колонку
 		Otvet = Otvet + "\t" + `"` + FieldName + `"` + " " + SQLType + " " + TextNullable + ",\n"
@@ -127,6 +127,7 @@ CREATE TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" (
 	if IdentifierName != "" {
 		TextPrimaryKey := "\t" + "CONSTRAINT " + TableName + "_pk PRIMARY KEY (" + IdentifierName + "),\n"
 		Otvet = Otvet + TextPrimaryKey
+		isFoundID = true
 	}
 
 	//добавим CONSTRAINT
@@ -189,7 +190,7 @@ func CreateFiles_Enum(Settings *config.SettingsINI, enum1 *types.EnumElement) (s
 }
 
 // IsNullableField - возвращает true, если поле nullable
-func IsNullableField(Field types.FieldElement) bool {
+func IsNullableField(Field *types.FieldElement) bool {
 	Otvet := false
 
 	TypeName := Field.Type
@@ -220,7 +221,7 @@ func IsTimestampType(stype string) bool {
 }
 
 // IsIdentifierField - возвращает true, если поле ИД
-func IsIdentifierField(Field types.FieldElement) bool {
+func IsIdentifierField(Field *types.FieldElement) bool {
 	Otvet := false
 
 	//
@@ -250,7 +251,7 @@ func TextNullable(IsNullable bool) string {
 }
 
 // FindFieldName - возвращает имя поля
-func FindFieldName(field1 types.FieldElement) string {
+func FindFieldName(field1 *types.FieldElement) string {
 	Otvet := field1.Name
 
 	IsIdentifierField := IsIdentifierField(field1)
@@ -273,7 +274,7 @@ func AddText_id(Text string) string {
 }
 
 // FindForignTableNameAndColumnName - возвращает имя таблицы и столбца внешней связанной таблицы
-func FindForignTableNameAndColumnName(Settings *config.SettingsINI, Field types.FieldElement) (ForignTableName string, ForignTableColumnName string) {
+func FindForignTableNameAndColumnName(Settings *config.SettingsINI, Field *types.FieldElement) (ForignTableName string, ForignTableColumnName string) {
 
 	//ИД
 	if Field.TypeSQL != "" {
@@ -326,14 +327,14 @@ func FindForignTableNameAndColumnName(Settings *config.SettingsINI, Field types.
 //}
 
 // Find_ID_from_Fields - возвращает колонку с идентификатором таблицы (ID), или nil
-func Find_ID_from_Fields(Settings *config.SettingsINI, Fields []types.FieldElement) *types.FieldElement {
+func Find_ID_from_Fields(Settings *config.SettingsINI, Fields []*types.FieldElement) *types.FieldElement {
 	var Otvet *types.FieldElement
 
 	MassIndexNames := Settings.MassIndexNames
 	for _, IndexName1 := range MassIndexNames {
 		for _, Field1 := range Fields {
 			if Field1.Name == IndexName1 {
-				Otvet = &Field1
+				Otvet = Field1
 				return Otvet
 			}
 		}
@@ -343,7 +344,7 @@ func Find_ID_from_Fields(Settings *config.SettingsINI, Fields []types.FieldEleme
 }
 
 // Find_ID_Name_from_Fields - возвращает имя колонки с идентификатором таблицы (ID)
-func Find_ID_Name_from_Fields(Settings *config.SettingsINI, Fields []types.FieldElement) string {
+func Find_ID_Name_from_Fields(Settings *config.SettingsINI, Fields []*types.FieldElement) string {
 	Otvet := ""
 
 	Field1 := Find_ID_from_Fields(Settings, Fields)

@@ -20,10 +20,10 @@ func StartAll(Settings *config.SettingsINI) {
 	}
 
 	//
-	ddl.StartAll(Settings, Proto)
+	FillTypeSQL(Settings, &Proto)
 
 	//
-	FillTypeSQL(Settings, &Proto)
+	ddl.StartAll(Settings, Proto)
 }
 
 // FillTypeSQL - заполняет типы SQL в структуре Proto.MapMessages.Fields
