@@ -23,14 +23,14 @@ func StartAll(Settings *config.SettingsINI) {
 	}
 	Settings.MapMappings = MapMappings
 
-	//ColumnsEveryTable
+	//TextEveryTableColumns
 	Filename = dir + Settings.CONFIG_DIRECTORY_NAME + micro.SeparatorFile() + constants.COLUMNS_EVERY_TABLE_FILENAME
 	s, err := LoadColumnsEveryTable(Filename)
 	if err != nil {
 		err = fmt.Errorf("LoadMappings(%s) error: %w", Filename, err)
 		log.Panic(err)
 	}
-	Settings.ColumnsEveryTable = s
+	Settings.TextEveryTableColumns = s
 
 	//MassIndexNames
 	Filename = dir + Settings.CONFIG_DIRECTORY_NAME + micro.SeparatorFile() + Settings.INDEX_NAMES_FILENAME

@@ -3,19 +3,21 @@ package ddl
 import (
 	"fmt"
 	"github.com/ManyakRus/ddl_from_protobuf/internal/config"
+	"github.com/ManyakRus/ddl_from_protobuf/internal/types"
 	"github.com/ManyakRus/starter/log"
 	"github.com/ManyakRus/starter/micro"
-	"github.com/tallstoat/pbparser"
 	"os"
 	"strings"
 )
 
 // StartAll - создание всех файлов ddl .sql
-func StartAll(Settings *config.SettingsINI, MassProto []pbparser.ProtoFile) {
+func StartAll(Settings *config.SettingsINI, Proto types.ProtoAll) {
 	var err error
 
-	FillMapMessages(Settings, MassProto)
-	FillMapEnums(Settings, MassProto)
+	//FillMapMessages(Settings, MassProto)
+	//FillMapEnums(Settings, MassProto)
+
+	Settings.MapMessages = Proto.MapMessages
 
 	//создадим 1 общий текст SQL
 	TextSQL := ""
@@ -38,7 +40,7 @@ func StartAll(Settings *config.SettingsINI, MassProto []pbparser.ProtoFile) {
 
 }
 
-// Start1 - создание много файлов ddl .sql, для одного .proto
+// Start1 - создание 1 файл ddl .sql, для одного .proto
 // возвращает текст SQL для одного .proto
 func Start1(Settings *config.SettingsINI) (string, error) {
 	Otvet := ""
@@ -52,7 +54,7 @@ func Start1(Settings *config.SettingsINI) (string, error) {
 			err = fmt.Errorf("CreateFiles_Message(%s) error: %w", message1.Name, err)
 			return Otvet, err
 		}
-		Otvet = Otvet + Otvet1
+		Otvet = Otvet + Otvet1 + "\n"
 	}
 
 	//отсортированно
@@ -63,14 +65,14 @@ func Start1(Settings *config.SettingsINI) (string, error) {
 			err = fmt.Errorf("CreateFiles_Enum(%s) error: %w", enum1.Name, err)
 			return Otvet, err
 		}
-		Otvet = Otvet + Otvet1
+		Otvet = Otvet + Otvet1 + "\n"
 	}
 
 	return Otvet, err
 }
 
 // CreateFiles_Message - создание одного файла ddl .sql, для message
-func CreateFiles_Message(Settings *config.SettingsINI, message1 pbparser.MessageElement) (string, error) {
+func CreateFiles_Message(Settings *config.SettingsINI, message1 *types.MessageElement) (string, error) {
 	Otvet := ""
 	var err error
 
@@ -87,22 +89,21 @@ func CreateFiles_Message(Settings *config.SettingsINI, message1 pbparser.Message
 	Otvet = `
 CREATE TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" (
 `
-	Otvet = Otvet + Settings.ColumnsEveryTable
+	Otvet = Otvet + Settings.TextEveryTableColumns
 
 	IdentifierName := ""
 
 	//fields
 	for _, field1 := range message1.Fields {
-		FieldType := field1.Type.Name()
+		FieldType := field1.Type
 		SQLType := FieldType
 		MapMappings1, ok := Settings.MapMappings[FieldType]
-		Category := field1.Type.Category()
-		if Category == pbparser.ScalarDataTypeCategory {
-			if ok == false {
-				err = fmt.Errorf("MapMappings() error: not found field type: %s", FieldType)
-				log.Error(err)
-				return Otvet, err
-			}
+		//Category := field1.Type
+		if ok == false {
+			//err = fmt.Errorf("MapMappings() error: not found field type: %s", FieldType)
+			//log.Error(err)
+			//return Otvet, err
+		} else {
 			SQLType = MapMappings1.SQLType
 		}
 		isNullabe := IsNullableField(field1)
@@ -116,17 +117,17 @@ CREATE TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" (
 		Otvet = Otvet + "\t" + `"` + FieldName + `"` + " " + SQLType + " " + TextNullable + ",\n"
 
 		//добавим PRIMARY KEY
-		if IsIdentifier == true {
-			IdentifierName = FieldName
-		}
+		//if IsIdentifier == true {
+		//	IdentifierName = FieldName
+		//}
 	}
 
+	//PRIMARY KEY
+	IdentifierName = Find_ID_Name_from_Fields(Settings, message1.Fields)
 	if IdentifierName != "" {
 		TextPrimaryKey := "\t" + "CONSTRAINT " + TableName + "_pk PRIMARY KEY (" + IdentifierName + "),\n"
 		Otvet = Otvet + TextPrimaryKey
 	}
-
-	//PRIMARY KEY
 
 	//добавим CONSTRAINT
 	for _, field1 := range message1.Fields {
@@ -180,7 +181,7 @@ CREATE TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" (
 }
 
 // CreateFiles_Enum - создание одного файла ddl .sql, для enum
-func CreateFiles_Enum(Settings *config.SettingsINI, message1 pbparser.EnumElement) (string, error) {
+func CreateFiles_Enum(Settings *config.SettingsINI, enum1 *types.EnumElement) (string, error) {
 	Otvet := ""
 	var err error
 
@@ -188,10 +189,10 @@ func CreateFiles_Enum(Settings *config.SettingsINI, message1 pbparser.EnumElemen
 }
 
 // IsNullableField - возвращает true, если поле nullable
-func IsNullableField(Field pbparser.FieldElement) bool {
+func IsNullableField(Field types.FieldElement) bool {
 	Otvet := false
 
-	TypeName := Field.Type.Name()
+	TypeName := Field.Type
 
 	//Дата
 	if TypeName == "google.protobuf.Timestamp" {
@@ -208,14 +209,27 @@ func IsNullableField(Field pbparser.FieldElement) bool {
 	return Otvet
 }
 
+// IsTimestampType - возвращает true, если тип timestamp
+func IsTimestampType(stype string) bool {
+
+	if stype == "google.protobuf.Timestamp" {
+		return true
+	}
+
+	return false
+}
+
 // IsIdentifierField - возвращает true, если поле ИД
-func IsIdentifierField(Field pbparser.FieldElement) bool {
+func IsIdentifierField(Field types.FieldElement) bool {
 	Otvet := false
 
-	Category := Field.Type.Category()
+	//
+	if IsTimestampType(Field.Type) == true {
+		return Otvet
+	}
 
 	//ИД
-	if Category == pbparser.NamedDataTypeCategory {
+	if Field.TypeSQL == "" {
 		Otvet = true
 		return Otvet
 	}
@@ -236,7 +250,7 @@ func TextNullable(IsNullable bool) string {
 }
 
 // FindFieldName - возвращает имя поля
-func FindFieldName(field1 pbparser.FieldElement) string {
+func FindFieldName(field1 types.FieldElement) string {
 	Otvet := field1.Name
 
 	IsIdentifierField := IsIdentifierField(field1)
@@ -251,7 +265,7 @@ func FindFieldName(field1 pbparser.FieldElement) string {
 func AddText_id(Text string) string {
 	Otvet := Text
 
-	if strings.HasSuffix(Otvet, "_id") == true {
+	if strings.HasSuffix(Otvet, "_id") == false {
 		Otvet = Otvet + "_id"
 	}
 
@@ -259,16 +273,14 @@ func AddText_id(Text string) string {
 }
 
 // FindForignTableNameAndColumnName - возвращает имя таблицы и столбца внешней связанной таблицы
-func FindForignTableNameAndColumnName(Settings *config.SettingsINI, Field pbparser.FieldElement) (ForignTableName string, ForignTableColumnName string) {
-
-	Category := Field.Type.Category()
+func FindForignTableNameAndColumnName(Settings *config.SettingsINI, Field types.FieldElement) (ForignTableName string, ForignTableColumnName string) {
 
 	//ИД
-	if Category != pbparser.NamedDataTypeCategory {
+	if Field.TypeSQL != "" {
 		return
 	}
 
-	ForignTableName = Field.Type.Name()
+	ForignTableName = Field.Type
 
 	Map1, ok := Settings.MapMessages[ForignTableName]
 	if ok == false {
@@ -279,43 +291,43 @@ func FindForignTableNameAndColumnName(Settings *config.SettingsINI, Field pbpars
 	return
 }
 
-// FillMapMessages - создаёт единый map messages
-func FillMapMessages(Settings *config.SettingsINI, MassProto []pbparser.ProtoFile) {
-
-	MapMessages := make(map[string]pbparser.MessageElement)
-	for _, proto1 := range MassProto {
-		for _, message1 := range proto1.Messages {
-			_, ok := MapMessages[message1.Name]
-			if ok == true {
-				log.Warnf("warning: message %s already exists", message1.Name)
-			}
-			MapMessages[message1.Name] = message1
-		}
-	}
-	Settings.MapMessages = MapMessages
-
-}
-
-// FillMapEnums - создаёт единый map enums
-func FillMapEnums(Settings *config.SettingsINI, MassProto []pbparser.ProtoFile) {
-
-	MapEnums := make(map[string]pbparser.EnumElement)
-	for _, proto1 := range MassProto {
-		for _, enum1 := range proto1.Enums {
-			_, ok := MapEnums[enum1.Name]
-			if ok == true {
-				//log.Warnf("warning: enum %s already exists", enum1.Name)
-			}
-			MapEnums[enum1.Name] = enum1
-		}
-	}
-	Settings.MapEnums = MapEnums
-
-}
+//// FillMapMessages - создаёт единый map messages
+//func FillMapMessages(Settings *config.SettingsINI, MassProto []types.ProtoAll) {
+//
+//	MapMessages := make(map[string]pbparser.MessageElement)
+//	for _, proto1 := range MassProto {
+//		for _, message1 := range proto1.MapMessages {
+//			_, ok := MapMessages[message1.Name]
+//			if ok == true {
+//				log.Warnf("warning: message %s already exists", message1.Name)
+//			}
+//			MapMessages[message1.Name] = message1
+//		}
+//	}
+//	Settings.MapMessages = MapMessages
+//
+//}
+//
+//// FillMapEnums - создаёт единый map enums
+//func FillMapEnums(Settings *config.SettingsINI, MassProto []types.ProtoAll) {
+//
+//	MapEnums := make(map[string]pbparser.EnumElement)
+//	for _, proto1 := range MassProto {
+//		for _, enum1 := range proto1.MapEnums {
+//			_, ok := MapEnums[enum1.Name]
+//			if ok == true {
+//				//log.Warnf("warning: enum %s already exists", enum1.Name)
+//			}
+//			MapEnums[enum1.Name] = enum1
+//		}
+//	}
+//	Settings.MapEnums = MapEnums
+//
+//}
 
 // Find_ID_from_Fields - возвращает колонку с идентификатором таблицы (ID), или nil
-func Find_ID_from_Fields(Settings *config.SettingsINI, Fields []pbparser.FieldElement) *pbparser.FieldElement {
-	var Otvet *pbparser.FieldElement
+func Find_ID_from_Fields(Settings *config.SettingsINI, Fields []types.FieldElement) *types.FieldElement {
+	var Otvet *types.FieldElement
 
 	MassIndexNames := Settings.MassIndexNames
 	for _, IndexName1 := range MassIndexNames {
@@ -331,7 +343,7 @@ func Find_ID_from_Fields(Settings *config.SettingsINI, Fields []pbparser.FieldEl
 }
 
 // Find_ID_Name_from_Fields - возвращает имя колонки с идентификатором таблицы (ID)
-func Find_ID_Name_from_Fields(Settings *config.SettingsINI, Fields []pbparser.FieldElement) string {
+func Find_ID_Name_from_Fields(Settings *config.SettingsINI, Fields []types.FieldElement) string {
 	Otvet := ""
 
 	Field1 := Find_ID_from_Fields(Settings, Fields)
@@ -341,5 +353,3 @@ func Find_ID_Name_from_Fields(Settings *config.SettingsINI, Fields []pbparser.Fi
 
 	return Otvet
 }
-
-// MapMessages           map[string]pbparser.MessageElement

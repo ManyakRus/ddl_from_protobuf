@@ -2,8 +2,8 @@ package config
 
 import (
 	"github.com/ManyakRus/ddl_from_protobuf/internal/load_configs/load_configs_mapping"
+	"github.com/ManyakRus/ddl_from_protobuf/internal/types"
 	"github.com/ManyakRus/starter/log"
-	"github.com/tallstoat/pbparser"
 	"io/fs"
 	"os"
 	"strconv"
@@ -20,10 +20,10 @@ type SettingsINI struct {
 	DDL_FILENAME          string
 	CONFIG_DIRECTORY_NAME string
 	MapMappings           map[string]load_configs_mapping.SQLMapping
-	ColumnsEveryTable     string
+	TextEveryTableColumns string
 	DB_SCHEMA_NAME        string
-	MapMessages           map[string]pbparser.MessageElement
-	MapEnums              map[string]pbparser.EnumElement
+	MapMessages           map[string]*types.MessageElement
+	MapEnums              map[string]*types.EnumElement
 	MassIndexNames        []string
 	INDEX_NAMES_FILENAME  string
 	FILE_PERMISSIONS      fs.FileMode //= 0666
@@ -33,8 +33,8 @@ type SettingsINI struct {
 func CreateSettings() SettingsINI {
 	Otvet := SettingsINI{}
 	Otvet.MapMappings = make(map[string]load_configs_mapping.SQLMapping)
-	Otvet.MapMessages = make(map[string]pbparser.MessageElement)
-	Otvet.MapEnums = make(map[string]pbparser.EnumElement)
+	Otvet.MapMessages = make(map[string]*types.MessageElement)
+	Otvet.MapEnums = make(map[string]*types.EnumElement)
 	Otvet.MassIndexNames = make([]string, 0)
 	return Otvet
 }

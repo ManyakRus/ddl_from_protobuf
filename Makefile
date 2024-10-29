@@ -21,8 +21,6 @@ mod:
 build:
 	clear
 	go build -race -o $(FILEAPP) $(FILEMAIN)
-	cd ./cmd && \
-	./VersionToFile.py
 	cp $(FILEAPP) $(GOPATH)/bin
 lint:
 	clear
