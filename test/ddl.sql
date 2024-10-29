@@ -1,4 +1,583 @@
 
+CREATE TABLE "public"."AccessLevel" (
+	"id" int64 ,
+	"name" text ,
+	CONSTRAINT AccessLevel_pk PRIMARY KEY (id)
+
+)
+	CREATE INDEX AccessLevel_id_idx ON public.AccessLevel USING btree (id);
+	COMMENT ON TABLE "public"."AccessLevel" IS 'Уровень доступа к счёту.';
+	INSERT INTO AccessLevel(id, name) VALUES (0, 'ACCOUNT_ACCESS_LEVEL_UNSPECIFIED');
+	INSERT INTO AccessLevel(id, name) VALUES (1, 'ACCOUNT_ACCESS_LEVEL_FULL_ACCESS');
+	INSERT INTO AccessLevel(id, name) VALUES (2, 'ACCOUNT_ACCESS_LEVEL_READ_ONLY');
+	INSERT INTO AccessLevel(id, name) VALUES (3, 'ACCOUNT_ACCESS_LEVEL_NO_ACCESS');
+
+
+CREATE TABLE "public"."AccountStatus" (
+	"id" int64 ,
+	"name" text ,
+	CONSTRAINT AccountStatus_pk PRIMARY KEY (id)
+
+)
+	CREATE INDEX AccountStatus_id_idx ON public.AccountStatus USING btree (id);
+	COMMENT ON TABLE "public"."AccountStatus" IS 'Статус счёта.';
+	INSERT INTO AccountStatus(id, name) VALUES (0, 'ACCOUNT_STATUS_UNSPECIFIED');
+	INSERT INTO AccountStatus(id, name) VALUES (1, 'ACCOUNT_STATUS_NEW');
+	INSERT INTO AccountStatus(id, name) VALUES (2, 'ACCOUNT_STATUS_OPEN');
+	INSERT INTO AccountStatus(id, name) VALUES (3, 'ACCOUNT_STATUS_CLOSED');
+
+
+CREATE TABLE "public"."AccountType" (
+	"id" int64 ,
+	"name" text ,
+	CONSTRAINT AccountType_pk PRIMARY KEY (id)
+
+)
+	CREATE INDEX AccountType_id_idx ON public.AccountType USING btree (id);
+	COMMENT ON TABLE "public"."AccountType" IS 'Тип счёта.';
+	INSERT INTO AccountType(id, name) VALUES (0, 'ACCOUNT_TYPE_UNSPECIFIED');
+	INSERT INTO AccountType(id, name) VALUES (1, 'ACCOUNT_TYPE_TINKOFF');
+	INSERT INTO AccountType(id, name) VALUES (2, 'ACCOUNT_TYPE_TINKOFF_IIS');
+	INSERT INTO AccountType(id, name) VALUES (3, 'ACCOUNT_TYPE_INVEST_BOX');
+
+
+CREATE TABLE "public"."AssetType" (
+	"id" int64 ,
+	"name" text ,
+	CONSTRAINT AssetType_pk PRIMARY KEY (id)
+
+)
+	CREATE INDEX AssetType_id_idx ON public.AssetType USING btree (id);
+	COMMENT ON TABLE "public"."AssetType" IS 'Тип актива.';
+	INSERT INTO AssetType(id, name) VALUES (0, 'ASSET_TYPE_UNSPECIFIED');
+	INSERT INTO AssetType(id, name) VALUES (1, 'ASSET_TYPE_CURRENCY');
+	INSERT INTO AssetType(id, name) VALUES (2, 'ASSET_TYPE_COMMODITY');
+	INSERT INTO AssetType(id, name) VALUES (3, 'ASSET_TYPE_INDEX');
+	INSERT INTO AssetType(id, name) VALUES (4, 'ASSET_TYPE_SECURITY');
+
+
+CREATE TABLE "public"."CandleInterval" (
+	"id" int64 ,
+	"name" text ,
+	CONSTRAINT CandleInterval_pk PRIMARY KEY (id)
+
+)
+	CREATE INDEX CandleInterval_id_idx ON public.CandleInterval USING btree (id);
+	COMMENT ON TABLE "public"."CandleInterval" IS 'Интервал свечей.';
+	INSERT INTO CandleInterval(id, name) VALUES (0, 'CANDLE_INTERVAL_UNSPECIFIED');
+	INSERT INTO CandleInterval(id, name) VALUES (1, 'CANDLE_INTERVAL_1_MIN');
+	INSERT INTO CandleInterval(id, name) VALUES (2, 'CANDLE_INTERVAL_5_MIN');
+	INSERT INTO CandleInterval(id, name) VALUES (3, 'CANDLE_INTERVAL_15_MIN');
+	INSERT INTO CandleInterval(id, name) VALUES (4, 'CANDLE_INTERVAL_HOUR');
+	INSERT INTO CandleInterval(id, name) VALUES (5, 'CANDLE_INTERVAL_DAY');
+	INSERT INTO CandleInterval(id, name) VALUES (6, 'CANDLE_INTERVAL_2_MIN');
+	INSERT INTO CandleInterval(id, name) VALUES (7, 'CANDLE_INTERVAL_3_MIN');
+	INSERT INTO CandleInterval(id, name) VALUES (8, 'CANDLE_INTERVAL_10_MIN');
+	INSERT INTO CandleInterval(id, name) VALUES (9, 'CANDLE_INTERVAL_30_MIN');
+	INSERT INTO CandleInterval(id, name) VALUES (10, 'CANDLE_INTERVAL_2_HOUR');
+	INSERT INTO CandleInterval(id, name) VALUES (11, 'CANDLE_INTERVAL_4_HOUR');
+	INSERT INTO CandleInterval(id, name) VALUES (12, 'CANDLE_INTERVAL_WEEK');
+	INSERT INTO CandleInterval(id, name) VALUES (13, 'CANDLE_INTERVAL_MONTH');
+
+
+CREATE TABLE "public"."CouponType" (
+	"id" int64 ,
+	"name" text ,
+	CONSTRAINT CouponType_pk PRIMARY KEY (id)
+
+)
+	CREATE INDEX CouponType_id_idx ON public.CouponType USING btree (id);
+	COMMENT ON TABLE "public"."CouponType" IS 'Тип купонов.';
+	INSERT INTO CouponType(id, name) VALUES (0, 'COUPON_TYPE_UNSPECIFIED');
+	INSERT INTO CouponType(id, name) VALUES (1, 'COUPON_TYPE_CONSTANT');
+	INSERT INTO CouponType(id, name) VALUES (2, 'COUPON_TYPE_FLOATING');
+	INSERT INTO CouponType(id, name) VALUES (3, 'COUPON_TYPE_DISCOUNT');
+	INSERT INTO CouponType(id, name) VALUES (4, 'COUPON_TYPE_MORTGAGE');
+	INSERT INTO CouponType(id, name) VALUES (5, 'COUPON_TYPE_FIX');
+	INSERT INTO CouponType(id, name) VALUES (6, 'COUPON_TYPE_VARIABLE');
+	INSERT INTO CouponType(id, name) VALUES (7, 'COUPON_TYPE_OTHER');
+
+
+CREATE TABLE "public"."CurrencyRequest" (
+	"id" int64 ,
+	"name" text ,
+	CONSTRAINT CurrencyRequest_pk PRIMARY KEY (id)
+
+)
+	CREATE INDEX CurrencyRequest_id_idx ON public.CurrencyRequest USING btree (id);
+	COMMENT ON TABLE "public"."CurrencyRequest" IS '';
+	INSERT INTO CurrencyRequest(id, name) VALUES (0, 'RUB');
+	INSERT INTO CurrencyRequest(id, name) VALUES (1, 'USD');
+	INSERT INTO CurrencyRequest(id, name) VALUES (2, 'EUR');
+
+
+CREATE TABLE "public"."EditFavoritesActionType" (
+	"id" int64 ,
+	"name" text ,
+	CONSTRAINT EditFavoritesActionType_pk PRIMARY KEY (id)
+
+)
+	CREATE INDEX EditFavoritesActionType_id_idx ON public.EditFavoritesActionType USING btree (id);
+	COMMENT ON TABLE "public"."EditFavoritesActionType" IS 'Тип действия со списком избранных инструментов.';
+	INSERT INTO EditFavoritesActionType(id, name) VALUES (0, 'EDIT_FAVORITES_ACTION_TYPE_UNSPECIFIED');
+	INSERT INTO EditFavoritesActionType(id, name) VALUES (1, 'EDIT_FAVORITES_ACTION_TYPE_ADD');
+	INSERT INTO EditFavoritesActionType(id, name) VALUES (2, 'EDIT_FAVORITES_ACTION_TYPE_DEL');
+
+
+CREATE TABLE "public"."InstrumentIdType" (
+	"id" int64 ,
+	"name" text ,
+	CONSTRAINT InstrumentIdType_pk PRIMARY KEY (id)
+
+)
+	CREATE INDEX InstrumentIdType_id_idx ON public.InstrumentIdType USING btree (id);
+	COMMENT ON TABLE "public"."InstrumentIdType" IS 'Тип идентификатора инструмента. Подробнее об идентификации инструментов: [Идентификация инструментов](https://tinkoff.github.io/investAPI/faq_identification/)';
+	INSERT INTO InstrumentIdType(id, name) VALUES (0, 'INSTRUMENT_ID_UNSPECIFIED');
+	INSERT INTO InstrumentIdType(id, name) VALUES (1, 'INSTRUMENT_ID_TYPE_FIGI');
+	INSERT INTO InstrumentIdType(id, name) VALUES (2, 'INSTRUMENT_ID_TYPE_TICKER');
+	INSERT INTO InstrumentIdType(id, name) VALUES (3, 'INSTRUMENT_ID_TYPE_UID');
+	INSERT INTO InstrumentIdType(id, name) VALUES (4, 'INSTRUMENT_ID_TYPE_POSITION_UID');
+
+
+CREATE TABLE "public"."InstrumentStatus" (
+	"id" int64 ,
+	"name" text ,
+	CONSTRAINT InstrumentStatus_pk PRIMARY KEY (id)
+
+)
+	CREATE INDEX InstrumentStatus_id_idx ON public.InstrumentStatus USING btree (id);
+	COMMENT ON TABLE "public"."InstrumentStatus" IS 'Статус запрашиваемых инструментов.';
+	INSERT INTO InstrumentStatus(id, name) VALUES (0, 'INSTRUMENT_STATUS_UNSPECIFIED');
+	INSERT INTO InstrumentStatus(id, name) VALUES (1, 'INSTRUMENT_STATUS_BASE');
+	INSERT INTO InstrumentStatus(id, name) VALUES (2, 'INSTRUMENT_STATUS_ALL');
+
+
+CREATE TABLE "public"."InstrumentType" (
+	"id" int64 ,
+	"name" text ,
+	CONSTRAINT InstrumentType_pk PRIMARY KEY (id)
+
+)
+	CREATE INDEX InstrumentType_id_idx ON public.InstrumentType USING btree (id);
+	COMMENT ON TABLE "public"."InstrumentType" IS 'Тип инструмента.';
+	INSERT INTO InstrumentType(id, name) VALUES (0, 'INSTRUMENT_TYPE_UNSPECIFIED');
+	INSERT INTO InstrumentType(id, name) VALUES (1, 'INSTRUMENT_TYPE_BOND');
+	INSERT INTO InstrumentType(id, name) VALUES (2, 'INSTRUMENT_TYPE_SHARE');
+	INSERT INTO InstrumentType(id, name) VALUES (3, 'INSTRUMENT_TYPE_CURRENCY');
+	INSERT INTO InstrumentType(id, name) VALUES (4, 'INSTRUMENT_TYPE_ETF');
+	INSERT INTO InstrumentType(id, name) VALUES (5, 'INSTRUMENT_TYPE_FUTURES');
+	INSERT INTO InstrumentType(id, name) VALUES (6, 'INSTRUMENT_TYPE_SP');
+	INSERT INTO InstrumentType(id, name) VALUES (7, 'INSTRUMENT_TYPE_OPTION');
+	INSERT INTO InstrumentType(id, name) VALUES (8, 'INSTRUMENT_TYPE_CLEARING_CERTIFICATE');
+
+
+CREATE TABLE "public"."OperationState" (
+	"id" int64 ,
+	"name" text ,
+	CONSTRAINT OperationState_pk PRIMARY KEY (id)
+
+)
+	CREATE INDEX OperationState_id_idx ON public.OperationState USING btree (id);
+	COMMENT ON TABLE "public"."OperationState" IS 'Статус запрашиваемых операций.';
+	INSERT INTO OperationState(id, name) VALUES (0, 'OPERATION_STATE_UNSPECIFIED');
+	INSERT INTO OperationState(id, name) VALUES (1, 'OPERATION_STATE_EXECUTED');
+	INSERT INTO OperationState(id, name) VALUES (2, 'OPERATION_STATE_CANCELED');
+	INSERT INTO OperationState(id, name) VALUES (3, 'OPERATION_STATE_PROGRESS');
+
+
+CREATE TABLE "public"."OperationType" (
+	"id" int64 ,
+	"name" text ,
+	CONSTRAINT OperationType_pk PRIMARY KEY (id)
+
+)
+	CREATE INDEX OperationType_id_idx ON public.OperationType USING btree (id);
+	COMMENT ON TABLE "public"."OperationType" IS 'Тип операции.';
+	INSERT INTO OperationType(id, name) VALUES (0, 'OPERATION_TYPE_UNSPECIFIED');
+	INSERT INTO OperationType(id, name) VALUES (1, 'OPERATION_TYPE_INPUT');
+	INSERT INTO OperationType(id, name) VALUES (2, 'OPERATION_TYPE_BOND_TAX');
+	INSERT INTO OperationType(id, name) VALUES (3, 'OPERATION_TYPE_OUTPUT_SECURITIES');
+	INSERT INTO OperationType(id, name) VALUES (4, 'OPERATION_TYPE_OVERNIGHT');
+	INSERT INTO OperationType(id, name) VALUES (5, 'OPERATION_TYPE_TAX');
+	INSERT INTO OperationType(id, name) VALUES (6, 'OPERATION_TYPE_BOND_REPAYMENT_FULL');
+	INSERT INTO OperationType(id, name) VALUES (7, 'OPERATION_TYPE_SELL_CARD');
+	INSERT INTO OperationType(id, name) VALUES (8, 'OPERATION_TYPE_DIVIDEND_TAX');
+	INSERT INTO OperationType(id, name) VALUES (9, 'OPERATION_TYPE_OUTPUT');
+	INSERT INTO OperationType(id, name) VALUES (10, 'OPERATION_TYPE_BOND_REPAYMENT');
+	INSERT INTO OperationType(id, name) VALUES (11, 'OPERATION_TYPE_TAX_CORRECTION');
+	INSERT INTO OperationType(id, name) VALUES (12, 'OPERATION_TYPE_SERVICE_FEE');
+	INSERT INTO OperationType(id, name) VALUES (13, 'OPERATION_TYPE_BENEFIT_TAX');
+	INSERT INTO OperationType(id, name) VALUES (14, 'OPERATION_TYPE_MARGIN_FEE');
+	INSERT INTO OperationType(id, name) VALUES (15, 'OPERATION_TYPE_BUY');
+	INSERT INTO OperationType(id, name) VALUES (16, 'OPERATION_TYPE_BUY_CARD');
+	INSERT INTO OperationType(id, name) VALUES (17, 'OPERATION_TYPE_INPUT_SECURITIES');
+	INSERT INTO OperationType(id, name) VALUES (18, 'OPERATION_TYPE_SELL_MARGIN');
+	INSERT INTO OperationType(id, name) VALUES (19, 'OPERATION_TYPE_BROKER_FEE');
+	INSERT INTO OperationType(id, name) VALUES (20, 'OPERATION_TYPE_BUY_MARGIN');
+	INSERT INTO OperationType(id, name) VALUES (21, 'OPERATION_TYPE_DIVIDEND');
+	INSERT INTO OperationType(id, name) VALUES (22, 'OPERATION_TYPE_SELL');
+	INSERT INTO OperationType(id, name) VALUES (23, 'OPERATION_TYPE_COUPON');
+	INSERT INTO OperationType(id, name) VALUES (24, 'OPERATION_TYPE_SUCCESS_FEE');
+	INSERT INTO OperationType(id, name) VALUES (25, 'OPERATION_TYPE_DIVIDEND_TRANSFER');
+	INSERT INTO OperationType(id, name) VALUES (26, 'OPERATION_TYPE_ACCRUING_VARMARGIN');
+	INSERT INTO OperationType(id, name) VALUES (27, 'OPERATION_TYPE_WRITING_OFF_VARMARGIN');
+	INSERT INTO OperationType(id, name) VALUES (28, 'OPERATION_TYPE_DELIVERY_BUY');
+	INSERT INTO OperationType(id, name) VALUES (29, 'OPERATION_TYPE_DELIVERY_SELL');
+	INSERT INTO OperationType(id, name) VALUES (30, 'OPERATION_TYPE_TRACK_MFEE');
+	INSERT INTO OperationType(id, name) VALUES (31, 'OPERATION_TYPE_TRACK_PFEE');
+	INSERT INTO OperationType(id, name) VALUES (32, 'OPERATION_TYPE_TAX_PROGRESSIVE');
+	INSERT INTO OperationType(id, name) VALUES (33, 'OPERATION_TYPE_BOND_TAX_PROGRESSIVE');
+	INSERT INTO OperationType(id, name) VALUES (34, 'OPERATION_TYPE_DIVIDEND_TAX_PROGRESSIVE');
+	INSERT INTO OperationType(id, name) VALUES (35, 'OPERATION_TYPE_BENEFIT_TAX_PROGRESSIVE');
+	INSERT INTO OperationType(id, name) VALUES (36, 'OPERATION_TYPE_TAX_CORRECTION_PROGRESSIVE');
+	INSERT INTO OperationType(id, name) VALUES (37, 'OPERATION_TYPE_TAX_REPO_PROGRESSIVE');
+	INSERT INTO OperationType(id, name) VALUES (38, 'OPERATION_TYPE_TAX_REPO');
+	INSERT INTO OperationType(id, name) VALUES (39, 'OPERATION_TYPE_TAX_REPO_HOLD');
+	INSERT INTO OperationType(id, name) VALUES (40, 'OPERATION_TYPE_TAX_REPO_REFUND');
+	INSERT INTO OperationType(id, name) VALUES (41, 'OPERATION_TYPE_TAX_REPO_HOLD_PROGRESSIVE');
+	INSERT INTO OperationType(id, name) VALUES (42, 'OPERATION_TYPE_TAX_REPO_REFUND_PROGRESSIVE');
+	INSERT INTO OperationType(id, name) VALUES (43, 'OPERATION_TYPE_DIV_EXT');
+	INSERT INTO OperationType(id, name) VALUES (44, 'OPERATION_TYPE_TAX_CORRECTION_COUPON');
+	INSERT INTO OperationType(id, name) VALUES (45, 'OPERATION_TYPE_CASH_FEE');
+	INSERT INTO OperationType(id, name) VALUES (46, 'OPERATION_TYPE_OUT_FEE');
+	INSERT INTO OperationType(id, name) VALUES (47, 'OPERATION_TYPE_OUT_STAMP_DUTY');
+	INSERT INTO OperationType(id, name) VALUES (50, 'OPERATION_TYPE_OUTPUT_SWIFT');
+	INSERT INTO OperationType(id, name) VALUES (51, 'OPERATION_TYPE_INPUT_SWIFT');
+	INSERT INTO OperationType(id, name) VALUES (53, 'OPERATION_TYPE_OUTPUT_ACQUIRING');
+	INSERT INTO OperationType(id, name) VALUES (54, 'OPERATION_TYPE_INPUT_ACQUIRING');
+	INSERT INTO OperationType(id, name) VALUES (55, 'OPERATION_TYPE_OUTPUT_PENALTY');
+	INSERT INTO OperationType(id, name) VALUES (56, 'OPERATION_TYPE_ADVICE_FEE');
+	INSERT INTO OperationType(id, name) VALUES (57, 'OPERATION_TYPE_TRANS_IIS_BS');
+	INSERT INTO OperationType(id, name) VALUES (58, 'OPERATION_TYPE_TRANS_BS_BS');
+	INSERT INTO OperationType(id, name) VALUES (59, 'OPERATION_TYPE_OUT_MULTI');
+	INSERT INTO OperationType(id, name) VALUES (60, 'OPERATION_TYPE_INP_MULTI');
+	INSERT INTO OperationType(id, name) VALUES (61, 'OPERATION_TYPE_OVER_PLACEMENT');
+	INSERT INTO OperationType(id, name) VALUES (62, 'OPERATION_TYPE_OVER_COM');
+	INSERT INTO OperationType(id, name) VALUES (63, 'OPERATION_TYPE_OVER_INCOME');
+	INSERT INTO OperationType(id, name) VALUES (64, 'OPERATION_TYPE_OPTION_EXPIRATION');
+
+
+CREATE TABLE "public"."OptionDirection" (
+	"id" int64 ,
+	"name" text ,
+	CONSTRAINT OptionDirection_pk PRIMARY KEY (id)
+
+)
+	CREATE INDEX OptionDirection_id_idx ON public.OptionDirection USING btree (id);
+	COMMENT ON TABLE "public"."OptionDirection" IS 'Тип опциона по направлению сделки.';
+	INSERT INTO OptionDirection(id, name) VALUES (0, 'OPTION_DIRECTION_UNSPECIFIED');
+	INSERT INTO OptionDirection(id, name) VALUES (1, 'OPTION_DIRECTION_PUT');
+	INSERT INTO OptionDirection(id, name) VALUES (2, 'OPTION_DIRECTION_CALL');
+
+
+CREATE TABLE "public"."OptionPaymentType" (
+	"id" int64 ,
+	"name" text ,
+	CONSTRAINT OptionPaymentType_pk PRIMARY KEY (id)
+
+)
+	CREATE INDEX OptionPaymentType_id_idx ON public.OptionPaymentType USING btree (id);
+	COMMENT ON TABLE "public"."OptionPaymentType" IS 'Тип расчетов по опциону.';
+	INSERT INTO OptionPaymentType(id, name) VALUES (0, 'OPTION_PAYMENT_TYPE_UNSPECIFIED');
+	INSERT INTO OptionPaymentType(id, name) VALUES (1, 'OPTION_PAYMENT_TYPE_PREMIUM');
+	INSERT INTO OptionPaymentType(id, name) VALUES (2, 'OPTION_PAYMENT_TYPE_MARGINAL');
+
+
+CREATE TABLE "public"."OptionSettlementType" (
+	"id" int64 ,
+	"name" text ,
+	CONSTRAINT OptionSettlementType_pk PRIMARY KEY (id)
+
+)
+	CREATE INDEX OptionSettlementType_id_idx ON public.OptionSettlementType USING btree (id);
+	COMMENT ON TABLE "public"."OptionSettlementType" IS 'Тип опциона по способу исполнения.';
+	INSERT INTO OptionSettlementType(id, name) VALUES (0, 'OPTION_EXECUTION_TYPE_UNSPECIFIED');
+	INSERT INTO OptionSettlementType(id, name) VALUES (1, 'OPTION_EXECUTION_TYPE_PHYSICAL_DELIVERY');
+	INSERT INTO OptionSettlementType(id, name) VALUES (2, 'OPTION_EXECUTION_TYPE_CASH_SETTLEMENT');
+
+
+CREATE TABLE "public"."OptionStyle" (
+	"id" int64 ,
+	"name" text ,
+	CONSTRAINT OptionStyle_pk PRIMARY KEY (id)
+
+)
+	CREATE INDEX OptionStyle_id_idx ON public.OptionStyle USING btree (id);
+	COMMENT ON TABLE "public"."OptionStyle" IS 'Тип опциона по стилю.';
+	INSERT INTO OptionStyle(id, name) VALUES (0, 'OPTION_STYLE_UNSPECIFIED');
+	INSERT INTO OptionStyle(id, name) VALUES (1, 'OPTION_STYLE_AMERICAN');
+	INSERT INTO OptionStyle(id, name) VALUES (2, 'OPTION_STYLE_EUROPEAN');
+
+
+CREATE TABLE "public"."OrderDirection" (
+	"id" int64 ,
+	"name" text ,
+	CONSTRAINT OrderDirection_pk PRIMARY KEY (id)
+
+)
+	CREATE INDEX OrderDirection_id_idx ON public.OrderDirection USING btree (id);
+	COMMENT ON TABLE "public"."OrderDirection" IS 'Направление операции.';
+	INSERT INTO OrderDirection(id, name) VALUES (0, 'ORDER_DIRECTION_UNSPECIFIED');
+	INSERT INTO OrderDirection(id, name) VALUES (1, 'ORDER_DIRECTION_BUY');
+	INSERT INTO OrderDirection(id, name) VALUES (2, 'ORDER_DIRECTION_SELL');
+
+
+CREATE TABLE "public"."OrderExecutionReportStatus" (
+	"id" int64 ,
+	"name" text ,
+	CONSTRAINT OrderExecutionReportStatus_pk PRIMARY KEY (id)
+
+)
+	CREATE INDEX OrderExecutionReportStatus_id_idx ON public.OrderExecutionReportStatus USING btree (id);
+	COMMENT ON TABLE "public"."OrderExecutionReportStatus" IS 'Текущий статус заявки (поручения)';
+	INSERT INTO OrderExecutionReportStatus(id, name) VALUES (0, 'EXECUTION_REPORT_STATUS_UNSPECIFIED');
+	INSERT INTO OrderExecutionReportStatus(id, name) VALUES (1, 'EXECUTION_REPORT_STATUS_FILL');
+	INSERT INTO OrderExecutionReportStatus(id, name) VALUES (2, 'EXECUTION_REPORT_STATUS_REJECTED');
+	INSERT INTO OrderExecutionReportStatus(id, name) VALUES (3, 'EXECUTION_REPORT_STATUS_CANCELLED');
+	INSERT INTO OrderExecutionReportStatus(id, name) VALUES (4, 'EXECUTION_REPORT_STATUS_NEW');
+	INSERT INTO OrderExecutionReportStatus(id, name) VALUES (5, 'EXECUTION_REPORT_STATUS_PARTIALLYFILL');
+
+
+CREATE TABLE "public"."OrderType" (
+	"id" int64 ,
+	"name" text ,
+	CONSTRAINT OrderType_pk PRIMARY KEY (id)
+
+)
+	CREATE INDEX OrderType_id_idx ON public.OrderType USING btree (id);
+	COMMENT ON TABLE "public"."OrderType" IS 'Тип заявки.';
+	INSERT INTO OrderType(id, name) VALUES (0, 'ORDER_TYPE_UNSPECIFIED');
+	INSERT INTO OrderType(id, name) VALUES (1, 'ORDER_TYPE_LIMIT');
+	INSERT INTO OrderType(id, name) VALUES (2, 'ORDER_TYPE_MARKET');
+	INSERT INTO OrderType(id, name) VALUES (3, 'ORDER_TYPE_BESTPRICE');
+
+
+CREATE TABLE "public"."PortfolioSubscriptionStatus" (
+	"id" int64 ,
+	"name" text ,
+	CONSTRAINT PortfolioSubscriptionStatus_pk PRIMARY KEY (id)
+
+)
+	CREATE INDEX PortfolioSubscriptionStatus_id_idx ON public.PortfolioSubscriptionStatus USING btree (id);
+	COMMENT ON TABLE "public"."PortfolioSubscriptionStatus" IS 'Результат подписки.';
+	INSERT INTO PortfolioSubscriptionStatus(id, name) VALUES (0, 'PORTFOLIO_SUBSCRIPTION_STATUS_UNSPECIFIED');
+	INSERT INTO PortfolioSubscriptionStatus(id, name) VALUES (1, 'PORTFOLIO_SUBSCRIPTION_STATUS_SUCCESS');
+	INSERT INTO PortfolioSubscriptionStatus(id, name) VALUES (2, 'PORTFOLIO_SUBSCRIPTION_STATUS_ACCOUNT_NOT_FOUND');
+	INSERT INTO PortfolioSubscriptionStatus(id, name) VALUES (3, 'PORTFOLIO_SUBSCRIPTION_STATUS_INTERNAL_ERROR');
+
+
+CREATE TABLE "public"."PositionsAccountSubscriptionStatus" (
+	"id" int64 ,
+	"name" text ,
+	CONSTRAINT PositionsAccountSubscriptionStatus_pk PRIMARY KEY (id)
+
+)
+	CREATE INDEX PositionsAccountSubscriptionStatus_id_idx ON public.PositionsAccountSubscriptionStatus USING btree (id);
+	COMMENT ON TABLE "public"."PositionsAccountSubscriptionStatus" IS 'Результат подписки.';
+	INSERT INTO PositionsAccountSubscriptionStatus(id, name) VALUES (0, 'POSITIONS_SUBSCRIPTION_STATUS_UNSPECIFIED');
+	INSERT INTO PositionsAccountSubscriptionStatus(id, name) VALUES (1, 'POSITIONS_SUBSCRIPTION_STATUS_SUCCESS');
+	INSERT INTO PositionsAccountSubscriptionStatus(id, name) VALUES (2, 'POSITIONS_SUBSCRIPTION_STATUS_ACCOUNT_NOT_FOUND');
+	INSERT INTO PositionsAccountSubscriptionStatus(id, name) VALUES (3, 'POSITIONS_SUBSCRIPTION_STATUS_INTERNAL_ERROR');
+
+
+CREATE TABLE "public"."PriceType" (
+	"id" int64 ,
+	"name" text ,
+	CONSTRAINT PriceType_pk PRIMARY KEY (id)
+
+)
+	CREATE INDEX PriceType_id_idx ON public.PriceType USING btree (id);
+	COMMENT ON TABLE "public"."PriceType" IS 'Тип цены.';
+	INSERT INTO PriceType(id, name) VALUES (0, 'PRICE_TYPE_UNSPECIFIED');
+	INSERT INTO PriceType(id, name) VALUES (1, 'PRICE_TYPE_POINT');
+	INSERT INTO PriceType(id, name) VALUES (2, 'PRICE_TYPE_CURRENCY');
+
+
+CREATE TABLE "public"."RealExchange" (
+	"id" int64 ,
+	"name" text ,
+	CONSTRAINT RealExchange_pk PRIMARY KEY (id)
+
+)
+	CREATE INDEX RealExchange_id_idx ON public.RealExchange USING btree (id);
+	COMMENT ON TABLE "public"."RealExchange" IS 'Реальная площадка исполнения расчётов.';
+	INSERT INTO RealExchange(id, name) VALUES (0, 'REAL_EXCHANGE_UNSPECIFIED');
+	INSERT INTO RealExchange(id, name) VALUES (1, 'REAL_EXCHANGE_MOEX');
+	INSERT INTO RealExchange(id, name) VALUES (2, 'REAL_EXCHANGE_RTS');
+	INSERT INTO RealExchange(id, name) VALUES (3, 'REAL_EXCHANGE_OTC');
+
+
+CREATE TABLE "public"."RiskLevel" (
+	"id" int64 ,
+	"name" text ,
+	CONSTRAINT RiskLevel_pk PRIMARY KEY (id)
+
+)
+	CREATE INDEX RiskLevel_id_idx ON public.RiskLevel USING btree (id);
+	COMMENT ON TABLE "public"."RiskLevel" IS 'Уровень риска облигации.';
+	INSERT INTO RiskLevel(id, name) VALUES (0, 'RISK_LEVEL_UNSPECIFIED');
+	INSERT INTO RiskLevel(id, name) VALUES (1, 'RISK_LEVEL_LOW');
+	INSERT INTO RiskLevel(id, name) VALUES (2, 'RISK_LEVEL_MODERATE');
+	INSERT INTO RiskLevel(id, name) VALUES (3, 'RISK_LEVEL_HIGH');
+
+
+CREATE TABLE "public"."SecurityTradingStatus" (
+	"id" int64 ,
+	"name" text ,
+	CONSTRAINT SecurityTradingStatus_pk PRIMARY KEY (id)
+
+)
+	CREATE INDEX SecurityTradingStatus_id_idx ON public.SecurityTradingStatus USING btree (id);
+	COMMENT ON TABLE "public"."SecurityTradingStatus" IS 'Режим торгов инструмента';
+	INSERT INTO SecurityTradingStatus(id, name) VALUES (0, 'SECURITY_TRADING_STATUS_UNSPECIFIED');
+	INSERT INTO SecurityTradingStatus(id, name) VALUES (1, 'SECURITY_TRADING_STATUS_NOT_AVAILABLE_FOR_TRADING');
+	INSERT INTO SecurityTradingStatus(id, name) VALUES (2, 'SECURITY_TRADING_STATUS_OPENING_PERIOD');
+	INSERT INTO SecurityTradingStatus(id, name) VALUES (3, 'SECURITY_TRADING_STATUS_CLOSING_PERIOD');
+	INSERT INTO SecurityTradingStatus(id, name) VALUES (4, 'SECURITY_TRADING_STATUS_BREAK_IN_TRADING');
+	INSERT INTO SecurityTradingStatus(id, name) VALUES (5, 'SECURITY_TRADING_STATUS_NORMAL_TRADING');
+	INSERT INTO SecurityTradingStatus(id, name) VALUES (6, 'SECURITY_TRADING_STATUS_CLOSING_AUCTION');
+	INSERT INTO SecurityTradingStatus(id, name) VALUES (7, 'SECURITY_TRADING_STATUS_DARK_POOL_AUCTION');
+	INSERT INTO SecurityTradingStatus(id, name) VALUES (8, 'SECURITY_TRADING_STATUS_DISCRETE_AUCTION');
+	INSERT INTO SecurityTradingStatus(id, name) VALUES (9, 'SECURITY_TRADING_STATUS_OPENING_AUCTION_PERIOD');
+	INSERT INTO SecurityTradingStatus(id, name) VALUES (10, 'SECURITY_TRADING_STATUS_TRADING_AT_CLOSING_AUCTION_PRICE');
+	INSERT INTO SecurityTradingStatus(id, name) VALUES (11, 'SECURITY_TRADING_STATUS_SESSION_ASSIGNED');
+	INSERT INTO SecurityTradingStatus(id, name) VALUES (12, 'SECURITY_TRADING_STATUS_SESSION_CLOSE');
+	INSERT INTO SecurityTradingStatus(id, name) VALUES (13, 'SECURITY_TRADING_STATUS_SESSION_OPEN');
+	INSERT INTO SecurityTradingStatus(id, name) VALUES (14, 'SECURITY_TRADING_STATUS_DEALER_NORMAL_TRADING');
+	INSERT INTO SecurityTradingStatus(id, name) VALUES (15, 'SECURITY_TRADING_STATUS_DEALER_BREAK_IN_TRADING');
+	INSERT INTO SecurityTradingStatus(id, name) VALUES (16, 'SECURITY_TRADING_STATUS_DEALER_NOT_AVAILABLE_FOR_TRADING');
+
+
+CREATE TABLE "public"."ShareType" (
+	"id" int64 ,
+	"name" text ,
+	CONSTRAINT ShareType_pk PRIMARY KEY (id)
+
+)
+	CREATE INDEX ShareType_id_idx ON public.ShareType USING btree (id);
+	COMMENT ON TABLE "public"."ShareType" IS 'Тип акций.';
+	INSERT INTO ShareType(id, name) VALUES (0, 'SHARE_TYPE_UNSPECIFIED');
+	INSERT INTO ShareType(id, name) VALUES (1, 'SHARE_TYPE_COMMON');
+	INSERT INTO ShareType(id, name) VALUES (2, 'SHARE_TYPE_PREFERRED');
+	INSERT INTO ShareType(id, name) VALUES (3, 'SHARE_TYPE_ADR');
+	INSERT INTO ShareType(id, name) VALUES (4, 'SHARE_TYPE_GDR');
+	INSERT INTO ShareType(id, name) VALUES (5, 'SHARE_TYPE_MLP');
+	INSERT INTO ShareType(id, name) VALUES (6, 'SHARE_TYPE_NY_REG_SHRS');
+	INSERT INTO ShareType(id, name) VALUES (7, 'SHARE_TYPE_CLOSED_END_FUND');
+	INSERT INTO ShareType(id, name) VALUES (8, 'SHARE_TYPE_REIT');
+
+
+CREATE TABLE "public"."StopOrderDirection" (
+	"id" int64 ,
+	"name" text ,
+	CONSTRAINT StopOrderDirection_pk PRIMARY KEY (id)
+
+)
+	CREATE INDEX StopOrderDirection_id_idx ON public.StopOrderDirection USING btree (id);
+	COMMENT ON TABLE "public"."StopOrderDirection" IS 'Направление сделки стоп-заявки.';
+	INSERT INTO StopOrderDirection(id, name) VALUES (0, 'STOP_ORDER_DIRECTION_UNSPECIFIED');
+	INSERT INTO StopOrderDirection(id, name) VALUES (1, 'STOP_ORDER_DIRECTION_BUY');
+	INSERT INTO StopOrderDirection(id, name) VALUES (2, 'STOP_ORDER_DIRECTION_SELL');
+
+
+CREATE TABLE "public"."StopOrderExpirationType" (
+	"id" int64 ,
+	"name" text ,
+	CONSTRAINT StopOrderExpirationType_pk PRIMARY KEY (id)
+
+)
+	CREATE INDEX StopOrderExpirationType_id_idx ON public.StopOrderExpirationType USING btree (id);
+	COMMENT ON TABLE "public"."StopOrderExpirationType" IS 'Тип экспирации стоп-заявке.';
+	INSERT INTO StopOrderExpirationType(id, name) VALUES (0, 'STOP_ORDER_EXPIRATION_TYPE_UNSPECIFIED');
+	INSERT INTO StopOrderExpirationType(id, name) VALUES (1, 'STOP_ORDER_EXPIRATION_TYPE_GOOD_TILL_CANCEL');
+	INSERT INTO StopOrderExpirationType(id, name) VALUES (2, 'STOP_ORDER_EXPIRATION_TYPE_GOOD_TILL_DATE');
+
+
+CREATE TABLE "public"."StopOrderType" (
+	"id" int64 ,
+	"name" text ,
+	CONSTRAINT StopOrderType_pk PRIMARY KEY (id)
+
+)
+	CREATE INDEX StopOrderType_id_idx ON public.StopOrderType USING btree (id);
+	COMMENT ON TABLE "public"."StopOrderType" IS 'Тип стоп-заявки.';
+	INSERT INTO StopOrderType(id, name) VALUES (0, 'STOP_ORDER_TYPE_UNSPECIFIED');
+	INSERT INTO StopOrderType(id, name) VALUES (1, 'STOP_ORDER_TYPE_TAKE_PROFIT');
+	INSERT INTO StopOrderType(id, name) VALUES (2, 'STOP_ORDER_TYPE_STOP_LOSS');
+	INSERT INTO StopOrderType(id, name) VALUES (3, 'STOP_ORDER_TYPE_STOP_LIMIT');
+
+
+CREATE TABLE "public"."StructuredProductType" (
+	"id" int64 ,
+	"name" text ,
+	CONSTRAINT StructuredProductType_pk PRIMARY KEY (id)
+
+)
+	CREATE INDEX StructuredProductType_id_idx ON public.StructuredProductType USING btree (id);
+	COMMENT ON TABLE "public"."StructuredProductType" IS 'Тип структурной ноты.';
+	INSERT INTO StructuredProductType(id, name) VALUES (0, 'SP_TYPE_UNSPECIFIED');
+	INSERT INTO StructuredProductType(id, name) VALUES (1, 'SP_TYPE_DELIVERABLE');
+	INSERT INTO StructuredProductType(id, name) VALUES (2, 'SP_TYPE_NON_DELIVERABLE');
+
+
+CREATE TABLE "public"."SubscriptionAction" (
+	"id" int64 ,
+	"name" text ,
+	CONSTRAINT SubscriptionAction_pk PRIMARY KEY (id)
+
+)
+	CREATE INDEX SubscriptionAction_id_idx ON public.SubscriptionAction USING btree (id);
+	COMMENT ON TABLE "public"."SubscriptionAction" IS 'Тип операции со списком подписок.';
+	INSERT INTO SubscriptionAction(id, name) VALUES (0, 'SUBSCRIPTION_ACTION_UNSPECIFIED');
+	INSERT INTO SubscriptionAction(id, name) VALUES (1, 'SUBSCRIPTION_ACTION_SUBSCRIBE');
+	INSERT INTO SubscriptionAction(id, name) VALUES (2, 'SUBSCRIPTION_ACTION_UNSUBSCRIBE');
+
+
+CREATE TABLE "public"."SubscriptionInterval" (
+	"id" int64 ,
+	"name" text ,
+	CONSTRAINT SubscriptionInterval_pk PRIMARY KEY (id)
+
+)
+	CREATE INDEX SubscriptionInterval_id_idx ON public.SubscriptionInterval USING btree (id);
+	COMMENT ON TABLE "public"."SubscriptionInterval" IS 'Интервал свечи.';
+	INSERT INTO SubscriptionInterval(id, name) VALUES (0, 'SUBSCRIPTION_INTERVAL_UNSPECIFIED');
+	INSERT INTO SubscriptionInterval(id, name) VALUES (1, 'SUBSCRIPTION_INTERVAL_ONE_MINUTE');
+	INSERT INTO SubscriptionInterval(id, name) VALUES (2, 'SUBSCRIPTION_INTERVAL_FIVE_MINUTES');
+
+
+CREATE TABLE "public"."SubscriptionStatus" (
+	"id" int64 ,
+	"name" text ,
+	CONSTRAINT SubscriptionStatus_pk PRIMARY KEY (id)
+
+)
+	CREATE INDEX SubscriptionStatus_id_idx ON public.SubscriptionStatus USING btree (id);
+	COMMENT ON TABLE "public"."SubscriptionStatus" IS 'Результат подписки.';
+	INSERT INTO SubscriptionStatus(id, name) VALUES (0, 'SUBSCRIPTION_STATUS_UNSPECIFIED');
+	INSERT INTO SubscriptionStatus(id, name) VALUES (1, 'SUBSCRIPTION_STATUS_SUCCESS');
+	INSERT INTO SubscriptionStatus(id, name) VALUES (2, 'SUBSCRIPTION_STATUS_INSTRUMENT_NOT_FOUND');
+	INSERT INTO SubscriptionStatus(id, name) VALUES (3, 'SUBSCRIPTION_STATUS_SUBSCRIPTION_ACTION_IS_INVALID');
+	INSERT INTO SubscriptionStatus(id, name) VALUES (4, 'SUBSCRIPTION_STATUS_DEPTH_IS_INVALID');
+	INSERT INTO SubscriptionStatus(id, name) VALUES (5, 'SUBSCRIPTION_STATUS_INTERVAL_IS_INVALID');
+	INSERT INTO SubscriptionStatus(id, name) VALUES (6, 'SUBSCRIPTION_STATUS_LIMIT_IS_EXCEEDED');
+	INSERT INTO SubscriptionStatus(id, name) VALUES (7, 'SUBSCRIPTION_STATUS_INTERNAL_ERROR');
+	INSERT INTO SubscriptionStatus(id, name) VALUES (8, 'SUBSCRIPTION_STATUS_TOO_MANY_REQUESTS');
+
+
+CREATE TABLE "public"."TradeDirection" (
+	"id" int64 ,
+	"name" text ,
+	CONSTRAINT TradeDirection_pk PRIMARY KEY (id)
+
+)
+	CREATE INDEX TradeDirection_id_idx ON public.TradeDirection USING btree (id);
+	COMMENT ON TABLE "public"."TradeDirection" IS 'Направление сделки.';
+	INSERT INTO TradeDirection(id, name) VALUES (0, 'TRADE_DIRECTION_UNSPECIFIED');
+	INSERT INTO TradeDirection(id, name) VALUES (1, 'TRADE_DIRECTION_BUY');
+	INSERT INTO TradeDirection(id, name) VALUES (2, 'TRADE_DIRECTION_SELL');
+
+
 CREATE TABLE "public"."Account" (
 	"id" text NOT NULL,
 	"type_id" AccountType NULL,

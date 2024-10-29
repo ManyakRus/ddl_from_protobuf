@@ -18,6 +18,7 @@ func StartAll(Settings *config.SettingsINI, Proto types.ProtoAll) {
 	//FillMapEnums(Settings, MassProto)
 
 	Settings.MapMessages = Proto.MapMessages
+	Settings.MapEnums = Proto.MapEnums
 
 	//создадим 1 общий текст SQL
 	TextSQL := ""
@@ -46,23 +47,23 @@ func Start1(Settings *config.SettingsINI) (string, error) {
 	Otvet := ""
 	var err error
 
-	//отсортированно
-	MassMessages := micro.MassFrom_Map(Settings.MapMessages)
-	for _, message1 := range MassMessages {
-		Otvet1, err := CreateFiles_Message(Settings, message1)
-		if err != nil {
-			err = fmt.Errorf("CreateFiles_Message(%s) error: %w", message1.Name, err)
-			return Otvet, err
-		}
-		Otvet = Otvet + Otvet1 + "\n"
-	}
-
-	//отсортированно
+	//enums отсортированно
 	MassEnums := micro.MassFrom_Map(Settings.MapEnums)
 	for _, enum1 := range MassEnums {
 		Otvet1, err := CreateFiles_Enum(Settings, enum1)
 		if err != nil {
 			err = fmt.Errorf("CreateFiles_Enum(%s) error: %w", enum1.Name, err)
+			return Otvet, err
+		}
+		Otvet = Otvet + Otvet1 + "\n"
+	}
+
+	//messages отсортированно
+	MassMessages := micro.MassFrom_Map(Settings.MapMessages)
+	for _, message1 := range MassMessages {
+		Otvet1, err := CreateFiles_Message(Settings, message1)
+		if err != nil {
+			err = fmt.Errorf("CreateFiles_Message(%s) error: %w", message1.Name, err)
 			return Otvet, err
 		}
 		Otvet = Otvet + Otvet1 + "\n"

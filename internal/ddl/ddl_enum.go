@@ -34,20 +34,20 @@ CREATE TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" (
 
 	//
 	TextPrimaryKey := "\t" + "CONSTRAINT " + TableName + "_pk PRIMARY KEY (" + ID_Name + ")\n"
-	Otvet = Otvet + TextPrimaryKey
+	Otvet = Otvet + TextPrimaryKey + "\n)\n"
 
 	//CREATE INDEX
-	Otvet = Otvet + "\t" + "CREATE INDEX " + TableName + "_" + ID_Name + "_idx ON " + Settings.DB_SCHEMA_NAME + "." + TableName + " USING btree (" + ID_Name + ");" + "\n"
+	Otvet = Otvet + "CREATE INDEX " + TableName + "_" + ID_Name + "_idx ON " + Settings.DB_SCHEMA_NAME + "." + TableName + " USING btree (" + ID_Name + ");" + "\n"
 
 	//COMMENT ON TABLE
-	Otvet = Otvet + "\t" + `COMMENT ON TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" IS '` + TableComments + `';` + "\n"
+	Otvet = Otvet + `COMMENT ON TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" IS '` + TableComments + `';` + "\n"
 
 	//insert
 	for _, constant1 := range enum1.EnumConstants {
 		ID := constant1.ID
 		sID := strconv.Itoa(ID)
 		Name := constant1.Name
-		Otvet1 := "\tINSERT INTO " + TableName + "(id, name) VALUES (" + sID + ", '" + Name + "');\n"
+		Otvet1 := "INSERT INTO " + TableName + "(id, name) VALUES (" + sID + ", '" + Name + "');\n"
 
 		//добавим колонку
 		Otvet = Otvet + Otvet1
