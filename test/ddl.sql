@@ -586,7 +586,10 @@ CREATE TABLE "public"."Account" (
 	"opened_date" timestamptz NULL,
 	"closed_date" timestamptz NULL,
 	"access_level_id" AccessLevel NULL,
-	CONSTRAINT Account_pk PRIMARY KEY (id)
+	CONSTRAINT Account_pk PRIMARY KEY (id),
+	CONSTRAINT Account_type_id_fk FOREIGN KEY (type_id) REFERENCES public.AccountType (id),
+	CONSTRAINT Account_status_id_fk FOREIGN KEY (status_id) REFERENCES public.AccountStatus (id),
+	CONSTRAINT Account_access_level_id_fk FOREIGN KEY (access_level_id) REFERENCES public.AccessLevel (id)
 );
 CREATE INDEX Account_type_id_idx ON public.Account USING btree (type_id);
 CREATE INDEX Account_status_id_idx ON public.Account USING btree (status_id);
@@ -606,6 +609,7 @@ CREATE TABLE "public"."Asset" (
 	"name" text NOT NULL,
 	"instruments_id" AssetInstrument NULL,
 	CONSTRAINT Asset_pk PRIMARY KEY (uid),
+	CONSTRAINT Asset_type_id_fk FOREIGN KEY (type_id) REFERENCES public.AssetType (id),
 	CONSTRAINT Asset_instruments_id_fk FOREIGN KEY (instruments_id) REFERENCES public.AssetInstrument (uid)
 );
 CREATE INDEX Asset_type_id_idx ON public.Asset USING btree (type_id);
@@ -712,6 +716,7 @@ CREATE TABLE "public"."AssetFull" (
 	"br_code_name" text NOT NULL,
 	"instruments_id" AssetInstrument NULL,
 	CONSTRAINT AssetFull_pk PRIMARY KEY (uid),
+	CONSTRAINT AssetFull_type_id_fk FOREIGN KEY (type_id) REFERENCES public.AssetType (id),
 	CONSTRAINT AssetFull_brand_id_fk FOREIGN KEY (brand_id) REFERENCES public.Brand (uid),
 	CONSTRAINT AssetFull_instruments_id_fk FOREIGN KEY (instruments_id) REFERENCES public.AssetInstrument (uid)
 );
@@ -745,7 +750,8 @@ CREATE TABLE "public"."AssetInstrument" (
 	"links_id" InstrumentLink NULL,
 	"instrument_kind_id" InstrumentType NULL,
 	"position_uid" text NOT NULL,
-	CONSTRAINT AssetInstrument_pk PRIMARY KEY (uid)
+	CONSTRAINT AssetInstrument_pk PRIMARY KEY (uid),
+	CONSTRAINT AssetInstrument_instrument_kind_id_fk FOREIGN KEY (instrument_kind_id) REFERENCES public.InstrumentType (id)
 );
 CREATE INDEX AssetInstrument_links_id_idx ON public.AssetInstrument USING btree (links_id);
 CREATE INDEX AssetInstrument_instrument_kind_id_idx ON public.AssetInstrument USING btree (instrument_kind_id);
@@ -775,7 +781,8 @@ CREATE TABLE "public"."AssetShare" (
 	"repres_isin" text NOT NULL,
 	"issue_size_plan_id" Quotation NULL,
 	"total_float_id" Quotation NULL,
-	CONSTRAINT AssetShare_pk PRIMARY KEY (primary_index)
+	CONSTRAINT AssetShare_pk PRIMARY KEY (primary_index),
+	CONSTRAINT AssetShare_type_id_fk FOREIGN KEY (type_id) REFERENCES public.ShareType (id)
 );
 CREATE INDEX AssetShare_type_id_idx ON public.AssetShare USING btree (type_id);
 CREATE INDEX AssetShare_issue_size_id_idx ON public.AssetShare USING btree (issue_size_id);
@@ -851,7 +858,14 @@ CREATE TABLE "public"."Bond" (
 	"first_1min_candle_date" timestamptz NULL,
 	"first_1day_candle_date" timestamptz NULL,
 	"risk_level_id" RiskLevel NULL,
-	CONSTRAINT Bond_pk PRIMARY KEY (uid)
+	CONSTRAINT Bond_pk PRIMARY KEY (uid),
+	CONSTRAINT Bond_nominal_id_fk FOREIGN KEY (nominal_id) REFERENCES public.MoneyValue (currency),
+	CONSTRAINT Bond_initial_nominal_id_fk FOREIGN KEY (initial_nominal_id) REFERENCES public.MoneyValue (currency),
+	CONSTRAINT Bond_placement_price_id_fk FOREIGN KEY (placement_price_id) REFERENCES public.MoneyValue (currency),
+	CONSTRAINT Bond_aci_value_id_fk FOREIGN KEY (aci_value_id) REFERENCES public.MoneyValue (currency),
+	CONSTRAINT Bond_trading_status_id_fk FOREIGN KEY (trading_status_id) REFERENCES public.SecurityTradingStatus (id),
+	CONSTRAINT Bond_real_exchange_id_fk FOREIGN KEY (real_exchange_id) REFERENCES public.RealExchange (id),
+	CONSTRAINT Bond_risk_level_id_fk FOREIGN KEY (risk_level_id) REFERENCES public.RiskLevel (id)
 );
 CREATE INDEX Bond_klong_id_idx ON public.Bond USING btree (klong_id);
 CREATE INDEX Bond_kshort_id_idx ON public.Bond USING btree (kshort_id);
@@ -975,7 +989,10 @@ CREATE TABLE "public"."Currency" (
 	"blocked_tca_flag" bool NOT NULL,
 	"first_1min_candle_date" timestamptz NULL,
 	"first_1day_candle_date" timestamptz NULL,
-	CONSTRAINT Currency_pk PRIMARY KEY (uid)
+	CONSTRAINT Currency_pk PRIMARY KEY (uid),
+	CONSTRAINT Currency_nominal_id_fk FOREIGN KEY (nominal_id) REFERENCES public.MoneyValue (currency),
+	CONSTRAINT Currency_trading_status_id_fk FOREIGN KEY (trading_status_id) REFERENCES public.SecurityTradingStatus (id),
+	CONSTRAINT Currency_real_exchange_id_fk FOREIGN KEY (real_exchange_id) REFERENCES public.RealExchange (id)
 );
 CREATE INDEX Currency_klong_id_idx ON public.Currency USING btree (klong_id);
 CREATE INDEX Currency_kshort_id_idx ON public.Currency USING btree (kshort_id);
@@ -1023,6 +1040,40 @@ COMMENT ON COLUMN "public"."Currency"."blocked_tca_flag" IS 'Флаг забло
 COMMENT ON COLUMN "public"."Currency"."first_1min_candle_date" IS 'Дата первой минутной свечи.';
 COMMENT ON COLUMN "public"."Currency"."first_1day_candle_date" IS 'Дата первой дневной свечи.';
 
+CREATE TABLE "public"."DividendsForeignIssuerReport" (
+	"record_date" timestamptz NULL,
+	"payment_date" timestamptz NULL,
+	"security_name" text NOT NULL,
+	"isin" text NOT NULL,
+	"issuer_country" text NOT NULL,
+	"quantity" bigint NOT NULL,
+	"dividend_id" Quotation NULL,
+	"external_commission_id" Quotation NULL,
+	"dividend_gross_id" Quotation NULL,
+	"tax_id" Quotation NULL,
+	"dividend_amount_id" Quotation NULL,
+	"currency" text NOT NULL,
+	CONSTRAINT DividendsForeignIssuerReport_pk PRIMARY KEY (currency)
+);
+CREATE INDEX DividendsForeignIssuerReport_dividend_id_idx ON public.DividendsForeignIssuerReport USING btree (dividend_id);
+CREATE INDEX DividendsForeignIssuerReport_external_commission_id_idx ON public.DividendsForeignIssuerReport USING btree (external_commission_id);
+CREATE INDEX DividendsForeignIssuerReport_dividend_gross_id_idx ON public.DividendsForeignIssuerReport USING btree (dividend_gross_id);
+CREATE INDEX DividendsForeignIssuerReport_tax_id_idx ON public.DividendsForeignIssuerReport USING btree (tax_id);
+CREATE INDEX DividendsForeignIssuerReport_dividend_amount_id_idx ON public.DividendsForeignIssuerReport USING btree (dividend_amount_id);
+COMMENT ON TABLE "public"."DividendsForeignIssuerReport" IS ' Отчёт "Справка о доходах за пределами РФ".';
+COMMENT ON COLUMN "public"."DividendsForeignIssuerReport"."record_date" IS 'Дата фиксации реестра.';
+COMMENT ON COLUMN "public"."DividendsForeignIssuerReport"."payment_date" IS 'Дата выплаты.';
+COMMENT ON COLUMN "public"."DividendsForeignIssuerReport"."security_name" IS 'Наименование ценной бумаги.';
+COMMENT ON COLUMN "public"."DividendsForeignIssuerReport"."isin" IS 'ISIN-идентификатор ценной бумаги.';
+COMMENT ON COLUMN "public"."DividendsForeignIssuerReport"."issuer_country" IS 'Страна эмитента. Для депозитарных расписок указывается страна эмитента базового актива.';
+COMMENT ON COLUMN "public"."DividendsForeignIssuerReport"."quantity" IS 'Количество ценных бумаг.';
+COMMENT ON COLUMN "public"."DividendsForeignIssuerReport"."dividend_id" IS 'Выплаты на одну бумагу';
+COMMENT ON COLUMN "public"."DividendsForeignIssuerReport"."external_commission_id" IS 'Комиссия внешних платёжных агентов.';
+COMMENT ON COLUMN "public"."DividendsForeignIssuerReport"."dividend_gross_id" IS 'Сумма до удержания налога.';
+COMMENT ON COLUMN "public"."DividendsForeignIssuerReport"."tax_id" IS 'Сумма налога, удержанного агентом.';
+COMMENT ON COLUMN "public"."DividendsForeignIssuerReport"."dividend_amount_id" IS 'Итоговая сумма выплаты.';
+COMMENT ON COLUMN "public"."DividendsForeignIssuerReport"."currency" IS 'Валюта.';
+
 CREATE TABLE "public"."Etf" (
 	"figi" text NOT NULL,
 	"ticker" text NOT NULL,
@@ -1063,7 +1114,9 @@ CREATE TABLE "public"."Etf" (
 	"liquidity_flag" bool NOT NULL,
 	"first_1min_candle_date" timestamptz NULL,
 	"first_1day_candle_date" timestamptz NULL,
-	CONSTRAINT Etf_pk PRIMARY KEY (uid)
+	CONSTRAINT Etf_pk PRIMARY KEY (uid),
+	CONSTRAINT Etf_trading_status_id_fk FOREIGN KEY (trading_status_id) REFERENCES public.SecurityTradingStatus (id),
+	CONSTRAINT Etf_real_exchange_id_fk FOREIGN KEY (real_exchange_id) REFERENCES public.RealExchange (id)
 );
 CREATE INDEX Etf_klong_id_idx ON public.Etf USING btree (klong_id);
 CREATE INDEX Etf_kshort_id_idx ON public.Etf USING btree (kshort_id);
@@ -1158,7 +1211,9 @@ CREATE TABLE "public"."Future" (
 	"blocked_tca_flag" bool NOT NULL,
 	"first_1min_candle_date" timestamptz NULL,
 	"first_1day_candle_date" timestamptz NULL,
-	CONSTRAINT Future_pk PRIMARY KEY (uid)
+	CONSTRAINT Future_pk PRIMARY KEY (uid),
+	CONSTRAINT Future_trading_status_id_fk FOREIGN KEY (trading_status_id) REFERENCES public.SecurityTradingStatus (id),
+	CONSTRAINT Future_real_exchange_id_fk FOREIGN KEY (real_exchange_id) REFERENCES public.RealExchange (id)
 );
 CREATE INDEX Future_klong_id_idx ON public.Future USING btree (klong_id);
 CREATE INDEX Future_kshort_id_idx ON public.Future USING btree (kshort_id);
@@ -1247,7 +1302,10 @@ CREATE TABLE "public"."Instrument" (
 	"instrument_kind_id" InstrumentType NULL,
 	"first_1min_candle_date" timestamptz NULL,
 	"first_1day_candle_date" timestamptz NULL,
-	CONSTRAINT Instrument_pk PRIMARY KEY (uid)
+	CONSTRAINT Instrument_pk PRIMARY KEY (uid),
+	CONSTRAINT Instrument_trading_status_id_fk FOREIGN KEY (trading_status_id) REFERENCES public.SecurityTradingStatus (id),
+	CONSTRAINT Instrument_real_exchange_id_fk FOREIGN KEY (real_exchange_id) REFERENCES public.RealExchange (id),
+	CONSTRAINT Instrument_instrument_kind_id_fk FOREIGN KEY (instrument_kind_id) REFERENCES public.InstrumentType (id)
 );
 CREATE INDEX Instrument_klong_id_idx ON public.Instrument USING btree (klong_id);
 CREATE INDEX Instrument_kshort_id_idx ON public.Instrument USING btree (kshort_id);
@@ -1299,7 +1357,8 @@ CREATE TABLE "public"."InstrumentRequest" (
 	"id_type_id" InstrumentIdType NULL,
 	"class_code" text NOT NULL,
 	"id" text NOT NULL,
-	CONSTRAINT InstrumentRequest_pk PRIMARY KEY (id)
+	CONSTRAINT InstrumentRequest_pk PRIMARY KEY (id),
+	CONSTRAINT InstrumentRequest_id_type_id_fk FOREIGN KEY (id_type_id) REFERENCES public.InstrumentIdType (id)
 );
 CREATE INDEX InstrumentRequest_id_type_id_idx ON public.InstrumentRequest USING btree (id_type_id);
 COMMENT ON TABLE "public"."InstrumentRequest" IS 'Запрос получения инструмента по идентификатору.';
@@ -1324,7 +1383,8 @@ CREATE TABLE "public"."InstrumentShort" (
 	"for_qual_investor_flag" bool NOT NULL,
 	"weekend_flag" bool NOT NULL,
 	"blocked_tca_flag" bool NOT NULL,
-	CONSTRAINT InstrumentShort_pk PRIMARY KEY (uid)
+	CONSTRAINT InstrumentShort_pk PRIMARY KEY (uid),
+	CONSTRAINT InstrumentShort_instrument_kind_id_fk FOREIGN KEY (instrument_kind_id) REFERENCES public.InstrumentType (id)
 );
 CREATE INDEX InstrumentShort_instrument_kind_id_idx ON public.InstrumentShort USING btree (instrument_kind_id);
 COMMENT ON TABLE "public"."InstrumentShort" IS 'Краткая информация об инструменте.';
@@ -1345,6 +1405,17 @@ COMMENT ON COLUMN "public"."InstrumentShort"."for_qual_investor_flag" IS 'Фла
 COMMENT ON COLUMN "public"."InstrumentShort"."weekend_flag" IS 'Флаг отображающий доступность торговли инструментом по выходным';
 COMMENT ON COLUMN "public"."InstrumentShort"."blocked_tca_flag" IS 'Флаг заблокированного ТКС';
 
+CREATE TABLE "public"."MoneyValue" (
+	"currency" text NOT NULL,
+	"units" bigint NOT NULL,
+	"nano" integer NOT NULL,
+	CONSTRAINT MoneyValue_pk PRIMARY KEY (currency)
+);
+COMMENT ON TABLE "public"."MoneyValue" IS 'Денежная сумма в определенной валюте';
+COMMENT ON COLUMN "public"."MoneyValue"."currency" IS ' строковый ISO-код валюты';
+COMMENT ON COLUMN "public"."MoneyValue"."units" IS ' целая часть суммы, может быть отрицательным числом';
+COMMENT ON COLUMN "public"."MoneyValue"."nano" IS ' дробная часть суммы, может быть отрицательным числом';
+
 CREATE TABLE "public"."Operation" (
 	"id" text NOT NULL,
 	"parent_operation_id" text NOT NULL,
@@ -1363,7 +1434,11 @@ CREATE TABLE "public"."Operation" (
 	"asset_uid" text NOT NULL,
 	"position_uid" text NOT NULL,
 	"instrument_uid" text NOT NULL,
-	CONSTRAINT Operation_pk PRIMARY KEY (id)
+	CONSTRAINT Operation_pk PRIMARY KEY (id),
+	CONSTRAINT Operation_payment_id_fk FOREIGN KEY (payment_id) REFERENCES public.MoneyValue (currency),
+	CONSTRAINT Operation_price_id_fk FOREIGN KEY (price_id) REFERENCES public.MoneyValue (currency),
+	CONSTRAINT Operation_state_id_fk FOREIGN KEY (state_id) REFERENCES public.OperationState (id),
+	CONSTRAINT Operation_operation_type_id_fk FOREIGN KEY (operation_type_id) REFERENCES public.OperationType (id)
 );
 CREATE INDEX Operation_payment_id_idx ON public.Operation USING btree (payment_id);
 CREATE INDEX Operation_price_id_idx ON public.Operation USING btree (price_id);
@@ -1417,7 +1492,15 @@ CREATE TABLE "public"."OperationItem" (
 	"cancel_reason" text NOT NULL,
 	"trades_info_id" OperationItemTrades NULL,
 	"asset_uid" text NOT NULL,
-	CONSTRAINT OperationItem_pk PRIMARY KEY (id)
+	CONSTRAINT OperationItem_pk PRIMARY KEY (id),
+	CONSTRAINT OperationItem_type_id_fk FOREIGN KEY (type_id) REFERENCES public.OperationType (id),
+	CONSTRAINT OperationItem_state_id_fk FOREIGN KEY (state_id) REFERENCES public.OperationState (id),
+	CONSTRAINT OperationItem_instrument_kind_id_fk FOREIGN KEY (instrument_kind_id) REFERENCES public.InstrumentType (id),
+	CONSTRAINT OperationItem_payment_id_fk FOREIGN KEY (payment_id) REFERENCES public.MoneyValue (currency),
+	CONSTRAINT OperationItem_price_id_fk FOREIGN KEY (price_id) REFERENCES public.MoneyValue (currency),
+	CONSTRAINT OperationItem_commission_id_fk FOREIGN KEY (commission_id) REFERENCES public.MoneyValue (currency),
+	CONSTRAINT OperationItem_yield_id_fk FOREIGN KEY (yield_id) REFERENCES public.MoneyValue (currency),
+	CONSTRAINT OperationItem_accrued_int_id_fk FOREIGN KEY (accrued_int_id) REFERENCES public.MoneyValue (currency)
 );
 CREATE INDEX OperationItem_type_id_idx ON public.OperationItem USING btree (type_id);
 CREATE INDEX OperationItem_state_id_idx ON public.OperationItem USING btree (state_id);
@@ -1503,7 +1586,14 @@ CREATE TABLE "public"."Option" (
 	"weekend_flag" bool NOT NULL,
 	"blocked_tca_flag" bool NOT NULL,
 	"api_trade_available_flag" bool NOT NULL,
-	CONSTRAINT Option_pk PRIMARY KEY (uid)
+	CONSTRAINT Option_pk PRIMARY KEY (uid),
+	CONSTRAINT Option_trading_status_id_fk FOREIGN KEY (trading_status_id) REFERENCES public.SecurityTradingStatus (id),
+	CONSTRAINT Option_real_exchange_id_fk FOREIGN KEY (real_exchange_id) REFERENCES public.RealExchange (id),
+	CONSTRAINT Option_direction_id_fk FOREIGN KEY (direction_id) REFERENCES public.OptionDirection (id),
+	CONSTRAINT Option_payment_type_id_fk FOREIGN KEY (payment_type_id) REFERENCES public.OptionPaymentType (id),
+	CONSTRAINT Option_style_id_fk FOREIGN KEY (style_id) REFERENCES public.OptionStyle (id),
+	CONSTRAINT Option_settlement_type_id_fk FOREIGN KEY (settlement_type_id) REFERENCES public.OptionSettlementType (id),
+	CONSTRAINT Option_strike_price_id_fk FOREIGN KEY (strike_price_id) REFERENCES public.MoneyValue (currency)
 );
 CREATE INDEX Option_trading_status_id_idx ON public.Option USING btree (trading_status_id);
 CREATE INDEX Option_real_exchange_id_idx ON public.Option USING btree (real_exchange_id);
@@ -1566,6 +1656,85 @@ COMMENT ON COLUMN "public"."Option"."weekend_flag" IS 'Флаг отобража
 COMMENT ON COLUMN "public"."Option"."blocked_tca_flag" IS 'Флаг заблокированного ТКС.';
 COMMENT ON COLUMN "public"."Option"."api_trade_available_flag" IS 'Параметр указывает на возможность торговать инструментом через API.';
 
+CREATE TABLE "public"."OrderState" (
+	"order_id" text NOT NULL,
+	"execution_report_status_id" OrderExecutionReportStatus NULL,
+	"lots_requested" bigint NOT NULL,
+	"lots_executed" bigint NOT NULL,
+	"initial_order_price_id" MoneyValue NULL,
+	"executed_order_price_id" MoneyValue NULL,
+	"total_order_amount_id" MoneyValue NULL,
+	"average_position_price_id" MoneyValue NULL,
+	"initial_commission_id" MoneyValue NULL,
+	"executed_commission_id" MoneyValue NULL,
+	"figi" text NOT NULL,
+	"direction_id" OrderDirection NULL,
+	"initial_security_price_id" MoneyValue NULL,
+	"stages_id" OrderStage NULL,
+	"service_commission_id" MoneyValue NULL,
+	"currency" text NOT NULL,
+	"order_type_id" OrderType NULL,
+	"order_date" timestamptz NULL,
+	"instrument_uid" text NOT NULL,
+	"order_request_id" text NOT NULL,
+	CONSTRAINT OrderState_pk PRIMARY KEY (currency),
+	CONSTRAINT OrderState_execution_report_status_id_fk FOREIGN KEY (execution_report_status_id) REFERENCES public.OrderExecutionReportStatus (id),
+	CONSTRAINT OrderState_initial_order_price_id_fk FOREIGN KEY (initial_order_price_id) REFERENCES public.MoneyValue (currency),
+	CONSTRAINT OrderState_executed_order_price_id_fk FOREIGN KEY (executed_order_price_id) REFERENCES public.MoneyValue (currency),
+	CONSTRAINT OrderState_total_order_amount_id_fk FOREIGN KEY (total_order_amount_id) REFERENCES public.MoneyValue (currency),
+	CONSTRAINT OrderState_average_position_price_id_fk FOREIGN KEY (average_position_price_id) REFERENCES public.MoneyValue (currency),
+	CONSTRAINT OrderState_initial_commission_id_fk FOREIGN KEY (initial_commission_id) REFERENCES public.MoneyValue (currency),
+	CONSTRAINT OrderState_executed_commission_id_fk FOREIGN KEY (executed_commission_id) REFERENCES public.MoneyValue (currency),
+	CONSTRAINT OrderState_direction_id_fk FOREIGN KEY (direction_id) REFERENCES public.OrderDirection (id),
+	CONSTRAINT OrderState_initial_security_price_id_fk FOREIGN KEY (initial_security_price_id) REFERENCES public.MoneyValue (currency),
+	CONSTRAINT OrderState_service_commission_id_fk FOREIGN KEY (service_commission_id) REFERENCES public.MoneyValue (currency),
+	CONSTRAINT OrderState_order_type_id_fk FOREIGN KEY (order_type_id) REFERENCES public.OrderType (id)
+);
+CREATE INDEX OrderState_execution_report_status_id_idx ON public.OrderState USING btree (execution_report_status_id);
+CREATE INDEX OrderState_initial_order_price_id_idx ON public.OrderState USING btree (initial_order_price_id);
+CREATE INDEX OrderState_executed_order_price_id_idx ON public.OrderState USING btree (executed_order_price_id);
+CREATE INDEX OrderState_total_order_amount_id_idx ON public.OrderState USING btree (total_order_amount_id);
+CREATE INDEX OrderState_average_position_price_id_idx ON public.OrderState USING btree (average_position_price_id);
+CREATE INDEX OrderState_initial_commission_id_idx ON public.OrderState USING btree (initial_commission_id);
+CREATE INDEX OrderState_executed_commission_id_idx ON public.OrderState USING btree (executed_commission_id);
+CREATE INDEX OrderState_direction_id_idx ON public.OrderState USING btree (direction_id);
+CREATE INDEX OrderState_initial_security_price_id_idx ON public.OrderState USING btree (initial_security_price_id);
+CREATE INDEX OrderState_stages_id_idx ON public.OrderState USING btree (stages_id);
+CREATE INDEX OrderState_service_commission_id_idx ON public.OrderState USING btree (service_commission_id);
+CREATE INDEX OrderState_order_type_id_idx ON public.OrderState USING btree (order_type_id);
+COMMENT ON TABLE "public"."OrderState" IS 'Информация о торговом поручении.';
+COMMENT ON COLUMN "public"."OrderState"."order_id" IS 'Биржевой идентификатор заявки.';
+COMMENT ON COLUMN "public"."OrderState"."execution_report_status_id" IS 'Текущий статус заявки.';
+COMMENT ON COLUMN "public"."OrderState"."lots_requested" IS 'Запрошено лотов.';
+COMMENT ON COLUMN "public"."OrderState"."lots_executed" IS 'Исполнено лотов.';
+COMMENT ON COLUMN "public"."OrderState"."initial_order_price_id" IS 'Начальная цена заявки. Произведение количества запрошенных лотов на цену.';
+COMMENT ON COLUMN "public"."OrderState"."executed_order_price_id" IS 'Исполненная цена заявки. Произведение средней цены покупки на количество лотов.';
+COMMENT ON COLUMN "public"."OrderState"."total_order_amount_id" IS 'Итоговая стоимость заявки, включающая все комиссии.';
+COMMENT ON COLUMN "public"."OrderState"."average_position_price_id" IS 'Средняя цена позиции по сделке.';
+COMMENT ON COLUMN "public"."OrderState"."initial_commission_id" IS 'Начальная комиссия. Комиссия, рассчитанная на момент подачи заявки.';
+COMMENT ON COLUMN "public"."OrderState"."executed_commission_id" IS 'Фактическая комиссия по итогам исполнения заявки.';
+COMMENT ON COLUMN "public"."OrderState"."figi" IS 'Figi-идентификатор инструмента.';
+COMMENT ON COLUMN "public"."OrderState"."direction_id" IS 'Направление заявки.';
+COMMENT ON COLUMN "public"."OrderState"."initial_security_price_id" IS 'Начальная цена за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента.';
+COMMENT ON COLUMN "public"."OrderState"."stages_id" IS 'Стадии выполнения заявки.';
+COMMENT ON COLUMN "public"."OrderState"."service_commission_id" IS 'Сервисная комиссия.';
+COMMENT ON COLUMN "public"."OrderState"."currency" IS 'Валюта заявки.';
+COMMENT ON COLUMN "public"."OrderState"."order_type_id" IS 'Тип заявки.';
+COMMENT ON COLUMN "public"."OrderState"."order_date" IS 'Дата и время выставления заявки в часовом поясе UTC.';
+COMMENT ON COLUMN "public"."OrderState"."instrument_uid" IS 'UID идентификатор инструмента.';
+COMMENT ON COLUMN "public"."OrderState"."order_request_id" IS 'Идентификатор ключа идемпотентности, переданный клиентом.';
+
+CREATE TABLE "public"."PortfolioRequest" (
+	"account_id" text NOT NULL,
+	"currency_id" CurrencyRequest NULL,
+	CONSTRAINT PortfolioRequest_pk PRIMARY KEY (currency),
+	CONSTRAINT PortfolioRequest_currency_id_fk FOREIGN KEY (currency_id) REFERENCES public.CurrencyRequest (id)
+);
+CREATE INDEX PortfolioRequest_currency_id_idx ON public.PortfolioRequest USING btree (currency_id);
+COMMENT ON TABLE "public"."PortfolioRequest" IS 'Запрос получения текущего портфеля по счёту.';
+COMMENT ON COLUMN "public"."PortfolioRequest"."account_id" IS 'Идентификатор счёта пользователя.';
+COMMENT ON COLUMN "public"."PortfolioRequest"."currency_id" IS 'Валюта, в которой требуется рассчитать портфель';
+
 CREATE TABLE "public"."Share" (
 	"figi" text NOT NULL,
 	"ticker" text NOT NULL,
@@ -1607,7 +1776,11 @@ CREATE TABLE "public"."Share" (
 	"liquidity_flag" bool NOT NULL,
 	"first_1min_candle_date" timestamptz NULL,
 	"first_1day_candle_date" timestamptz NULL,
-	CONSTRAINT Share_pk PRIMARY KEY (uid)
+	CONSTRAINT Share_pk PRIMARY KEY (uid),
+	CONSTRAINT Share_nominal_id_fk FOREIGN KEY (nominal_id) REFERENCES public.MoneyValue (currency),
+	CONSTRAINT Share_trading_status_id_fk FOREIGN KEY (trading_status_id) REFERENCES public.SecurityTradingStatus (id),
+	CONSTRAINT Share_share_type_id_fk FOREIGN KEY (share_type_id) REFERENCES public.ShareType (id),
+	CONSTRAINT Share_real_exchange_id_fk FOREIGN KEY (real_exchange_id) REFERENCES public.RealExchange (id)
 );
 CREATE INDEX Share_klong_id_idx ON public.Share USING btree (klong_id);
 CREATE INDEX Share_kshort_id_idx ON public.Share USING btree (kshort_id);
@@ -1661,4 +1834,41 @@ COMMENT ON COLUMN "public"."Share"."blocked_tca_flag" IS 'Флаг заблок�
 COMMENT ON COLUMN "public"."Share"."liquidity_flag" IS 'Флаг достаточной ликвидности';
 COMMENT ON COLUMN "public"."Share"."first_1min_candle_date" IS 'Дата первой минутной свечи.';
 COMMENT ON COLUMN "public"."Share"."first_1day_candle_date" IS 'Дата первой дневной свечи.';
+
+CREATE TABLE "public"."StopOrder" (
+	"stop_order_id" text NOT NULL,
+	"lots_requested" bigint NOT NULL,
+	"figi" text NOT NULL,
+	"direction_id" StopOrderDirection NULL,
+	"currency" text NOT NULL,
+	"order_type_id" StopOrderType NULL,
+	"create_date" timestamptz NULL,
+	"activation_date_time" timestamptz NULL,
+	"expiration_time" timestamptz NULL,
+	"price_id" MoneyValue NULL,
+	"stop_price_id" MoneyValue NULL,
+	"instrument_uid" text NOT NULL,
+	CONSTRAINT StopOrder_pk PRIMARY KEY (currency),
+	CONSTRAINT StopOrder_direction_id_fk FOREIGN KEY (direction_id) REFERENCES public.StopOrderDirection (id),
+	CONSTRAINT StopOrder_order_type_id_fk FOREIGN KEY (order_type_id) REFERENCES public.StopOrderType (id),
+	CONSTRAINT StopOrder_price_id_fk FOREIGN KEY (price_id) REFERENCES public.MoneyValue (currency),
+	CONSTRAINT StopOrder_stop_price_id_fk FOREIGN KEY (stop_price_id) REFERENCES public.MoneyValue (currency)
+);
+CREATE INDEX StopOrder_direction_id_idx ON public.StopOrder USING btree (direction_id);
+CREATE INDEX StopOrder_order_type_id_idx ON public.StopOrder USING btree (order_type_id);
+CREATE INDEX StopOrder_price_id_idx ON public.StopOrder USING btree (price_id);
+CREATE INDEX StopOrder_stop_price_id_idx ON public.StopOrder USING btree (stop_price_id);
+COMMENT ON TABLE "public"."StopOrder" IS 'Информация о стоп-заявке.';
+COMMENT ON COLUMN "public"."StopOrder"."stop_order_id" IS 'Идентификатор-идентификатор стоп-заявки.';
+COMMENT ON COLUMN "public"."StopOrder"."lots_requested" IS 'Запрошено лотов.';
+COMMENT ON COLUMN "public"."StopOrder"."figi" IS 'Figi-идентификатор инструмента.';
+COMMENT ON COLUMN "public"."StopOrder"."direction_id" IS 'Направление операции.';
+COMMENT ON COLUMN "public"."StopOrder"."currency" IS 'Валюта стоп-заявки.';
+COMMENT ON COLUMN "public"."StopOrder"."order_type_id" IS 'Тип стоп-заявки.';
+COMMENT ON COLUMN "public"."StopOrder"."create_date" IS 'Дата и время выставления заявки в часовом поясе UTC.';
+COMMENT ON COLUMN "public"."StopOrder"."activation_date_time" IS 'Дата и время конвертации стоп-заявки в биржевую в часовом поясе UTC.';
+COMMENT ON COLUMN "public"."StopOrder"."expiration_time" IS 'Дата и время снятия заявки в часовом поясе UTC.';
+COMMENT ON COLUMN "public"."StopOrder"."price_id" IS 'Цена заявки за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента.';
+COMMENT ON COLUMN "public"."StopOrder"."stop_price_id" IS 'Цена активации стоп-заявки за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента.';
+COMMENT ON COLUMN "public"."StopOrder"."instrument_uid" IS 'instrument_uid идентификатор инструмента.';
 

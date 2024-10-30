@@ -63,7 +63,7 @@ CREATE TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" (
 			continue
 		}
 
-		ForignTableName, ForeignTableColumnName := FindForignTableNameAndColumnName(Settings, field1)
+		ForignTableName, ForeignTableColumnName := FindForeignTableNameAndColumnName(Settings, field1)
 		if ForignTableName != "" && ForeignTableColumnName != "" {
 			Otvet = Otvet + "\t" + "CONSTRAINT " + TableName + "_" + FieldName + "_fk FOREIGN KEY (" + FieldName + ") REFERENCES " + Settings.DB_SCHEMA_NAME + "." + ForignTableName + " (" + ForeignTableColumnName + ")" + ",\n"
 		}

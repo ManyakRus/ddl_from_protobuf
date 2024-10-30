@@ -33,7 +33,7 @@ func StartAll(Settings *config.SettingsINI) {
 	Settings.TextEveryTableColumns = s
 
 	//MassIndexNames
-	Filename = dir + Settings.CONFIG_DIRECTORY_NAME + micro.SeparatorFile() + Settings.INDEX_NAMES_FILENAME
+	Filename = dir + Settings.CONFIG_DIRECTORY_NAME + micro.SeparatorFile() + Settings.PRIMARY_KEY_NAMES_FILENAME
 	MassIndexNames, err := Load_IndexNames(Filename)
 	if err != nil {
 		err = fmt.Errorf("LoadMappings(%s) error: %w", Filename, err)

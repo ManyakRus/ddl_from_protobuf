@@ -156,21 +156,32 @@ func AddText_id(Text string) string {
 	return Otvet
 }
 
-// FindForignTableNameAndColumnName - возвращает имя таблицы и столбца внешней связанной таблицы
-func FindForignTableNameAndColumnName(Settings *config.SettingsINI, Field *types.FieldElement) (ForignTableName string, ForignTableColumnName string) {
+// FindForeignTableNameAndColumnName - возвращает имя таблицы и столбца внешней связанной таблицы
+func FindForeignTableNameAndColumnName(Settings *config.SettingsINI, Field *types.FieldElement) (ForeignTableName string, ForeignTableIDColumnName string) {
 
 	//ИД
 	if Field.TypeSQL != "" {
 		return
 	}
 
-	ForignTableName = Field.Type
+	ForeignTableName = Field.Type
 
-	Map1, ok := Settings.MapMessages[ForignTableName]
-	if ok == false {
-		return
+	//поищем в messages
+	MapMessage1, ok := Settings.MapMessages[ForeignTableName]
+	if ok == true {
+		ForeignTableIDColumnName = Find_ID_Name_from_Fields(Settings, MapMessage1.Fields)
+	} else {
+		//поищем в enums
+		_, ok := Settings.MapEnums[ForeignTableName]
+		if ok == true {
+			ForeignTableIDColumnName = Settings.ENUMS_ID_COLUMN_NAME
+		}
 	}
-	ForignTableColumnName = Find_ID_Name_from_Fields(Settings, Map1.Fields)
+
+	////проверка
+	//if ForeignTableIDColumnName == "" {
+	//	log.Warn("Not found message or enum (ForeignTableName) with name: ", ForeignTableName)
+	//}
 
 	return
 }

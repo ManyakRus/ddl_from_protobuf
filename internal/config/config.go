@@ -16,17 +16,19 @@ var Settings SettingsINI
 
 // SettingsINI - структура для хранения всех нужных переменных окружения
 type SettingsINI struct {
-	PROTOBUF_DIRECTORY    string
-	DDL_FILENAME          string
-	CONFIG_DIRECTORY_NAME string
-	MapMappings           map[string]load_configs_mapping.SQLMapping
-	TextEveryTableColumns string
-	DB_SCHEMA_NAME        string
-	MapMessages           map[string]*types.MessageElement
-	MapEnums              map[string]*types.EnumElement
-	MassIndexNames        []string
-	INDEX_NAMES_FILENAME  string
-	FILE_PERMISSIONS      fs.FileMode //= 0666
+	PROTOBUF_DIRECTORY         string
+	DDL_FILENAME               string
+	CONFIG_DIRECTORY_NAME      string
+	MapMappings                map[string]load_configs_mapping.SQLMapping
+	TextEveryTableColumns      string
+	DB_SCHEMA_NAME             string
+	MapMessages                map[string]*types.MessageElement
+	MapEnums                   map[string]*types.EnumElement
+	MassIndexNames             []string
+	PRIMARY_KEY_NAMES_FILENAME string
+	FILE_PERMISSIONS           fs.FileMode //= 0666
+	ENUMS_ID_COLUMN_NAME       string
+	ENUMS_NAME_COLUMN_NAME     string
 }
 
 // CreateSettings - создает структуру типа SettingsINI
@@ -71,9 +73,9 @@ func FillSettings() {
 	Settings.DB_SCHEMA_NAME = s
 
 	//
-	Name = "INDEX_NAMES_FILENAME"
+	Name = "PRIMARY_KEY_NAMES_FILENAME"
 	s = Getenv(Name, true)
-	Settings.INDEX_NAMES_FILENAME = s
+	Settings.PRIMARY_KEY_NAMES_FILENAME = s
 
 	//
 	Name = "FILE_PERMISSIONS"
@@ -84,6 +86,16 @@ func FillSettings() {
 		log.Error("FILE_PERMISSIONS error: ", err)
 	}
 	Settings.FILE_PERMISSIONS = fs.FileMode(x)
+
+	//
+	Name = "ENUMS_ID_COLUMN_NAME"
+	s = Getenv(Name, true)
+	Settings.ENUMS_ID_COLUMN_NAME = s
+
+	//
+	Name = "ENUMS_NAME_COLUMN_NAME"
+	s = Getenv(Name, true)
+	Settings.ENUMS_NAME_COLUMN_NAME = s
 
 }
 
