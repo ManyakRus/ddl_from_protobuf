@@ -59,14 +59,24 @@ func Start1(Settings *config.SettingsINI) (string, error) {
 	}
 
 	//messages отсортированно
+	//сначала делаем map для сортировки
+	MapSQL := make(map[string]string, len(Settings.MapMessages))
 	MassMessages := micro.MassFrom_Map(Settings.MapMessages)
-	for _, message1 := range MassMessages {
-		Otvet1, err := CreateFiles_Message(Settings, message1)
+	for i, message1 := range MassMessages {
+		Otvet1, ForeignCount, err := CreateFile_Message(Settings, message1)
 		if err != nil {
-			err = fmt.Errorf("CreateFiles_Message(%s) error: %w", message1.Name, err)
+			err = fmt.Errorf("CreateFile_Message(%s) error: %w", message1.Name, err)
 			return Otvet, err
 		}
-		Otvet = Otvet + Otvet1
+		//Otvet = Otvet + Otvet1
+		sCount := fmt.Sprint("%09d", i, "_%09d", ForeignCount)
+		MapSQL[sCount] = Otvet1
+	}
+
+	//сортируем по кол-ву внешних ключей
+	MassSQL := micro.MassFrom_Map(MapSQL)
+	for _, SQL1 := range MassSQL {
+		Otvet = Otvet + SQL1
 	}
 
 	return Otvet, err

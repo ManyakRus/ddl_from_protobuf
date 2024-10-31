@@ -656,10 +656,7 @@ CREATE TABLE IF NOT EXISTS "tin"."Account" (
 	"opened_date" timestamptz NULL,
 	"closed_date" timestamptz NULL,
 	"access_level_id" bigint NULL,
-	CONSTRAINT "Account_pk" PRIMARY KEY ("id"),
-	CONSTRAINT "Account_type_id_fk" FOREIGN KEY ("type_id") REFERENCES "tin"."AccountType" ("id"),
-	CONSTRAINT "Account_status_id_fk" FOREIGN KEY ("status_id") REFERENCES "tin"."AccountStatus" ("id"),
-	CONSTRAINT "Account_access_level_id_fk" FOREIGN KEY ("access_level_id") REFERENCES "tin"."AccessLevel" ("id")
+	CONSTRAINT "Account_pk" PRIMARY KEY ("id")
 );
 CREATE INDEX IF NOT EXISTS "Account_type_id_idx" ON "tin"."Account" USING btree ("type_id");
 CREATE INDEX IF NOT EXISTS "Account_status_id_idx" ON "tin"."Account" USING btree ("status_id");
@@ -673,190 +670,567 @@ COMMENT ON COLUMN "tin"."Account"."opened_date" IS ' Дата открытия �
 COMMENT ON COLUMN "tin"."Account"."closed_date" IS ' Дата закрытия счёта в часовом поясе UTC.';
 COMMENT ON COLUMN "tin"."Account"."access_level_id" IS ' Уровень доступа к текущему счёту (определяется токеном).';
 
-CREATE TABLE IF NOT EXISTS "tin"."Asset" (
-	"uid" text NOT NULL,
-	"type_id" bigint NULL,
-	"name" text NOT NULL,
-	"instruments_id" text NULL,
-	CONSTRAINT "Asset_pk" PRIMARY KEY ("uid"),
-	CONSTRAINT "Asset_type_id_fk" FOREIGN KEY ("type_id") REFERENCES "tin"."AssetType" ("id"),
-	CONSTRAINT "Asset_instruments_id_fk" FOREIGN KEY ("instruments_id") REFERENCES "tin"."AssetInstrument" ("uid")
-);
-CREATE INDEX IF NOT EXISTS "Asset_type_id_idx" ON "tin"."Asset" USING btree ("type_id");
-CREATE INDEX IF NOT EXISTS "Asset_instruments_id_idx" ON "tin"."Asset" USING btree ("instruments_id");
-COMMENT ON TABLE "tin"."Asset" IS 'Информация об активе.';
-COMMENT ON COLUMN "tin"."Asset"."uid" IS 'Уникальный идентификатор актива.';
-COMMENT ON COLUMN "tin"."Asset"."type_id" IS 'Тип актива.';
-COMMENT ON COLUMN "tin"."Asset"."name" IS 'Наименование актива.';
-COMMENT ON COLUMN "tin"."Asset"."instruments_id" IS 'Массив идентификаторов инструментов.';
-
-CREATE TABLE IF NOT EXISTS "tin"."AssetEtf" (
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"payment_type" text NOT NULL,
-	"watermark_flag" bool NOT NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"rebalancing_flag" bool NOT NULL,
-	"rebalancing_freq" text NOT NULL,
-	"management_type" text NOT NULL,
-	"primary_index" text NOT NULL,
-	"focus_type" text NOT NULL,
-	"leveraged_flag" bool NOT NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"ucits_flag" bool NOT NULL,
-	"released_date" timestamptz NULL,
-	"description" text NOT NULL,
-	"primary_index_description" text NOT NULL,
-	"primary_index_company" text NOT NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"inav_code" text NOT NULL,
-	"div_yield_flag" bool NOT NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"rebalancing_plan" text NOT NULL,
-	"tax_rate" text NOT NULL,
-	"rebalancing_dates" timestamptz NULL,
-	"issue_kind" text NOT NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"nominal_currency" text NOT NULL,
-	CONSTRAINT "AssetEtf_pk" PRIMARY KEY ("primary_index")
-);
-CREATE INDEX IF NOT EXISTS "AssetEtf_total_expense_id_idx" ON "tin"."AssetEtf" USING btree ("total_expense_id");
-CREATE INDEX IF NOT EXISTS "AssetEtf_hurdle_rate_id_idx" ON "tin"."AssetEtf" USING btree ("hurdle_rate_id");
-CREATE INDEX IF NOT EXISTS "AssetEtf_performance_fee_id_idx" ON "tin"."AssetEtf" USING btree ("performance_fee_id");
-CREATE INDEX IF NOT EXISTS "AssetEtf_fixed_commission_id_idx" ON "tin"."AssetEtf" USING btree ("fixed_commission_id");
-CREATE INDEX IF NOT EXISTS "AssetEtf_buy_premium_id_idx" ON "tin"."AssetEtf" USING btree ("buy_premium_id");
-CREATE INDEX IF NOT EXISTS "AssetEtf_sell_discount_id_idx" ON "tin"."AssetEtf" USING btree ("sell_discount_id");
-CREATE INDEX IF NOT EXISTS "AssetEtf_num_share_id_idx" ON "tin"."AssetEtf" USING btree ("num_share_id");
-CREATE INDEX IF NOT EXISTS "AssetEtf_index_recovery_period_id_idx" ON "tin"."AssetEtf" USING btree ("index_recovery_period_id");
-CREATE INDEX IF NOT EXISTS "AssetEtf_expense_commission_id_idx" ON "tin"."AssetEtf" USING btree ("expense_commission_id");
-CREATE INDEX IF NOT EXISTS "AssetEtf_primary_index_tracking_error_id_idx" ON "tin"."AssetEtf" USING btree ("primary_index_tracking_error_id");
-CREATE INDEX IF NOT EXISTS "AssetEtf_nominal_id_idx" ON "tin"."AssetEtf" USING btree ("nominal_id");
-COMMENT ON TABLE "tin"."AssetEtf" IS 'Фонд.';
-COMMENT ON COLUMN "tin"."AssetEtf"."total_expense_id" IS 'Суммарные расходы фонда (в %).';
-COMMENT ON COLUMN "tin"."AssetEtf"."hurdle_rate_id" IS 'Барьерная ставка доходности после которой фонд имеет право на perfomance fee (в процентах).';
-COMMENT ON COLUMN "tin"."AssetEtf"."performance_fee_id" IS 'Комиссия за успешные результаты фонда (в процентах).';
-COMMENT ON COLUMN "tin"."AssetEtf"."fixed_commission_id" IS 'Фиксированная комиссия за управление (в процентах).';
-COMMENT ON COLUMN "tin"."AssetEtf"."payment_type" IS 'Тип распределения доходов от выплат по бумагам.';
-COMMENT ON COLUMN "tin"."AssetEtf"."watermark_flag" IS 'Признак необходимости выхода фонда в плюс для получения комиссии.';
-COMMENT ON COLUMN "tin"."AssetEtf"."buy_premium_id" IS 'Премия (надбавка к цене) при покупке доли в фонде (в процентах).';
-COMMENT ON COLUMN "tin"."AssetEtf"."sell_discount_id" IS 'Ставка дисконта (вычет из цены) при продаже доли в фонде (в процентах).';
-COMMENT ON COLUMN "tin"."AssetEtf"."rebalancing_flag" IS 'Признак ребалансируемости портфеля фонда.';
-COMMENT ON COLUMN "tin"."AssetEtf"."rebalancing_freq" IS 'Периодичность ребалансировки.';
-COMMENT ON COLUMN "tin"."AssetEtf"."management_type" IS 'Тип управления.';
-COMMENT ON COLUMN "tin"."AssetEtf"."primary_index" IS 'Индекс, который реплицирует (старается копировать) фонд.';
-COMMENT ON COLUMN "tin"."AssetEtf"."focus_type" IS 'База ETF.';
-COMMENT ON COLUMN "tin"."AssetEtf"."leveraged_flag" IS 'Признак использования заемных активов (плечо).';
-COMMENT ON COLUMN "tin"."AssetEtf"."num_share_id" IS 'Количество акций в обращении.';
-COMMENT ON COLUMN "tin"."AssetEtf"."ucits_flag" IS 'Признак обязательства по отчетности перед регулятором.';
-COMMENT ON COLUMN "tin"."AssetEtf"."released_date" IS 'Дата выпуска.';
-COMMENT ON COLUMN "tin"."AssetEtf"."description" IS 'Описание фонда.';
-COMMENT ON COLUMN "tin"."AssetEtf"."primary_index_description" IS 'Описание индекса, за которым следует фонд.';
-COMMENT ON COLUMN "tin"."AssetEtf"."primary_index_company" IS 'Основные компании, в которые вкладывается фонд.';
-COMMENT ON COLUMN "tin"."AssetEtf"."index_recovery_period_id" IS 'Срок восстановления индекса (после просадки).';
-COMMENT ON COLUMN "tin"."AssetEtf"."inav_code" IS 'IVAV-код.';
-COMMENT ON COLUMN "tin"."AssetEtf"."div_yield_flag" IS 'Признак наличия дивидендной доходности.';
-COMMENT ON COLUMN "tin"."AssetEtf"."expense_commission_id" IS 'Комиссия на покрытие расходов фонда (в процентах).';
-COMMENT ON COLUMN "tin"."AssetEtf"."primary_index_tracking_error_id" IS 'Ошибка следования за индексом (в процентах).';
-COMMENT ON COLUMN "tin"."AssetEtf"."rebalancing_plan" IS 'Плановая ребалансировка портфеля.';
-COMMENT ON COLUMN "tin"."AssetEtf"."tax_rate" IS 'Ставки налогообложения дивидендов и купонов.';
-COMMENT ON COLUMN "tin"."AssetEtf"."rebalancing_dates" IS 'Даты ребалансировок.';
-COMMENT ON COLUMN "tin"."AssetEtf"."issue_kind" IS 'Форма выпуска.';
-COMMENT ON COLUMN "tin"."AssetEtf"."nominal_id" IS 'Номинал.';
-COMMENT ON COLUMN "tin"."AssetEtf"."nominal_currency" IS 'Валюта номинала.';
-
-CREATE TABLE IF NOT EXISTS "tin"."AssetFull" (
-	"uid" text NOT NULL,
-	"type_id" bigint NULL,
-	"name" text NOT NULL,
-	"name_brief" text NOT NULL,
-	"description" text NOT NULL,
-	"deleted_at" timestamptz NULL,
-	"required_tests" text NOT NULL,
-	"gos_reg_code" text NOT NULL,
-	"cfi" text NOT NULL,
-	"code_nsd" text NOT NULL,
-	"status" text NOT NULL,
-	"brand_id" text NULL,
-	"updated_at" timestamptz NULL,
-	"br_code" text NOT NULL,
-	"br_code_name" text NOT NULL,
-	"instruments_id" text NULL,
-	CONSTRAINT "AssetFull_pk" PRIMARY KEY ("uid"),
-	CONSTRAINT "AssetFull_type_id_fk" FOREIGN KEY ("type_id") REFERENCES "tin"."AssetType" ("id"),
-	CONSTRAINT "AssetFull_brand_id_fk" FOREIGN KEY ("brand_id") REFERENCES "tin"."Brand" ("uid"),
-	CONSTRAINT "AssetFull_instruments_id_fk" FOREIGN KEY ("instruments_id") REFERENCES "tin"."AssetInstrument" ("uid")
-);
-CREATE INDEX IF NOT EXISTS "AssetFull_type_id_idx" ON "tin"."AssetFull" USING btree ("type_id");
-CREATE INDEX IF NOT EXISTS "AssetFull_brand_id_idx" ON "tin"."AssetFull" USING btree ("brand_id");
-CREATE INDEX IF NOT EXISTS "AssetFull_instruments_id_idx" ON "tin"."AssetFull" USING btree ("instruments_id");
-COMMENT ON TABLE "tin"."AssetFull" IS '';
-COMMENT ON COLUMN "tin"."AssetFull"."uid" IS 'Уникальный идентификатор актива.';
-COMMENT ON COLUMN "tin"."AssetFull"."type_id" IS 'Тип актива.';
-COMMENT ON COLUMN "tin"."AssetFull"."name" IS 'Наименование актива.';
-COMMENT ON COLUMN "tin"."AssetFull"."name_brief" IS 'Короткое наименование актива.';
-COMMENT ON COLUMN "tin"."AssetFull"."description" IS 'Описание актива.';
-COMMENT ON COLUMN "tin"."AssetFull"."deleted_at" IS 'Дата и время удаления актива.';
-COMMENT ON COLUMN "tin"."AssetFull"."required_tests" IS 'Тестирование клиентов.';
-COMMENT ON COLUMN "tin"."AssetFull"."gos_reg_code" IS 'Номер государственной регистрации.';
-COMMENT ON COLUMN "tin"."AssetFull"."cfi" IS 'Код CFI.';
-COMMENT ON COLUMN "tin"."AssetFull"."code_nsd" IS 'Код НРД инструмента.';
-COMMENT ON COLUMN "tin"."AssetFull"."status" IS 'Статус актива.';
-COMMENT ON COLUMN "tin"."AssetFull"."brand_id" IS 'Бренд.';
-COMMENT ON COLUMN "tin"."AssetFull"."updated_at" IS 'Дата и время последнего обновления записи.';
-COMMENT ON COLUMN "tin"."AssetFull"."br_code" IS 'Код типа ц.б. по классификации Банка России.';
-COMMENT ON COLUMN "tin"."AssetFull"."br_code_name" IS 'Наименование кода типа ц.б. по классификации Банка России.';
-COMMENT ON COLUMN "tin"."AssetFull"."instruments_id" IS 'Массив идентификаторов инструментов.';
-
-CREATE TABLE IF NOT EXISTS "tin"."AssetInstrument" (
-	"uid" text NOT NULL,
+CREATE TABLE IF NOT EXISTS "tin"."GetTradingStatusRequest" (
 	"figi" text NOT NULL,
-	"instrument_type" text NOT NULL,
+	"instrument_id" text NOT NULL,
+	CONSTRAINT "GetTradingStatusRequest_pk" PRIMARY KEY ("figi")
+);
+COMMENT ON TABLE "tin"."GetTradingStatusRequest" IS 'Запрос получения торгового статуса.';
+COMMENT ON COLUMN "tin"."GetTradingStatusRequest"."figi" IS 'Deprecated Figi-идентификатор инструмента. Необходимо использовать instrument_id.';
+COMMENT ON COLUMN "tin"."GetTradingStatusRequest"."instrument_id" IS 'Идентификатор инструмента, принимает значение figi или instrument_uid.';
+
+CREATE TABLE IF NOT EXISTS "tin"."GetTradingStatusResponse" (
+	"figi" text NOT NULL,
+	"trading_status_id" bigint NULL,
+	"limit_order_available_flag" bool NOT NULL,
+	"market_order_available_flag" bool NOT NULL,
+	"api_trade_available_flag" bool NOT NULL,
+	"instrument_uid" text NOT NULL,
+	CONSTRAINT "GetTradingStatusResponse_pk" PRIMARY KEY ("figi")
+);
+CREATE INDEX IF NOT EXISTS "GetTradingStatusResponse_trading_status_id_idx" ON "tin"."GetTradingStatusResponse" USING btree ("trading_status_id");
+COMMENT ON TABLE "tin"."GetTradingStatusResponse" IS 'Информация о торговом статусе.';
+COMMENT ON COLUMN "tin"."GetTradingStatusResponse"."figi" IS 'Figi-идентификатор инструмента.';
+COMMENT ON COLUMN "tin"."GetTradingStatusResponse"."trading_status_id" IS 'Статус торговли инструментом.';
+COMMENT ON COLUMN "tin"."GetTradingStatusResponse"."limit_order_available_flag" IS 'Признак доступности выставления лимитной заявки по инструменту.';
+COMMENT ON COLUMN "tin"."GetTradingStatusResponse"."market_order_available_flag" IS 'Признак доступности выставления рыночной заявки по инструменту.';
+COMMENT ON COLUMN "tin"."GetTradingStatusResponse"."api_trade_available_flag" IS 'Признак доступности торгов через API.';
+COMMENT ON COLUMN "tin"."GetTradingStatusResponse"."instrument_uid" IS 'Uid инструмента.';
+
+CREATE TABLE IF NOT EXISTS "tin"."InfoInstrument" (
+	"figi" text NOT NULL,
+	"instrument_id" text NOT NULL,
+	CONSTRAINT "InfoInstrument_pk" PRIMARY KEY ("figi")
+);
+COMMENT ON TABLE "tin"."InfoInstrument" IS 'Запрос подписки на торговый статус.';
+COMMENT ON COLUMN "tin"."InfoInstrument"."figi" IS 'Deprecated Figi-идентификатор инструмента. Необходимо использовать instrument_id.';
+COMMENT ON COLUMN "tin"."InfoInstrument"."instrument_id" IS 'Идентификатор инструмента, принимает значение figi или instrument_uid';
+
+CREATE TABLE IF NOT EXISTS "tin"."InfoSubscription" (
+	"figi" text NOT NULL,
+	"subscription_status_id" bigint NULL,
+	"instrument_uid" text NOT NULL,
+	CONSTRAINT "InfoSubscription_pk" PRIMARY KEY ("figi")
+);
+CREATE INDEX IF NOT EXISTS "InfoSubscription_subscription_status_id_idx" ON "tin"."InfoSubscription" USING btree ("subscription_status_id");
+COMMENT ON TABLE "tin"."InfoSubscription" IS 'Статус подписки.';
+COMMENT ON COLUMN "tin"."InfoSubscription"."figi" IS 'Figi-идентификатор инструмента.';
+COMMENT ON COLUMN "tin"."InfoSubscription"."subscription_status_id" IS 'Статус подписки.';
+COMMENT ON COLUMN "tin"."InfoSubscription"."instrument_uid" IS 'Uid инструмента';
+
+CREATE TABLE IF NOT EXISTS "tin"."Instrument" (
+	"figi" text NOT NULL,
 	"ticker" text NOT NULL,
 	"class_code" text NOT NULL,
-	"string_type" text NULL,
-	"string_instrument_uid" text NULL,
-	"instrument_kind_id" bigint NULL,
+	"isin" text NOT NULL,
+	"lot" integer NOT NULL,
+	"currency" text NOT NULL,
+	"klong_id_units" bigint NULL,
+	"klong_id_nano" integer NULL,
+	"kshort_id_units" bigint NULL,
+	"kshort_id_nano" integer NULL,
+	"dlong_id_units" bigint NULL,
+	"dlong_id_nano" integer NULL,
+	"dshort_id_units" bigint NULL,
+	"dshort_id_nano" integer NULL,
+	"dlong_min_id_units" bigint NULL,
+	"dlong_min_id_nano" integer NULL,
+	"dshort_min_id_units" bigint NULL,
+	"dshort_min_id_nano" integer NULL,
+	"short_enabled_flag" bool NOT NULL,
+	"name" text NOT NULL,
+	"exchange" text NOT NULL,
+	"country_of_risk" text NOT NULL,
+	"country_of_risk_name" text NOT NULL,
+	"instrument_type" text NOT NULL,
+	"trading_status_id" bigint NULL,
+	"otc_flag" bool NOT NULL,
+	"buy_available_flag" bool NOT NULL,
+	"sell_available_flag" bool NOT NULL,
+	"min_price_increment_id_units" bigint NULL,
+	"min_price_increment_id_nano" integer NULL,
+	"api_trade_available_flag" bool NOT NULL,
+	"uid" text NOT NULL,
+	"real_exchange_id" bigint NULL,
 	"position_uid" text NOT NULL,
-	CONSTRAINT "AssetInstrument_pk" PRIMARY KEY ("uid"),
-	CONSTRAINT "AssetInstrument_instrument_kind_id_fk" FOREIGN KEY ("instrument_kind_id") REFERENCES "tin"."InstrumentType" ("id")
+	"for_iis_flag" bool NOT NULL,
+	"for_qual_investor_flag" bool NOT NULL,
+	"weekend_flag" bool NOT NULL,
+	"blocked_tca_flag" bool NOT NULL,
+	"instrument_kind_id" bigint NULL,
+	"first_1min_candle_date" timestamptz NULL,
+	"first_1day_candle_date" timestamptz NULL,
+	CONSTRAINT "Instrument_pk" PRIMARY KEY ("uid")
 );
-CREATE INDEX IF NOT EXISTS "AssetInstrument_links_id_idx" ON "tin"."AssetInstrument" USING btree ("links_id");
-CREATE INDEX IF NOT EXISTS "AssetInstrument_instrument_kind_id_idx" ON "tin"."AssetInstrument" USING btree ("instrument_kind_id");
-COMMENT ON TABLE "tin"."AssetInstrument" IS 'Идентификаторы инструмента.';
-COMMENT ON COLUMN "tin"."AssetInstrument"."uid" IS 'uid идентификатор инструмента.';
-COMMENT ON COLUMN "tin"."AssetInstrument"."figi" IS 'figi идентификатор инструмента.';
-COMMENT ON COLUMN "tin"."AssetInstrument"."instrument_type" IS 'Тип инструмента.';
-COMMENT ON COLUMN "tin"."AssetInstrument"."ticker" IS 'Тикер инструмента.';
-COMMENT ON COLUMN "tin"."AssetInstrument"."class_code" IS 'Класс-код (секция торгов).';
-COMMENT ON COLUMN "tin"."AssetInstrument"."links_id" IS 'Массив связанных инструментов.';
-COMMENT ON COLUMN "tin"."AssetInstrument"."instrument_kind_id" IS 'Тип инструмента.';
-COMMENT ON COLUMN "tin"."AssetInstrument"."position_uid" IS 'id позиции.';
+CREATE INDEX IF NOT EXISTS "Instrument_klong_id_idx" ON "tin"."Instrument" USING btree ("klong_id");
+CREATE INDEX IF NOT EXISTS "Instrument_kshort_id_idx" ON "tin"."Instrument" USING btree ("kshort_id");
+CREATE INDEX IF NOT EXISTS "Instrument_dlong_id_idx" ON "tin"."Instrument" USING btree ("dlong_id");
+CREATE INDEX IF NOT EXISTS "Instrument_dshort_id_idx" ON "tin"."Instrument" USING btree ("dshort_id");
+CREATE INDEX IF NOT EXISTS "Instrument_dlong_min_id_idx" ON "tin"."Instrument" USING btree ("dlong_min_id");
+CREATE INDEX IF NOT EXISTS "Instrument_dshort_min_id_idx" ON "tin"."Instrument" USING btree ("dshort_min_id");
+CREATE INDEX IF NOT EXISTS "Instrument_trading_status_id_idx" ON "tin"."Instrument" USING btree ("trading_status_id");
+CREATE INDEX IF NOT EXISTS "Instrument_min_price_increment_id_idx" ON "tin"."Instrument" USING btree ("min_price_increment_id");
+CREATE INDEX IF NOT EXISTS "Instrument_real_exchange_id_idx" ON "tin"."Instrument" USING btree ("real_exchange_id");
+CREATE INDEX IF NOT EXISTS "Instrument_instrument_kind_id_idx" ON "tin"."Instrument" USING btree ("instrument_kind_id");
+COMMENT ON TABLE "tin"."Instrument" IS 'Объект передачи основной информации об инструменте.';
+COMMENT ON COLUMN "tin"."Instrument"."figi" IS 'Figi-идентификатор инструмента.';
+COMMENT ON COLUMN "tin"."Instrument"."ticker" IS 'Тикер инструмента.';
+COMMENT ON COLUMN "tin"."Instrument"."class_code" IS 'Класс-код инструмента.';
+COMMENT ON COLUMN "tin"."Instrument"."isin" IS 'Isin-идентификатор инструмента.';
+COMMENT ON COLUMN "tin"."Instrument"."lot" IS 'Лотность инструмента. Возможно совершение операций только на количества ценной бумаги, кратные параметру *lot*. Подробнее: [лот](https://tinkoff.github.io/investAPI/glossary#lot)';
+COMMENT ON COLUMN "tin"."Instrument"."currency" IS 'Валюта расчётов.';
+COMMENT ON COLUMN "tin"."Instrument"."klong_id" IS 'Коэффициент ставки риска длинной позиции по инструменту.';
+COMMENT ON COLUMN "tin"."Instrument"."kshort_id" IS 'Коэффициент ставки риска короткой позиции по инструменту.';
+COMMENT ON COLUMN "tin"."Instrument"."dlong_id" IS 'Ставка риска минимальной маржи в лонг. Подробнее: [ставка риска в лонг](https://help.tinkoff.ru/margin-trade/long/risk-rate/)';
+COMMENT ON COLUMN "tin"."Instrument"."dshort_id" IS 'Ставка риска минимальной маржи в шорт. Подробнее: [ставка риска в шорт](https://help.tinkoff.ru/margin-trade/short/risk-rate/)';
+COMMENT ON COLUMN "tin"."Instrument"."dlong_min_id" IS 'Ставка риска начальной маржи в лонг. Подробнее: [ставка риска в лонг](https://help.tinkoff.ru/margin-trade/long/risk-rate/)';
+COMMENT ON COLUMN "tin"."Instrument"."dshort_min_id" IS 'Ставка риска начальной маржи в шорт. Подробнее: [ставка риска в шорт](https://help.tinkoff.ru/margin-trade/short/risk-rate/)';
+COMMENT ON COLUMN "tin"."Instrument"."short_enabled_flag" IS 'Признак доступности для операций в шорт.';
+COMMENT ON COLUMN "tin"."Instrument"."name" IS 'Название инструмента.';
+COMMENT ON COLUMN "tin"."Instrument"."exchange" IS 'Торговая площадка.';
+COMMENT ON COLUMN "tin"."Instrument"."country_of_risk" IS 'Код страны риска, т.е. страны, в которой компания ведёт основной бизнес.';
+COMMENT ON COLUMN "tin"."Instrument"."country_of_risk_name" IS 'Наименование страны риска, т.е. страны, в которой компания ведёт основной бизнес.';
+COMMENT ON COLUMN "tin"."Instrument"."instrument_type" IS 'Тип инструмента.';
+COMMENT ON COLUMN "tin"."Instrument"."trading_status_id" IS 'Текущий режим торгов инструмента.';
+COMMENT ON COLUMN "tin"."Instrument"."otc_flag" IS 'Признак внебиржевой ценной бумаги.';
+COMMENT ON COLUMN "tin"."Instrument"."buy_available_flag" IS 'Признак доступности для покупки.';
+COMMENT ON COLUMN "tin"."Instrument"."sell_available_flag" IS 'Признак доступности для продажи.';
+COMMENT ON COLUMN "tin"."Instrument"."min_price_increment_id" IS 'Шаг цены.';
+COMMENT ON COLUMN "tin"."Instrument"."api_trade_available_flag" IS 'Параметр указывает на возможность торговать инструментом через API.';
+COMMENT ON COLUMN "tin"."Instrument"."uid" IS 'Уникальный идентификатор инструмента.';
+COMMENT ON COLUMN "tin"."Instrument"."real_exchange_id" IS 'Реальная площадка исполнения расчётов.';
+COMMENT ON COLUMN "tin"."Instrument"."position_uid" IS 'Уникальный идентификатор позиции инструмента.';
+COMMENT ON COLUMN "tin"."Instrument"."for_iis_flag" IS 'Признак доступности для ИИС.';
+COMMENT ON COLUMN "tin"."Instrument"."for_qual_investor_flag" IS 'Флаг отображающий доступность торговли инструментом только для квалифицированных инвесторов.';
+COMMENT ON COLUMN "tin"."Instrument"."weekend_flag" IS 'Флаг отображающий доступность торговли инструментом по выходным';
+COMMENT ON COLUMN "tin"."Instrument"."blocked_tca_flag" IS 'Флаг заблокированного ТКС';
+COMMENT ON COLUMN "tin"."Instrument"."instrument_kind_id" IS 'Тип инструмента.';
+COMMENT ON COLUMN "tin"."Instrument"."first_1min_candle_date" IS 'Дата первой минутной свечи.';
+COMMENT ON COLUMN "tin"."Instrument"."first_1day_candle_date" IS 'Дата первой дневной свечи.';
+
+CREATE TABLE IF NOT EXISTS "tin"."InstrumentClosePriceResponse" (
+	"figi" text NOT NULL,
+	"instrument_uid" text NOT NULL,
+	"price_id_units" bigint NULL,
+	"price_id_nano" integer NULL,
+	"time" timestamptz NULL,
+	CONSTRAINT "InstrumentClosePriceResponse_pk" PRIMARY KEY ("figi")
+);
+CREATE INDEX IF NOT EXISTS "InstrumentClosePriceResponse_price_id_idx" ON "tin"."InstrumentClosePriceResponse" USING btree ("price_id");
+COMMENT ON TABLE "tin"."InstrumentClosePriceResponse" IS 'Цена закрытия торговой сессии по инструменту.';
+COMMENT ON COLUMN "tin"."InstrumentClosePriceResponse"."figi" IS 'Figi инструмента.';
+COMMENT ON COLUMN "tin"."InstrumentClosePriceResponse"."instrument_uid" IS 'Uid инструмента.';
+COMMENT ON COLUMN "tin"."InstrumentClosePriceResponse"."price_id" IS 'Цена закрытия торговой сессии.';
+COMMENT ON COLUMN "tin"."InstrumentClosePriceResponse"."time" IS 'Дата совершения торгов.';
+
+CREATE TABLE IF NOT EXISTS "tin"."InstrumentRequest" (
+	"id_type_id" bigint NULL,
+	"class_code" text NOT NULL,
+	"id" text NOT NULL,
+	CONSTRAINT "InstrumentRequest_pk" PRIMARY KEY ("id")
+);
+CREATE INDEX IF NOT EXISTS "InstrumentRequest_id_type_id_idx" ON "tin"."InstrumentRequest" USING btree ("id_type_id");
+COMMENT ON TABLE "tin"."InstrumentRequest" IS 'Запрос получения инструмента по идентификатору.';
+COMMENT ON COLUMN "tin"."InstrumentRequest"."id_type_id" IS ' Тип идентификатора инструмента. Возможные значения: figi, ticker. Подробнее об идентификации инструментов: [Идентификация инструментов](https://tinkoff.github.io/investAPI/faq_identification/)';
+COMMENT ON COLUMN "tin"."InstrumentRequest"."class_code" IS ' Идентификатор class_code. Обязателен при id_type = ticker.';
+COMMENT ON COLUMN "tin"."InstrumentRequest"."id" IS ' Идентификатор запрашиваемого инструмента.';
+
+CREATE TABLE IF NOT EXISTS "tin"."InstrumentShort" (
+	"isin" text NOT NULL,
+	"figi" text NOT NULL,
+	"ticker" text NOT NULL,
+	"class_code" text NOT NULL,
+	"instrument_type" text NOT NULL,
+	"name" text NOT NULL,
+	"uid" text NOT NULL,
+	"position_uid" text NOT NULL,
+	"instrument_kind_id" bigint NULL,
+	"api_trade_available_flag" bool NOT NULL,
+	"for_iis_flag" bool NOT NULL,
+	"first_1min_candle_date" timestamptz NULL,
+	"first_1day_candle_date" timestamptz NULL,
+	"for_qual_investor_flag" bool NOT NULL,
+	"weekend_flag" bool NOT NULL,
+	"blocked_tca_flag" bool NOT NULL,
+	CONSTRAINT "InstrumentShort_pk" PRIMARY KEY ("uid")
+);
+CREATE INDEX IF NOT EXISTS "InstrumentShort_instrument_kind_id_idx" ON "tin"."InstrumentShort" USING btree ("instrument_kind_id");
+COMMENT ON TABLE "tin"."InstrumentShort" IS 'Краткая информация об инструменте.';
+COMMENT ON COLUMN "tin"."InstrumentShort"."isin" IS 'Isin инструмента.';
+COMMENT ON COLUMN "tin"."InstrumentShort"."figi" IS 'Figi инструмента.';
+COMMENT ON COLUMN "tin"."InstrumentShort"."ticker" IS 'Ticker инструмента.';
+COMMENT ON COLUMN "tin"."InstrumentShort"."class_code" IS 'ClassCode инструмента.';
+COMMENT ON COLUMN "tin"."InstrumentShort"."instrument_type" IS 'Тип инструмента.';
+COMMENT ON COLUMN "tin"."InstrumentShort"."name" IS 'Название инструмента.';
+COMMENT ON COLUMN "tin"."InstrumentShort"."uid" IS 'Уникальный идентификатор инструмента.';
+COMMENT ON COLUMN "tin"."InstrumentShort"."position_uid" IS 'Уникальный идентификатор позиции инструмента.';
+COMMENT ON COLUMN "tin"."InstrumentShort"."instrument_kind_id" IS 'Тип инструмента.';
+COMMENT ON COLUMN "tin"."InstrumentShort"."api_trade_available_flag" IS 'Параметр указывает на возможность торговать инструментом через API.';
+COMMENT ON COLUMN "tin"."InstrumentShort"."for_iis_flag" IS 'Признак доступности для ИИС.';
+COMMENT ON COLUMN "tin"."InstrumentShort"."first_1min_candle_date" IS 'Дата первой минутной свечи.';
+COMMENT ON COLUMN "tin"."InstrumentShort"."first_1day_candle_date" IS 'Дата первой дневной свечи.';
+COMMENT ON COLUMN "tin"."InstrumentShort"."for_qual_investor_flag" IS 'Флаг отображающий доступность торговли инструментом только для квалифицированных инвесторов.';
+COMMENT ON COLUMN "tin"."InstrumentShort"."weekend_flag" IS 'Флаг отображающий доступность торговли инструментом по выходным';
+COMMENT ON COLUMN "tin"."InstrumentShort"."blocked_tca_flag" IS 'Флаг заблокированного ТКС';
+
+CREATE TABLE IF NOT EXISTS "tin"."LastPrice" (
+	"figi" text NOT NULL,
+	"price_id_units" bigint NULL,
+	"price_id_nano" integer NULL,
+	"time" timestamptz NULL,
+	"instrument_uid" text NOT NULL,
+	CONSTRAINT "LastPrice_pk" PRIMARY KEY ("figi")
+);
+CREATE INDEX IF NOT EXISTS "LastPrice_price_id_idx" ON "tin"."LastPrice" USING btree ("price_id");
+COMMENT ON TABLE "tin"."LastPrice" IS 'Информация о цене последней сделки.';
+COMMENT ON COLUMN "tin"."LastPrice"."figi" IS 'Figi инструмента.';
+COMMENT ON COLUMN "tin"."LastPrice"."price_id" IS 'Цена последней сделки за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента. Для перевод цен в валюту рекомендуем использовать [информацию со страницы](https://tinkoff.github.io/investAPI/faq_marketdata/)';
+COMMENT ON COLUMN "tin"."LastPrice"."time" IS 'Время получения последней цены в часовом поясе UTC по времени биржи.';
+COMMENT ON COLUMN "tin"."LastPrice"."instrument_uid" IS 'Uid инструмента';
+
+CREATE TABLE IF NOT EXISTS "tin"."LastPriceInstrument" (
+	"figi" text NOT NULL,
+	"instrument_id" text NOT NULL,
+	CONSTRAINT "LastPriceInstrument_pk" PRIMARY KEY ("figi")
+);
+COMMENT ON TABLE "tin"."LastPriceInstrument" IS 'Запрос подписки на последнюю цену.';
+COMMENT ON COLUMN "tin"."LastPriceInstrument"."figi" IS 'Deprecated Figi-идентификатор инструмента. Необходимо использовать instrument_id.';
+COMMENT ON COLUMN "tin"."LastPriceInstrument"."instrument_id" IS 'Идентификатор инструмента, принимает значение figi или instrument_uid';
+
+CREATE TABLE IF NOT EXISTS "tin"."LastPriceSubscription" (
+	"figi" text NOT NULL,
+	"subscription_status_id" bigint NULL,
+	"instrument_uid" text NOT NULL,
+	CONSTRAINT "LastPriceSubscription_pk" PRIMARY KEY ("figi")
+);
+CREATE INDEX IF NOT EXISTS "LastPriceSubscription_subscription_status_id_idx" ON "tin"."LastPriceSubscription" USING btree ("subscription_status_id");
+COMMENT ON TABLE "tin"."LastPriceSubscription" IS 'Статус подписки на цену последней сделки.';
+COMMENT ON COLUMN "tin"."LastPriceSubscription"."figi" IS 'Figi-идентификатор инструмента.';
+COMMENT ON COLUMN "tin"."LastPriceSubscription"."subscription_status_id" IS 'Статус подписки.';
+COMMENT ON COLUMN "tin"."LastPriceSubscription"."instrument_uid" IS 'Uid инструмента';
+
+CREATE TABLE IF NOT EXISTS "tin"."Operation" (
+	"id" text NOT NULL,
+	"parent_operation_id" text NOT NULL,
+	"currency" text NOT NULL,
+	"payment_id_currency" text NULL,
+	"payment_id_units" bigint NULL,
+	"payment_id_nano" integer NULL,
+	"price_id_currency" text NULL,
+	"price_id_units" bigint NULL,
+	"price_id_nano" integer NULL,
+	"state_id" bigint NULL,
+	"quantity" bigint NOT NULL,
+	"quantity_rest" bigint NOT NULL,
+	"figi" text NOT NULL,
+	"instrument_type" text NOT NULL,
+	"date" timestamptz NULL,
+	"type" text NOT NULL,
+	"operation_type_id" bigint NULL,
+	"trades_id" text NULL,
+	"asset_uid" text NOT NULL,
+	"position_uid" text NOT NULL,
+	"instrument_uid" text NOT NULL,
+	CONSTRAINT "Operation_pk" PRIMARY KEY ("id"),
+	CONSTRAINT "Operation_trades_id_fk" FOREIGN KEY ("trades_id") REFERENCES "tin"."OperationTrade" ("trade_id")
+);
+CREATE INDEX IF NOT EXISTS "Operation_payment_id_idx" ON "tin"."Operation" USING btree ("payment_id");
+CREATE INDEX IF NOT EXISTS "Operation_price_id_idx" ON "tin"."Operation" USING btree ("price_id");
+CREATE INDEX IF NOT EXISTS "Operation_state_id_idx" ON "tin"."Operation" USING btree ("state_id");
+CREATE INDEX IF NOT EXISTS "Operation_operation_type_id_idx" ON "tin"."Operation" USING btree ("operation_type_id");
+CREATE INDEX IF NOT EXISTS "Operation_trades_id_idx" ON "tin"."Operation" USING btree ("trades_id");
+COMMENT ON TABLE "tin"."Operation" IS 'Данные по операции.';
+COMMENT ON COLUMN "tin"."Operation"."id" IS 'Идентификатор операции.';
+COMMENT ON COLUMN "tin"."Operation"."parent_operation_id" IS 'Идентификатор родительской операции.';
+COMMENT ON COLUMN "tin"."Operation"."currency" IS 'Валюта операции.';
+COMMENT ON COLUMN "tin"."Operation"."payment_id" IS 'Сумма операции.';
+COMMENT ON COLUMN "tin"."Operation"."price_id" IS 'Цена операции за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента.';
+COMMENT ON COLUMN "tin"."Operation"."state_id" IS 'Статус операции.';
+COMMENT ON COLUMN "tin"."Operation"."quantity" IS 'Количество единиц инструмента.';
+COMMENT ON COLUMN "tin"."Operation"."quantity_rest" IS 'Неисполненный остаток по сделке.';
+COMMENT ON COLUMN "tin"."Operation"."figi" IS 'Figi-идентификатор инструмента, связанного с операцией.';
+COMMENT ON COLUMN "tin"."Operation"."instrument_type" IS 'Тип инструмента. Возможные значения: </br>**bond** — облигация; </br>**share** — акция; </br>**currency** — валюта; </br>**etf** — фонд; </br>**futures** — фьючерс.';
+COMMENT ON COLUMN "tin"."Operation"."date" IS 'Дата и время операции в формате часовом поясе UTC.';
+COMMENT ON COLUMN "tin"."Operation"."type" IS 'Текстовое описание типа операции.';
+COMMENT ON COLUMN "tin"."Operation"."operation_type_id" IS 'Тип операции.';
+COMMENT ON COLUMN "tin"."Operation"."trades_id" IS 'Массив сделок.';
+COMMENT ON COLUMN "tin"."Operation"."asset_uid" IS 'Идентификатор актива';
+COMMENT ON COLUMN "tin"."Operation"."position_uid" IS 'position_uid-идентификатора инструмента.';
+COMMENT ON COLUMN "tin"."Operation"."instrument_uid" IS 'Уникальный идентификатор инструмента.';
+
+CREATE TABLE IF NOT EXISTS "tin"."OperationTrade" (
+	"trade_id" text NOT NULL,
+	"date_time" timestamptz NULL,
+	"quantity" bigint NOT NULL,
+	"price_id_currency" text NULL,
+	"price_id_units" bigint NULL,
+	"price_id_nano" integer NULL,
+	CONSTRAINT "OperationTrade_pk" PRIMARY KEY ("trade_id")
+);
+CREATE INDEX IF NOT EXISTS "OperationTrade_price_id_idx" ON "tin"."OperationTrade" USING btree ("price_id");
+COMMENT ON TABLE "tin"."OperationTrade" IS 'Сделка по операции.';
+COMMENT ON COLUMN "tin"."OperationTrade"."trade_id" IS 'Идентификатор сделки.';
+COMMENT ON COLUMN "tin"."OperationTrade"."date_time" IS 'Дата и время сделки в часовом поясе UTC.';
+COMMENT ON COLUMN "tin"."OperationTrade"."quantity" IS 'Количество инструментов.';
+COMMENT ON COLUMN "tin"."OperationTrade"."price_id" IS 'Цена за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента.';
+
+CREATE TABLE IF NOT EXISTS "tin"."OperationsRequest" (
+	"account_id" text NOT NULL,
+	"from" timestamptz NULL,
+	"to" timestamptz NULL,
+	"state_id" bigint NULL,
+	"figi" text NOT NULL,
+	CONSTRAINT "OperationsRequest_pk" PRIMARY KEY ("figi")
+);
+CREATE INDEX IF NOT EXISTS "OperationsRequest_state_id_idx" ON "tin"."OperationsRequest" USING btree ("state_id");
+COMMENT ON TABLE "tin"."OperationsRequest" IS 'Запрос получения списка операций по счёту.';
+COMMENT ON COLUMN "tin"."OperationsRequest"."account_id" IS 'Идентификатор счёта клиента.';
+COMMENT ON COLUMN "tin"."OperationsRequest"."from" IS 'Начало периода (по UTC).';
+COMMENT ON COLUMN "tin"."OperationsRequest"."to" IS 'Окончание периода (по UTC).';
+COMMENT ON COLUMN "tin"."OperationsRequest"."state_id" IS 'Статус запрашиваемых операций.';
+COMMENT ON COLUMN "tin"."OperationsRequest"."figi" IS 'Figi-идентификатор инструмента для фильтрации.';
+
+CREATE TABLE IF NOT EXISTS "tin"."Option" (
+	"uid" text NOT NULL,
+	"position_uid" text NOT NULL,
+	"ticker" text NOT NULL,
+	"class_code" text NOT NULL,
+	"basic_asset_position_uid" text NOT NULL,
+	"trading_status_id" bigint NULL,
+	"real_exchange_id" bigint NULL,
+	"direction_id" bigint NULL,
+	"payment_type_id" bigint NULL,
+	"style_id" bigint NULL,
+	"settlement_type_id" bigint NULL,
+	"name" text NOT NULL,
+	"currency" text NOT NULL,
+	"settlement_currency" text NOT NULL,
+	"asset_type" text NOT NULL,
+	"basic_asset" text NOT NULL,
+	"exchange" text NOT NULL,
+	"country_of_risk" text NOT NULL,
+	"country_of_risk_name" text NOT NULL,
+	"sector" text NOT NULL,
+	"lot" integer NOT NULL,
+	"basic_asset_size_id_units" bigint NULL,
+	"basic_asset_size_id_nano" integer NULL,
+	"klong_id_units" bigint NULL,
+	"klong_id_nano" integer NULL,
+	"kshort_id_units" bigint NULL,
+	"kshort_id_nano" integer NULL,
+	"dlong_id_units" bigint NULL,
+	"dlong_id_nano" integer NULL,
+	"dshort_id_units" bigint NULL,
+	"dshort_id_nano" integer NULL,
+	"dlong_min_id_units" bigint NULL,
+	"dlong_min_id_nano" integer NULL,
+	"dshort_min_id_units" bigint NULL,
+	"dshort_min_id_nano" integer NULL,
+	"min_price_increment_id_units" bigint NULL,
+	"min_price_increment_id_nano" integer NULL,
+	"strike_price_id_currency" text NULL,
+	"strike_price_id_units" bigint NULL,
+	"strike_price_id_nano" integer NULL,
+	"expiration_date" timestamptz NULL,
+	"first_trade_date" timestamptz NULL,
+	"last_trade_date" timestamptz NULL,
+	"first_1min_candle_date" timestamptz NULL,
+	"first_1day_candle_date" timestamptz NULL,
+	"short_enabled_flag" bool NOT NULL,
+	"for_iis_flag" bool NOT NULL,
+	"otc_flag" bool NOT NULL,
+	"buy_available_flag" bool NOT NULL,
+	"sell_available_flag" bool NOT NULL,
+	"for_qual_investor_flag" bool NOT NULL,
+	"weekend_flag" bool NOT NULL,
+	"blocked_tca_flag" bool NOT NULL,
+	"api_trade_available_flag" bool NOT NULL,
+	CONSTRAINT "Option_pk" PRIMARY KEY ("uid")
+);
+CREATE INDEX IF NOT EXISTS "Option_trading_status_id_idx" ON "tin"."Option" USING btree ("trading_status_id");
+CREATE INDEX IF NOT EXISTS "Option_real_exchange_id_idx" ON "tin"."Option" USING btree ("real_exchange_id");
+CREATE INDEX IF NOT EXISTS "Option_direction_id_idx" ON "tin"."Option" USING btree ("direction_id");
+CREATE INDEX IF NOT EXISTS "Option_payment_type_id_idx" ON "tin"."Option" USING btree ("payment_type_id");
+CREATE INDEX IF NOT EXISTS "Option_style_id_idx" ON "tin"."Option" USING btree ("style_id");
+CREATE INDEX IF NOT EXISTS "Option_settlement_type_id_idx" ON "tin"."Option" USING btree ("settlement_type_id");
+CREATE INDEX IF NOT EXISTS "Option_basic_asset_size_id_idx" ON "tin"."Option" USING btree ("basic_asset_size_id");
+CREATE INDEX IF NOT EXISTS "Option_klong_id_idx" ON "tin"."Option" USING btree ("klong_id");
+CREATE INDEX IF NOT EXISTS "Option_kshort_id_idx" ON "tin"."Option" USING btree ("kshort_id");
+CREATE INDEX IF NOT EXISTS "Option_dlong_id_idx" ON "tin"."Option" USING btree ("dlong_id");
+CREATE INDEX IF NOT EXISTS "Option_dshort_id_idx" ON "tin"."Option" USING btree ("dshort_id");
+CREATE INDEX IF NOT EXISTS "Option_dlong_min_id_idx" ON "tin"."Option" USING btree ("dlong_min_id");
+CREATE INDEX IF NOT EXISTS "Option_dshort_min_id_idx" ON "tin"."Option" USING btree ("dshort_min_id");
+CREATE INDEX IF NOT EXISTS "Option_min_price_increment_id_idx" ON "tin"."Option" USING btree ("min_price_increment_id");
+CREATE INDEX IF NOT EXISTS "Option_strike_price_id_idx" ON "tin"."Option" USING btree ("strike_price_id");
+COMMENT ON TABLE "tin"."Option" IS 'Опцион.';
+COMMENT ON COLUMN "tin"."Option"."uid" IS 'Уникальный идентификатор инструмента.';
+COMMENT ON COLUMN "tin"."Option"."position_uid" IS 'Уникальный идентификатор позиции.';
+COMMENT ON COLUMN "tin"."Option"."ticker" IS 'Тикер инструмента.';
+COMMENT ON COLUMN "tin"."Option"."class_code" IS 'Класс-код.';
+COMMENT ON COLUMN "tin"."Option"."basic_asset_position_uid" IS 'Уникальный идентификатор позиции основного инструмента.';
+COMMENT ON COLUMN "tin"."Option"."trading_status_id" IS 'Текущий режим торгов инструмента.';
+COMMENT ON COLUMN "tin"."Option"."real_exchange_id" IS 'Реальная площадка исполнения расчётов. Допустимые значения: [REAL_EXCHANGE_MOEX, REAL_EXCHANGE_RTS]';
+COMMENT ON COLUMN "tin"."Option"."direction_id" IS 'Направление опциона.';
+COMMENT ON COLUMN "tin"."Option"."payment_type_id" IS 'Тип расчетов по опциону.';
+COMMENT ON COLUMN "tin"."Option"."style_id" IS 'Стиль опциона.';
+COMMENT ON COLUMN "tin"."Option"."settlement_type_id" IS 'Способ исполнения опциона.';
+COMMENT ON COLUMN "tin"."Option"."name" IS 'Название инструмента.';
+COMMENT ON COLUMN "tin"."Option"."currency" IS 'Валюта.';
+COMMENT ON COLUMN "tin"."Option"."settlement_currency" IS 'Валюта, в которой оценивается контракт.';
+COMMENT ON COLUMN "tin"."Option"."asset_type" IS 'Тип актива.';
+COMMENT ON COLUMN "tin"."Option"."basic_asset" IS 'Основной актив.';
+COMMENT ON COLUMN "tin"."Option"."exchange" IS 'Биржа.';
+COMMENT ON COLUMN "tin"."Option"."country_of_risk" IS 'Код страны рисков.';
+COMMENT ON COLUMN "tin"."Option"."country_of_risk_name" IS 'Наименование страны рисков.';
+COMMENT ON COLUMN "tin"."Option"."sector" IS 'Сектор экономики.';
+COMMENT ON COLUMN "tin"."Option"."lot" IS 'Количество бумаг в лоте.';
+COMMENT ON COLUMN "tin"."Option"."basic_asset_size_id" IS 'Размер основного актива.';
+COMMENT ON COLUMN "tin"."Option"."klong_id" IS 'Коэффициент ставки риска длинной позиции по клиенту.';
+COMMENT ON COLUMN "tin"."Option"."kshort_id" IS 'Коэффициент ставки риска короткой позиции по клиенту.';
+COMMENT ON COLUMN "tin"."Option"."dlong_id" IS 'Ставка риска минимальной маржи лонг.';
+COMMENT ON COLUMN "tin"."Option"."dshort_id" IS 'Ставка риска минимальной маржи шорт.';
+COMMENT ON COLUMN "tin"."Option"."dlong_min_id" IS 'Ставка риска начальной маржи лонг.';
+COMMENT ON COLUMN "tin"."Option"."dshort_min_id" IS 'Ставка риска начальной маржи шорт.';
+COMMENT ON COLUMN "tin"."Option"."min_price_increment_id" IS 'Минимальный шаг цены.';
+COMMENT ON COLUMN "tin"."Option"."strike_price_id" IS 'Цена страйка.';
+COMMENT ON COLUMN "tin"."Option"."expiration_date" IS 'Дата истечения срока в формате UTC.';
+COMMENT ON COLUMN "tin"."Option"."first_trade_date" IS 'Дата начала обращения контракта в формате UTC.';
+COMMENT ON COLUMN "tin"."Option"."last_trade_date" IS 'Дата исполнения в формате UTC.';
+COMMENT ON COLUMN "tin"."Option"."first_1min_candle_date" IS 'Дата первой минутной свечи в формате UTC.';
+COMMENT ON COLUMN "tin"."Option"."first_1day_candle_date" IS 'Дата первой дневной свечи в формате UTC.';
+COMMENT ON COLUMN "tin"."Option"."short_enabled_flag" IS 'Признак доступности для операций шорт.';
+COMMENT ON COLUMN "tin"."Option"."for_iis_flag" IS 'Возможность покупки/продажи на ИИС.';
+COMMENT ON COLUMN "tin"."Option"."otc_flag" IS 'Признак внебиржевой ценной бумаги.';
+COMMENT ON COLUMN "tin"."Option"."buy_available_flag" IS 'Признак доступности для покупки.';
+COMMENT ON COLUMN "tin"."Option"."sell_available_flag" IS 'Признак доступности для продажи.';
+COMMENT ON COLUMN "tin"."Option"."for_qual_investor_flag" IS 'Флаг отображающий доступность торговли инструментом только для квалифицированных инвесторов.';
+COMMENT ON COLUMN "tin"."Option"."weekend_flag" IS 'Флаг отображающий доступность торговли инструментом по выходным.';
+COMMENT ON COLUMN "tin"."Option"."blocked_tca_flag" IS 'Флаг заблокированного ТКС.';
+COMMENT ON COLUMN "tin"."Option"."api_trade_available_flag" IS 'Параметр указывает на возможность торговать инструментом через API.';
+
+CREATE TABLE IF NOT EXISTS "tin"."OrderBookInstrument" (
+	"figi" text NOT NULL,
+	"depth" integer NOT NULL,
+	"instrument_id" text NOT NULL,
+	CONSTRAINT "OrderBookInstrument_pk" PRIMARY KEY ("figi")
+);
+COMMENT ON TABLE "tin"."OrderBookInstrument" IS 'Запрос подписки на стаканы.';
+COMMENT ON COLUMN "tin"."OrderBookInstrument"."figi" IS 'Deprecated Figi-идентификатор инструмента. Необходимо использовать instrument_id.';
+COMMENT ON COLUMN "tin"."OrderBookInstrument"."depth" IS 'Глубина стакана.';
+COMMENT ON COLUMN "tin"."OrderBookInstrument"."instrument_id" IS 'Идентификатор инструмента, принимает значение figi или instrument_uid';
+
+CREATE TABLE IF NOT EXISTS "tin"."OrderBookSubscription" (
+	"figi" text NOT NULL,
+	"depth" integer NOT NULL,
+	"subscription_status_id" bigint NULL,
+	"instrument_uid" text NOT NULL,
+	CONSTRAINT "OrderBookSubscription_pk" PRIMARY KEY ("figi")
+);
+CREATE INDEX IF NOT EXISTS "OrderBookSubscription_subscription_status_id_idx" ON "tin"."OrderBookSubscription" USING btree ("subscription_status_id");
+COMMENT ON TABLE "tin"."OrderBookSubscription" IS 'Статус подписки.';
+COMMENT ON COLUMN "tin"."OrderBookSubscription"."figi" IS 'Figi-идентификатор инструмента.';
+COMMENT ON COLUMN "tin"."OrderBookSubscription"."depth" IS 'Глубина стакана.';
+COMMENT ON COLUMN "tin"."OrderBookSubscription"."subscription_status_id" IS 'Статус подписки.';
+COMMENT ON COLUMN "tin"."OrderBookSubscription"."instrument_uid" IS 'Uid инструмента';
+
+CREATE TABLE IF NOT EXISTS "tin"."OrderStage" (
+	"price_id_currency" text NULL,
+	"price_id_units" bigint NULL,
+	"price_id_nano" integer NULL,
+	"quantity" bigint NOT NULL,
+	"trade_id" text NOT NULL,
+	CONSTRAINT "OrderStage_pk" PRIMARY KEY ("trade_id")
+);
+CREATE INDEX IF NOT EXISTS "OrderStage_price_id_idx" ON "tin"."OrderStage" USING btree ("price_id");
+COMMENT ON TABLE "tin"."OrderStage" IS 'Сделки в рамках торгового поручения.';
+COMMENT ON COLUMN "tin"."OrderStage"."price_id" IS 'Цена за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента.';
+COMMENT ON COLUMN "tin"."OrderStage"."quantity" IS 'Количество лотов.';
+COMMENT ON COLUMN "tin"."OrderStage"."trade_id" IS 'Идентификатор сделки.';
+
+CREATE TABLE IF NOT EXISTS "tin"."OrderState" (
+	"order_id" text NOT NULL,
+	"execution_report_status_id" bigint NULL,
+	"lots_requested" bigint NOT NULL,
+	"lots_executed" bigint NOT NULL,
+	"initial_order_price_id_currency" text NULL,
+	"initial_order_price_id_units" bigint NULL,
+	"initial_order_price_id_nano" integer NULL,
+	"executed_order_price_id_currency" text NULL,
+	"executed_order_price_id_units" bigint NULL,
+	"executed_order_price_id_nano" integer NULL,
+	"total_order_amount_id_currency" text NULL,
+	"total_order_amount_id_units" bigint NULL,
+	"total_order_amount_id_nano" integer NULL,
+	"average_position_price_id_currency" text NULL,
+	"average_position_price_id_units" bigint NULL,
+	"average_position_price_id_nano" integer NULL,
+	"initial_commission_id_currency" text NULL,
+	"initial_commission_id_units" bigint NULL,
+	"initial_commission_id_nano" integer NULL,
+	"executed_commission_id_currency" text NULL,
+	"executed_commission_id_units" bigint NULL,
+	"executed_commission_id_nano" integer NULL,
+	"figi" text NOT NULL,
+	"direction_id" bigint NULL,
+	"initial_security_price_id_currency" text NULL,
+	"initial_security_price_id_units" bigint NULL,
+	"initial_security_price_id_nano" integer NULL,
+	"stages_id" text NULL,
+	"service_commission_id_currency" text NULL,
+	"service_commission_id_units" bigint NULL,
+	"service_commission_id_nano" integer NULL,
+	"currency" text NOT NULL,
+	"order_type_id" bigint NULL,
+	"order_date" timestamptz NULL,
+	"instrument_uid" text NOT NULL,
+	"order_request_id" text NOT NULL,
+	CONSTRAINT "OrderState_pk" PRIMARY KEY ("figi"),
+	CONSTRAINT "OrderState_stages_id_fk" FOREIGN KEY ("stages_id") REFERENCES "tin"."OrderStage" ("trade_id")
+);
+CREATE INDEX IF NOT EXISTS "OrderState_execution_report_status_id_idx" ON "tin"."OrderState" USING btree ("execution_report_status_id");
+CREATE INDEX IF NOT EXISTS "OrderState_initial_order_price_id_idx" ON "tin"."OrderState" USING btree ("initial_order_price_id");
+CREATE INDEX IF NOT EXISTS "OrderState_executed_order_price_id_idx" ON "tin"."OrderState" USING btree ("executed_order_price_id");
+CREATE INDEX IF NOT EXISTS "OrderState_total_order_amount_id_idx" ON "tin"."OrderState" USING btree ("total_order_amount_id");
+CREATE INDEX IF NOT EXISTS "OrderState_average_position_price_id_idx" ON "tin"."OrderState" USING btree ("average_position_price_id");
+CREATE INDEX IF NOT EXISTS "OrderState_initial_commission_id_idx" ON "tin"."OrderState" USING btree ("initial_commission_id");
+CREATE INDEX IF NOT EXISTS "OrderState_executed_commission_id_idx" ON "tin"."OrderState" USING btree ("executed_commission_id");
+CREATE INDEX IF NOT EXISTS "OrderState_direction_id_idx" ON "tin"."OrderState" USING btree ("direction_id");
+CREATE INDEX IF NOT EXISTS "OrderState_initial_security_price_id_idx" ON "tin"."OrderState" USING btree ("initial_security_price_id");
+CREATE INDEX IF NOT EXISTS "OrderState_stages_id_idx" ON "tin"."OrderState" USING btree ("stages_id");
+CREATE INDEX IF NOT EXISTS "OrderState_service_commission_id_idx" ON "tin"."OrderState" USING btree ("service_commission_id");
+CREATE INDEX IF NOT EXISTS "OrderState_order_type_id_idx" ON "tin"."OrderState" USING btree ("order_type_id");
+COMMENT ON TABLE "tin"."OrderState" IS 'Информация о торговом поручении.';
+COMMENT ON COLUMN "tin"."OrderState"."order_id" IS 'Биржевой идентификатор заявки.';
+COMMENT ON COLUMN "tin"."OrderState"."execution_report_status_id" IS 'Текущий статус заявки.';
+COMMENT ON COLUMN "tin"."OrderState"."lots_requested" IS 'Запрошено лотов.';
+COMMENT ON COLUMN "tin"."OrderState"."lots_executed" IS 'Исполнено лотов.';
+COMMENT ON COLUMN "tin"."OrderState"."initial_order_price_id" IS 'Начальная цена заявки. Произведение количества запрошенных лотов на цену.';
+COMMENT ON COLUMN "tin"."OrderState"."executed_order_price_id" IS 'Исполненная цена заявки. Произведение средней цены покупки на количество лотов.';
+COMMENT ON COLUMN "tin"."OrderState"."total_order_amount_id" IS 'Итоговая стоимость заявки, включающая все комиссии.';
+COMMENT ON COLUMN "tin"."OrderState"."average_position_price_id" IS 'Средняя цена позиции по сделке.';
+COMMENT ON COLUMN "tin"."OrderState"."initial_commission_id" IS 'Начальная комиссия. Комиссия, рассчитанная на момент подачи заявки.';
+COMMENT ON COLUMN "tin"."OrderState"."executed_commission_id" IS 'Фактическая комиссия по итогам исполнения заявки.';
+COMMENT ON COLUMN "tin"."OrderState"."figi" IS 'Figi-идентификатор инструмента.';
+COMMENT ON COLUMN "tin"."OrderState"."direction_id" IS 'Направление заявки.';
+COMMENT ON COLUMN "tin"."OrderState"."initial_security_price_id" IS 'Начальная цена за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента.';
+COMMENT ON COLUMN "tin"."OrderState"."stages_id" IS 'Стадии выполнения заявки.';
+COMMENT ON COLUMN "tin"."OrderState"."service_commission_id" IS 'Сервисная комиссия.';
+COMMENT ON COLUMN "tin"."OrderState"."currency" IS 'Валюта заявки.';
+COMMENT ON COLUMN "tin"."OrderState"."order_type_id" IS 'Тип заявки.';
+COMMENT ON COLUMN "tin"."OrderState"."order_date" IS 'Дата и время выставления заявки в часовом поясе UTC.';
+COMMENT ON COLUMN "tin"."OrderState"."instrument_uid" IS 'UID идентификатор инструмента.';
+COMMENT ON COLUMN "tin"."OrderState"."order_request_id" IS 'Идентификатор ключа идемпотентности, переданный клиентом.';
 
 CREATE TABLE IF NOT EXISTS "tin"."AssetShare" (
 	"type_id" bigint NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
+	"issue_size_id_units" bigint NULL,
+	"issue_size_id_nano" integer NULL,
+	"nominal_id_units" bigint NULL,
+	"nominal_id_nano" integer NULL,
 	"nominal_currency" text NOT NULL,
 	"primary_index" text NOT NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
+	"dividend_rate_id_units" bigint NULL,
+	"dividend_rate_id_nano" integer NULL,
 	"preferred_share_type" text NOT NULL,
 	"ipo_date" timestamptz NULL,
 	"registry_date" timestamptz NULL,
@@ -864,12 +1238,11 @@ CREATE TABLE IF NOT EXISTS "tin"."AssetShare" (
 	"issue_kind" text NOT NULL,
 	"placement_date" timestamptz NULL,
 	"repres_isin" text NOT NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	CONSTRAINT "AssetShare_pk" PRIMARY KEY ("primary_index"),
-	CONSTRAINT "AssetShare_type_id_fk" FOREIGN KEY ("type_id") REFERENCES "tin"."ShareType" ("id")
+	"issue_size_plan_id_units" bigint NULL,
+	"issue_size_plan_id_nano" integer NULL,
+	"total_float_id_units" bigint NULL,
+	"total_float_id_nano" integer NULL,
+	CONSTRAINT "AssetShare_pk" PRIMARY KEY ("primary_index")
 );
 CREATE INDEX IF NOT EXISTS "AssetShare_type_id_idx" ON "tin"."AssetShare" USING btree ("type_id");
 CREATE INDEX IF NOT EXISTS "AssetShare_issue_size_id_idx" ON "tin"."AssetShare" USING btree ("issue_size_id");
@@ -894,6 +1267,405 @@ COMMENT ON COLUMN "tin"."AssetShare"."repres_isin" IS 'ISIN базового а�
 COMMENT ON COLUMN "tin"."AssetShare"."issue_size_plan_id" IS 'Объявленное количество шт.';
 COMMENT ON COLUMN "tin"."AssetShare"."total_float_id" IS 'Количество акций в свободном обращении.';
 
+CREATE TABLE IF NOT EXISTS "tin"."OrderTrade" (
+	"date_time" timestamptz NULL,
+	"price_id_units" bigint NULL,
+	"price_id_nano" integer NULL,
+	"quantity" bigint NOT NULL,
+	"trade_id" text NOT NULL,
+	CONSTRAINT "OrderTrade_pk" PRIMARY KEY ("trade_id")
+);
+CREATE INDEX IF NOT EXISTS "OrderTrade_price_id_idx" ON "tin"."OrderTrade" USING btree ("price_id");
+COMMENT ON TABLE "tin"."OrderTrade" IS 'Информация о сделке.';
+COMMENT ON COLUMN "tin"."OrderTrade"."date_time" IS 'Дата и время совершения сделки в часовом поясе UTC.';
+COMMENT ON COLUMN "tin"."OrderTrade"."price_id" IS 'Цена за 1 инструмент, по которой совершена сделка.';
+COMMENT ON COLUMN "tin"."OrderTrade"."quantity" IS 'Количество штук в сделке.';
+COMMENT ON COLUMN "tin"."OrderTrade"."trade_id" IS 'Идентификатор сделки.';
+
+CREATE TABLE IF NOT EXISTS "tin"."OrderTrades" (
+	"order_id" text NOT NULL,
+	"created_at" timestamptz NULL,
+	"direction_id" bigint NULL,
+	"figi" text NOT NULL,
+	"trades_id" text NULL,
+	"account_id" text NOT NULL,
+	"instrument_uid" text NOT NULL,
+	CONSTRAINT "OrderTrades_pk" PRIMARY KEY ("figi"),
+	CONSTRAINT "OrderTrades_trades_id_fk" FOREIGN KEY ("trades_id") REFERENCES "tin"."OrderTrade" ("trade_id")
+);
+CREATE INDEX IF NOT EXISTS "OrderTrades_direction_id_idx" ON "tin"."OrderTrades" USING btree ("direction_id");
+CREATE INDEX IF NOT EXISTS "OrderTrades_trades_id_idx" ON "tin"."OrderTrades" USING btree ("trades_id");
+COMMENT ON TABLE "tin"."OrderTrades" IS 'Информация об исполнении торгового поручения.';
+COMMENT ON COLUMN "tin"."OrderTrades"."order_id" IS 'Идентификатор торгового поручения.';
+COMMENT ON COLUMN "tin"."OrderTrades"."created_at" IS 'Дата и время создания сообщения в часовом поясе UTC.';
+COMMENT ON COLUMN "tin"."OrderTrades"."direction_id" IS 'Направление сделки.';
+COMMENT ON COLUMN "tin"."OrderTrades"."figi" IS 'Figi-идентификатор инструмента.';
+COMMENT ON COLUMN "tin"."OrderTrades"."trades_id" IS 'Массив сделок.';
+COMMENT ON COLUMN "tin"."OrderTrades"."account_id" IS 'Идентификатор счёта.';
+COMMENT ON COLUMN "tin"."OrderTrades"."instrument_uid" IS 'UID идентификатор инструмента.';
+
+CREATE TABLE IF NOT EXISTS "tin"."PortfolioPosition" (
+	"figi" text NOT NULL,
+	"instrument_type" text NOT NULL,
+	"quantity_id_units" bigint NULL,
+	"quantity_id_nano" integer NULL,
+	"average_position_price_id_currency" text NULL,
+	"average_position_price_id_units" bigint NULL,
+	"average_position_price_id_nano" integer NULL,
+	"expected_yield_id_units" bigint NULL,
+	"expected_yield_id_nano" integer NULL,
+	"current_nkd_id_currency" text NULL,
+	"current_nkd_id_units" bigint NULL,
+	"current_nkd_id_nano" integer NULL,
+	"average_position_price_pt_id_units" bigint NULL,
+	"average_position_price_pt_id_nano" integer NULL,
+	"current_price_id_currency" text NULL,
+	"current_price_id_units" bigint NULL,
+	"current_price_id_nano" integer NULL,
+	"average_position_price_fifo_id_currency" text NULL,
+	"average_position_price_fifo_id_units" bigint NULL,
+	"average_position_price_fifo_id_nano" integer NULL,
+	"quantity_lots_id_units" bigint NULL,
+	"quantity_lots_id_nano" integer NULL,
+	"blocked" bool NOT NULL,
+	"blocked_lots_id_units" bigint NULL,
+	"blocked_lots_id_nano" integer NULL,
+	"position_uid" text NOT NULL,
+	"instrument_uid" text NOT NULL,
+	"var_margin_id_currency" text NULL,
+	"var_margin_id_units" bigint NULL,
+	"var_margin_id_nano" integer NULL,
+	"expected_yield_fifo_id_units" bigint NULL,
+	"expected_yield_fifo_id_nano" integer NULL,
+	CONSTRAINT "PortfolioPosition_pk" PRIMARY KEY ("figi")
+);
+CREATE INDEX IF NOT EXISTS "PortfolioPosition_quantity_id_idx" ON "tin"."PortfolioPosition" USING btree ("quantity_id");
+CREATE INDEX IF NOT EXISTS "PortfolioPosition_average_position_price_id_idx" ON "tin"."PortfolioPosition" USING btree ("average_position_price_id");
+CREATE INDEX IF NOT EXISTS "PortfolioPosition_expected_yield_id_idx" ON "tin"."PortfolioPosition" USING btree ("expected_yield_id");
+CREATE INDEX IF NOT EXISTS "PortfolioPosition_current_nkd_id_idx" ON "tin"."PortfolioPosition" USING btree ("current_nkd_id");
+CREATE INDEX IF NOT EXISTS "PortfolioPosition_average_position_price_pt_id_idx" ON "tin"."PortfolioPosition" USING btree ("average_position_price_pt_id");
+CREATE INDEX IF NOT EXISTS "PortfolioPosition_current_price_id_idx" ON "tin"."PortfolioPosition" USING btree ("current_price_id");
+CREATE INDEX IF NOT EXISTS "PortfolioPosition_average_position_price_fifo_id_idx" ON "tin"."PortfolioPosition" USING btree ("average_position_price_fifo_id");
+CREATE INDEX IF NOT EXISTS "PortfolioPosition_quantity_lots_id_idx" ON "tin"."PortfolioPosition" USING btree ("quantity_lots_id");
+CREATE INDEX IF NOT EXISTS "PortfolioPosition_blocked_lots_id_idx" ON "tin"."PortfolioPosition" USING btree ("blocked_lots_id");
+CREATE INDEX IF NOT EXISTS "PortfolioPosition_var_margin_id_idx" ON "tin"."PortfolioPosition" USING btree ("var_margin_id");
+CREATE INDEX IF NOT EXISTS "PortfolioPosition_expected_yield_fifo_id_idx" ON "tin"."PortfolioPosition" USING btree ("expected_yield_fifo_id");
+COMMENT ON TABLE "tin"."PortfolioPosition" IS 'Позиции портфеля.';
+COMMENT ON COLUMN "tin"."PortfolioPosition"."figi" IS 'Figi-идентификатора инструмента.';
+COMMENT ON COLUMN "tin"."PortfolioPosition"."instrument_type" IS 'Тип инструмента.';
+COMMENT ON COLUMN "tin"."PortfolioPosition"."quantity_id" IS 'Количество инструмента в портфеле в штуках.';
+COMMENT ON COLUMN "tin"."PortfolioPosition"."average_position_price_id" IS 'Средневзвешенная цена позиции. **Возможна задержка до секунды для пересчёта**.';
+COMMENT ON COLUMN "tin"."PortfolioPosition"."expected_yield_id" IS 'Текущая рассчитанная доходность позиции.';
+COMMENT ON COLUMN "tin"."PortfolioPosition"."current_nkd_id" IS ' Текущий НКД.';
+COMMENT ON COLUMN "tin"."PortfolioPosition"."average_position_price_pt_id" IS ' Deprecated Средняя цена позиции в пунктах (для фьючерсов). **Возможна задержка до секунды для пересчёта**.';
+COMMENT ON COLUMN "tin"."PortfolioPosition"."current_price_id" IS 'Текущая цена за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента.';
+COMMENT ON COLUMN "tin"."PortfolioPosition"."average_position_price_fifo_id" IS 'Средняя цена позиции по методу FIFO. **Возможна задержка до секунды для пересчёта**.';
+COMMENT ON COLUMN "tin"."PortfolioPosition"."quantity_lots_id" IS 'Deprecated Количество лотов в портфеле.';
+COMMENT ON COLUMN "tin"."PortfolioPosition"."blocked" IS 'Заблокировано на бирже.';
+COMMENT ON COLUMN "tin"."PortfolioPosition"."blocked_lots_id" IS 'Количество бумаг, заблокированных выставленными заявками.';
+COMMENT ON COLUMN "tin"."PortfolioPosition"."position_uid" IS 'position_uid-идентификатора инструмента';
+COMMENT ON COLUMN "tin"."PortfolioPosition"."instrument_uid" IS 'instrument_uid-идентификатора инструмента';
+COMMENT ON COLUMN "tin"."PortfolioPosition"."var_margin_id" IS 'Вариационная маржа';
+COMMENT ON COLUMN "tin"."PortfolioPosition"."expected_yield_fifo_id" IS 'Текущая рассчитанная доходность позиции.';
+
+CREATE TABLE IF NOT EXISTS "tin"."PositionsFutures" (
+	"figi" text NOT NULL,
+	"blocked" bigint NOT NULL,
+	"balance" bigint NOT NULL,
+	"position_uid" text NOT NULL,
+	"instrument_uid" text NOT NULL,
+	CONSTRAINT "PositionsFutures_pk" PRIMARY KEY ("figi")
+);
+COMMENT ON TABLE "tin"."PositionsFutures" IS 'Баланс фьючерса.';
+COMMENT ON COLUMN "tin"."PositionsFutures"."figi" IS 'Figi-идентификатор фьючерса.';
+COMMENT ON COLUMN "tin"."PositionsFutures"."blocked" IS 'Количество бумаг заблокированных выставленными заявками.';
+COMMENT ON COLUMN "tin"."PositionsFutures"."balance" IS 'Текущий незаблокированный баланс.';
+COMMENT ON COLUMN "tin"."PositionsFutures"."position_uid" IS 'Уникальный идентификатор позиции.';
+COMMENT ON COLUMN "tin"."PositionsFutures"."instrument_uid" IS 'Уникальный идентификатор  инструмента.';
+
+CREATE TABLE IF NOT EXISTS "tin"."PositionsSecurities" (
+	"figi" text NOT NULL,
+	"blocked" bigint NOT NULL,
+	"balance" bigint NOT NULL,
+	"position_uid" text NOT NULL,
+	"instrument_uid" text NOT NULL,
+	"exchange_blocked" bool NOT NULL,
+	"instrument_type" text NOT NULL,
+	CONSTRAINT "PositionsSecurities_pk" PRIMARY KEY ("figi")
+);
+COMMENT ON TABLE "tin"."PositionsSecurities" IS 'Баланс позиции ценной бумаги.';
+COMMENT ON COLUMN "tin"."PositionsSecurities"."figi" IS 'Figi-идентификатор бумаги.';
+COMMENT ON COLUMN "tin"."PositionsSecurities"."blocked" IS 'Количество бумаг заблокированных выставленными заявками.';
+COMMENT ON COLUMN "tin"."PositionsSecurities"."balance" IS 'Текущий незаблокированный баланс.';
+COMMENT ON COLUMN "tin"."PositionsSecurities"."position_uid" IS 'Уникальный идентификатор позиции.';
+COMMENT ON COLUMN "tin"."PositionsSecurities"."instrument_uid" IS 'Уникальный идентификатор  инструмента.';
+COMMENT ON COLUMN "tin"."PositionsSecurities"."exchange_blocked" IS 'Заблокировано на бирже.';
+COMMENT ON COLUMN "tin"."PositionsSecurities"."instrument_type" IS 'Тип инструмента.';
+
+CREATE TABLE IF NOT EXISTS "tin"."PostOrderRequest" (
+	"figi" text NOT NULL,
+	"quantity" bigint NOT NULL,
+	"price_id_units" bigint NULL,
+	"price_id_nano" integer NULL,
+	"direction_id" bigint NULL,
+	"account_id" text NOT NULL,
+	"order_type_id" bigint NULL,
+	"order_id" text NOT NULL,
+	"instrument_id" text NOT NULL,
+	CONSTRAINT "PostOrderRequest_pk" PRIMARY KEY ("figi")
+);
+CREATE INDEX IF NOT EXISTS "PostOrderRequest_price_id_idx" ON "tin"."PostOrderRequest" USING btree ("price_id");
+CREATE INDEX IF NOT EXISTS "PostOrderRequest_direction_id_idx" ON "tin"."PostOrderRequest" USING btree ("direction_id");
+CREATE INDEX IF NOT EXISTS "PostOrderRequest_order_type_id_idx" ON "tin"."PostOrderRequest" USING btree ("order_type_id");
+COMMENT ON TABLE "tin"."PostOrderRequest" IS 'Запрос выставления торгового поручения.';
+COMMENT ON COLUMN "tin"."PostOrderRequest"."figi" IS 'Deprecated Figi-идентификатор инструмента. Необходимо использовать instrument_id.';
+COMMENT ON COLUMN "tin"."PostOrderRequest"."quantity" IS 'Количество лотов.';
+COMMENT ON COLUMN "tin"."PostOrderRequest"."price_id" IS 'Цена за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента. Игнорируется для рыночных поручений.';
+COMMENT ON COLUMN "tin"."PostOrderRequest"."direction_id" IS 'Направление операции.';
+COMMENT ON COLUMN "tin"."PostOrderRequest"."account_id" IS 'Номер счёта.';
+COMMENT ON COLUMN "tin"."PostOrderRequest"."order_type_id" IS 'Тип заявки.';
+COMMENT ON COLUMN "tin"."PostOrderRequest"."order_id" IS 'Идентификатор запроса выставления поручения для целей идемпотентности. Максимальная длина 36 символов.';
+COMMENT ON COLUMN "tin"."PostOrderRequest"."instrument_id" IS 'Идентификатор инструмента, принимает значения Figi или Instrument_uid.';
+
+CREATE TABLE IF NOT EXISTS "tin"."PostOrderResponse" (
+	"order_id" text NOT NULL,
+	"execution_report_status_id" bigint NULL,
+	"lots_requested" bigint NOT NULL,
+	"lots_executed" bigint NOT NULL,
+	"initial_order_price_id_currency" text NULL,
+	"initial_order_price_id_units" bigint NULL,
+	"initial_order_price_id_nano" integer NULL,
+	"executed_order_price_id_currency" text NULL,
+	"executed_order_price_id_units" bigint NULL,
+	"executed_order_price_id_nano" integer NULL,
+	"total_order_amount_id_currency" text NULL,
+	"total_order_amount_id_units" bigint NULL,
+	"total_order_amount_id_nano" integer NULL,
+	"initial_commission_id_currency" text NULL,
+	"initial_commission_id_units" bigint NULL,
+	"initial_commission_id_nano" integer NULL,
+	"executed_commission_id_currency" text NULL,
+	"executed_commission_id_units" bigint NULL,
+	"executed_commission_id_nano" integer NULL,
+	"aci_value_id_currency" text NULL,
+	"aci_value_id_units" bigint NULL,
+	"aci_value_id_nano" integer NULL,
+	"figi" text NOT NULL,
+	"direction_id" bigint NULL,
+	"initial_security_price_id_currency" text NULL,
+	"initial_security_price_id_units" bigint NULL,
+	"initial_security_price_id_nano" integer NULL,
+	"order_type_id" bigint NULL,
+	"message" text NOT NULL,
+	"initial_order_price_pt_id_units" bigint NULL,
+	"initial_order_price_pt_id_nano" integer NULL,
+	"instrument_uid" text NOT NULL,
+	CONSTRAINT "PostOrderResponse_pk" PRIMARY KEY ("figi")
+);
+CREATE INDEX IF NOT EXISTS "PostOrderResponse_execution_report_status_id_idx" ON "tin"."PostOrderResponse" USING btree ("execution_report_status_id");
+CREATE INDEX IF NOT EXISTS "PostOrderResponse_initial_order_price_id_idx" ON "tin"."PostOrderResponse" USING btree ("initial_order_price_id");
+CREATE INDEX IF NOT EXISTS "PostOrderResponse_executed_order_price_id_idx" ON "tin"."PostOrderResponse" USING btree ("executed_order_price_id");
+CREATE INDEX IF NOT EXISTS "PostOrderResponse_total_order_amount_id_idx" ON "tin"."PostOrderResponse" USING btree ("total_order_amount_id");
+CREATE INDEX IF NOT EXISTS "PostOrderResponse_initial_commission_id_idx" ON "tin"."PostOrderResponse" USING btree ("initial_commission_id");
+CREATE INDEX IF NOT EXISTS "PostOrderResponse_executed_commission_id_idx" ON "tin"."PostOrderResponse" USING btree ("executed_commission_id");
+CREATE INDEX IF NOT EXISTS "PostOrderResponse_aci_value_id_idx" ON "tin"."PostOrderResponse" USING btree ("aci_value_id");
+CREATE INDEX IF NOT EXISTS "PostOrderResponse_direction_id_idx" ON "tin"."PostOrderResponse" USING btree ("direction_id");
+CREATE INDEX IF NOT EXISTS "PostOrderResponse_initial_security_price_id_idx" ON "tin"."PostOrderResponse" USING btree ("initial_security_price_id");
+CREATE INDEX IF NOT EXISTS "PostOrderResponse_order_type_id_idx" ON "tin"."PostOrderResponse" USING btree ("order_type_id");
+CREATE INDEX IF NOT EXISTS "PostOrderResponse_initial_order_price_pt_id_idx" ON "tin"."PostOrderResponse" USING btree ("initial_order_price_pt_id");
+COMMENT ON TABLE "tin"."PostOrderResponse" IS 'Информация о выставлении поручения.';
+COMMENT ON COLUMN "tin"."PostOrderResponse"."order_id" IS 'Биржевой идентификатор заявки.';
+COMMENT ON COLUMN "tin"."PostOrderResponse"."execution_report_status_id" IS 'Текущий статус заявки.';
+COMMENT ON COLUMN "tin"."PostOrderResponse"."lots_requested" IS 'Запрошено лотов.';
+COMMENT ON COLUMN "tin"."PostOrderResponse"."lots_executed" IS 'Исполнено лотов.';
+COMMENT ON COLUMN "tin"."PostOrderResponse"."initial_order_price_id" IS 'Начальная цена заявки. Произведение количества запрошенных лотов на цену.';
+COMMENT ON COLUMN "tin"."PostOrderResponse"."executed_order_price_id" IS 'Исполненная средняя цена 1 одного инструмента в заявки.';
+COMMENT ON COLUMN "tin"."PostOrderResponse"."total_order_amount_id" IS 'Итоговая стоимость заявки, включающая все комиссии.';
+COMMENT ON COLUMN "tin"."PostOrderResponse"."initial_commission_id" IS 'Начальная комиссия. Комиссия рассчитанная при выставлении заявки.';
+COMMENT ON COLUMN "tin"."PostOrderResponse"."executed_commission_id" IS 'Фактическая комиссия по итогам исполнения заявки.';
+COMMENT ON COLUMN "tin"."PostOrderResponse"."aci_value_id" IS 'Значение НКД (накопленного купонного дохода) на дату. Подробнее: [НКД при выставлении торговых поручений](https://tinkoff.github.io/investAPI/head-orders#coupon)';
+COMMENT ON COLUMN "tin"."PostOrderResponse"."figi" IS ' Figi-идентификатор инструмента.';
+COMMENT ON COLUMN "tin"."PostOrderResponse"."direction_id" IS 'Направление сделки.';
+COMMENT ON COLUMN "tin"."PostOrderResponse"."initial_security_price_id" IS 'Начальная цена за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента.';
+COMMENT ON COLUMN "tin"."PostOrderResponse"."order_type_id" IS 'Тип заявки.';
+COMMENT ON COLUMN "tin"."PostOrderResponse"."message" IS 'Дополнительные данные об исполнении заявки.';
+COMMENT ON COLUMN "tin"."PostOrderResponse"."initial_order_price_pt_id" IS 'Начальная цена заявки в пунктах (для фьючерсов).';
+COMMENT ON COLUMN "tin"."PostOrderResponse"."instrument_uid" IS 'UID идентификатор инструмента.';
+
+CREATE TABLE IF NOT EXISTS "tin"."PostStopOrderRequest" (
+	"figi" text NOT NULL,
+	"quantity" bigint NOT NULL,
+	"price_id_units" bigint NULL,
+	"price_id_nano" integer NULL,
+	"stop_price_id_units" bigint NULL,
+	"stop_price_id_nano" integer NULL,
+	"direction_id" bigint NULL,
+	"account_id" text NOT NULL,
+	"expiration_type_id" bigint NULL,
+	"stop_order_type_id" bigint NULL,
+	"expire_date" timestamptz NULL,
+	"instrument_id" text NOT NULL,
+	CONSTRAINT "PostStopOrderRequest_pk" PRIMARY KEY ("figi")
+);
+CREATE INDEX IF NOT EXISTS "PostStopOrderRequest_price_id_idx" ON "tin"."PostStopOrderRequest" USING btree ("price_id");
+CREATE INDEX IF NOT EXISTS "PostStopOrderRequest_stop_price_id_idx" ON "tin"."PostStopOrderRequest" USING btree ("stop_price_id");
+CREATE INDEX IF NOT EXISTS "PostStopOrderRequest_direction_id_idx" ON "tin"."PostStopOrderRequest" USING btree ("direction_id");
+CREATE INDEX IF NOT EXISTS "PostStopOrderRequest_expiration_type_id_idx" ON "tin"."PostStopOrderRequest" USING btree ("expiration_type_id");
+CREATE INDEX IF NOT EXISTS "PostStopOrderRequest_stop_order_type_id_idx" ON "tin"."PostStopOrderRequest" USING btree ("stop_order_type_id");
+COMMENT ON TABLE "tin"."PostStopOrderRequest" IS 'Запрос выставления стоп-заявки.';
+COMMENT ON COLUMN "tin"."PostStopOrderRequest"."figi" IS 'Deprecated Figi-идентификатор инструмента. Необходимо использовать instrument_id.';
+COMMENT ON COLUMN "tin"."PostStopOrderRequest"."quantity" IS 'Количество лотов.';
+COMMENT ON COLUMN "tin"."PostStopOrderRequest"."price_id" IS 'Цена за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента.';
+COMMENT ON COLUMN "tin"."PostStopOrderRequest"."stop_price_id" IS 'Стоп-цена заявки за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента.';
+COMMENT ON COLUMN "tin"."PostStopOrderRequest"."direction_id" IS 'Направление операции.';
+COMMENT ON COLUMN "tin"."PostStopOrderRequest"."account_id" IS 'Номер счёта.';
+COMMENT ON COLUMN "tin"."PostStopOrderRequest"."expiration_type_id" IS 'Тип экспирации заявки.';
+COMMENT ON COLUMN "tin"."PostStopOrderRequest"."stop_order_type_id" IS 'Тип заявки.';
+COMMENT ON COLUMN "tin"."PostStopOrderRequest"."expire_date" IS 'Дата и время окончания действия стоп-заявки в часовом поясе UTC. **Для ExpirationType = GoodTillDate заполнение обязательно**.';
+COMMENT ON COLUMN "tin"."PostStopOrderRequest"."instrument_id" IS 'Идентификатор инструмента, принимает значения Figi или instrument_uid.';
+
+CREATE TABLE IF NOT EXISTS "tin"."Share" (
+	"figi" text NOT NULL,
+	"ticker" text NOT NULL,
+	"class_code" text NOT NULL,
+	"isin" text NOT NULL,
+	"lot" integer NOT NULL,
+	"currency" text NOT NULL,
+	"klong_id_units" bigint NULL,
+	"klong_id_nano" integer NULL,
+	"kshort_id_units" bigint NULL,
+	"kshort_id_nano" integer NULL,
+	"dlong_id_units" bigint NULL,
+	"dlong_id_nano" integer NULL,
+	"dshort_id_units" bigint NULL,
+	"dshort_id_nano" integer NULL,
+	"dlong_min_id_units" bigint NULL,
+	"dlong_min_id_nano" integer NULL,
+	"dshort_min_id_units" bigint NULL,
+	"dshort_min_id_nano" integer NULL,
+	"short_enabled_flag" bool NOT NULL,
+	"name" text NOT NULL,
+	"exchange" text NOT NULL,
+	"ipo_date" timestamptz NULL,
+	"issue_size" bigint NOT NULL,
+	"country_of_risk" text NOT NULL,
+	"country_of_risk_name" text NOT NULL,
+	"sector" text NOT NULL,
+	"issue_size_plan" bigint NOT NULL,
+	"nominal_id_currency" text NULL,
+	"nominal_id_units" bigint NULL,
+	"nominal_id_nano" integer NULL,
+	"trading_status_id" bigint NULL,
+	"otc_flag" bool NOT NULL,
+	"buy_available_flag" bool NOT NULL,
+	"sell_available_flag" bool NOT NULL,
+	"div_yield_flag" bool NOT NULL,
+	"share_type_id" bigint NULL,
+	"min_price_increment_id_units" bigint NULL,
+	"min_price_increment_id_nano" integer NULL,
+	"api_trade_available_flag" bool NOT NULL,
+	"uid" text NOT NULL,
+	"real_exchange_id" bigint NULL,
+	"position_uid" text NOT NULL,
+	"for_iis_flag" bool NOT NULL,
+	"for_qual_investor_flag" bool NOT NULL,
+	"weekend_flag" bool NOT NULL,
+	"blocked_tca_flag" bool NOT NULL,
+	"liquidity_flag" bool NOT NULL,
+	"first_1min_candle_date" timestamptz NULL,
+	"first_1day_candle_date" timestamptz NULL,
+	CONSTRAINT "Share_pk" PRIMARY KEY ("uid")
+);
+CREATE INDEX IF NOT EXISTS "Share_klong_id_idx" ON "tin"."Share" USING btree ("klong_id");
+CREATE INDEX IF NOT EXISTS "Share_kshort_id_idx" ON "tin"."Share" USING btree ("kshort_id");
+CREATE INDEX IF NOT EXISTS "Share_dlong_id_idx" ON "tin"."Share" USING btree ("dlong_id");
+CREATE INDEX IF NOT EXISTS "Share_dshort_id_idx" ON "tin"."Share" USING btree ("dshort_id");
+CREATE INDEX IF NOT EXISTS "Share_dlong_min_id_idx" ON "tin"."Share" USING btree ("dlong_min_id");
+CREATE INDEX IF NOT EXISTS "Share_dshort_min_id_idx" ON "tin"."Share" USING btree ("dshort_min_id");
+CREATE INDEX IF NOT EXISTS "Share_nominal_id_idx" ON "tin"."Share" USING btree ("nominal_id");
+CREATE INDEX IF NOT EXISTS "Share_trading_status_id_idx" ON "tin"."Share" USING btree ("trading_status_id");
+CREATE INDEX IF NOT EXISTS "Share_share_type_id_idx" ON "tin"."Share" USING btree ("share_type_id");
+CREATE INDEX IF NOT EXISTS "Share_min_price_increment_id_idx" ON "tin"."Share" USING btree ("min_price_increment_id");
+CREATE INDEX IF NOT EXISTS "Share_real_exchange_id_idx" ON "tin"."Share" USING btree ("real_exchange_id");
+COMMENT ON TABLE "tin"."Share" IS 'Объект передачи информации об акции.';
+COMMENT ON COLUMN "tin"."Share"."figi" IS 'Figi-идентификатор инструмента.';
+COMMENT ON COLUMN "tin"."Share"."ticker" IS 'Тикер инструмента.';
+COMMENT ON COLUMN "tin"."Share"."class_code" IS 'Класс-код (секция торгов).';
+COMMENT ON COLUMN "tin"."Share"."isin" IS 'Isin-идентификатор инструмента.';
+COMMENT ON COLUMN "tin"."Share"."lot" IS 'Лотность инструмента. Возможно совершение операций только на количества ценной бумаги, кратные параметру *lot*. Подробнее: [лот](https://tinkoff.github.io/investAPI/glossary#lot)';
+COMMENT ON COLUMN "tin"."Share"."currency" IS 'Валюта расчётов.';
+COMMENT ON COLUMN "tin"."Share"."klong_id" IS 'Коэффициент ставки риска длинной позиции по инструменту.';
+COMMENT ON COLUMN "tin"."Share"."kshort_id" IS 'Коэффициент ставки риска короткой позиции по инструменту.';
+COMMENT ON COLUMN "tin"."Share"."dlong_id" IS 'Ставка риска минимальной маржи в лонг. Подробнее: [ставка риска в лонг](https://help.tinkoff.ru/margin-trade/long/risk-rate/)';
+COMMENT ON COLUMN "tin"."Share"."dshort_id" IS 'Ставка риска минимальной маржи в шорт. Подробнее: [ставка риска в шорт](https://help.tinkoff.ru/margin-trade/short/risk-rate/)';
+COMMENT ON COLUMN "tin"."Share"."dlong_min_id" IS 'Ставка риска начальной маржи в лонг. Подробнее: [ставка риска в лонг](https://help.tinkoff.ru/margin-trade/long/risk-rate/)';
+COMMENT ON COLUMN "tin"."Share"."dshort_min_id" IS 'Ставка риска начальной маржи в шорт. Подробнее: [ставка риска в шорт](https://help.tinkoff.ru/margin-trade/short/risk-rate/)';
+COMMENT ON COLUMN "tin"."Share"."short_enabled_flag" IS 'Признак доступности для операций в шорт.';
+COMMENT ON COLUMN "tin"."Share"."name" IS 'Название инструмента.';
+COMMENT ON COLUMN "tin"."Share"."exchange" IS 'Торговая площадка.';
+COMMENT ON COLUMN "tin"."Share"."ipo_date" IS 'Дата IPO акции в часовом поясе UTC.';
+COMMENT ON COLUMN "tin"."Share"."issue_size" IS 'Размер выпуска.';
+COMMENT ON COLUMN "tin"."Share"."country_of_risk" IS 'Код страны риска, т.е. страны, в которой компания ведёт основной бизнес.';
+COMMENT ON COLUMN "tin"."Share"."country_of_risk_name" IS 'Наименование страны риска, т.е. страны, в которой компания ведёт основной бизнес.';
+COMMENT ON COLUMN "tin"."Share"."sector" IS 'Сектор экономики.';
+COMMENT ON COLUMN "tin"."Share"."issue_size_plan" IS 'Плановый размер выпуска.';
+COMMENT ON COLUMN "tin"."Share"."nominal_id" IS 'Номинал.';
+COMMENT ON COLUMN "tin"."Share"."trading_status_id" IS 'Текущий режим торгов инструмента.';
+COMMENT ON COLUMN "tin"."Share"."otc_flag" IS 'Признак внебиржевой ценной бумаги.';
+COMMENT ON COLUMN "tin"."Share"."buy_available_flag" IS 'Признак доступности для покупки.';
+COMMENT ON COLUMN "tin"."Share"."sell_available_flag" IS 'Признак доступности для продажи.';
+COMMENT ON COLUMN "tin"."Share"."div_yield_flag" IS 'Признак наличия дивидендной доходности.';
+COMMENT ON COLUMN "tin"."Share"."share_type_id" IS 'Тип акции. Возможные значения: [ShareType](https://tinkoff.github.io/investAPI/instruments#sharetype)';
+COMMENT ON COLUMN "tin"."Share"."min_price_increment_id" IS 'Шаг цены.';
+COMMENT ON COLUMN "tin"."Share"."api_trade_available_flag" IS 'Параметр указывает на возможность торговать инструментом через API.';
+COMMENT ON COLUMN "tin"."Share"."uid" IS 'Уникальный идентификатор инструмента.';
+COMMENT ON COLUMN "tin"."Share"."real_exchange_id" IS 'Реальная площадка исполнения расчётов.';
+COMMENT ON COLUMN "tin"."Share"."position_uid" IS 'Уникальный идентификатор позиции инструмента.';
+COMMENT ON COLUMN "tin"."Share"."for_iis_flag" IS 'Признак доступности для ИИС.';
+COMMENT ON COLUMN "tin"."Share"."for_qual_investor_flag" IS 'Флаг отображающий доступность торговли инструментом только для квалифицированных инвесторов.';
+COMMENT ON COLUMN "tin"."Share"."weekend_flag" IS 'Флаг отображающий доступность торговли инструментом по выходным';
+COMMENT ON COLUMN "tin"."Share"."blocked_tca_flag" IS 'Флаг заблокированного ТКС';
+COMMENT ON COLUMN "tin"."Share"."liquidity_flag" IS 'Флаг достаточной ликвидности';
+COMMENT ON COLUMN "tin"."Share"."first_1min_candle_date" IS 'Дата первой минутной свечи.';
+COMMENT ON COLUMN "tin"."Share"."first_1day_candle_date" IS 'Дата первой дневной свечи.';
+
+CREATE TABLE IF NOT EXISTS "tin"."StopOrder" (
+	"stop_order_id" text NOT NULL,
+	"lots_requested" bigint NOT NULL,
+	"figi" text NOT NULL,
+	"direction_id" bigint NULL,
+	"currency" text NOT NULL,
+	"order_type_id" bigint NULL,
+	"create_date" timestamptz NULL,
+	"activation_date_time" timestamptz NULL,
+	"expiration_time" timestamptz NULL,
+	"price_id_currency" text NULL,
+	"price_id_units" bigint NULL,
+	"price_id_nano" integer NULL,
+	"stop_price_id_currency" text NULL,
+	"stop_price_id_units" bigint NULL,
+	"stop_price_id_nano" integer NULL,
+	"instrument_uid" text NOT NULL,
+	CONSTRAINT "StopOrder_pk" PRIMARY KEY ("figi")
+);
+CREATE INDEX IF NOT EXISTS "StopOrder_direction_id_idx" ON "tin"."StopOrder" USING btree ("direction_id");
+CREATE INDEX IF NOT EXISTS "StopOrder_order_type_id_idx" ON "tin"."StopOrder" USING btree ("order_type_id");
+CREATE INDEX IF NOT EXISTS "StopOrder_price_id_idx" ON "tin"."StopOrder" USING btree ("price_id");
+CREATE INDEX IF NOT EXISTS "StopOrder_stop_price_id_idx" ON "tin"."StopOrder" USING btree ("stop_price_id");
+COMMENT ON TABLE "tin"."StopOrder" IS 'Информация о стоп-заявке.';
+COMMENT ON COLUMN "tin"."StopOrder"."stop_order_id" IS 'Идентификатор-идентификатор стоп-заявки.';
+COMMENT ON COLUMN "tin"."StopOrder"."lots_requested" IS 'Запрошено лотов.';
+COMMENT ON COLUMN "tin"."StopOrder"."figi" IS 'Figi-идентификатор инструмента.';
+COMMENT ON COLUMN "tin"."StopOrder"."direction_id" IS 'Направление операции.';
+COMMENT ON COLUMN "tin"."StopOrder"."currency" IS 'Валюта стоп-заявки.';
+COMMENT ON COLUMN "tin"."StopOrder"."order_type_id" IS 'Тип стоп-заявки.';
+COMMENT ON COLUMN "tin"."StopOrder"."create_date" IS 'Дата и время выставления заявки в часовом поясе UTC.';
+COMMENT ON COLUMN "tin"."StopOrder"."activation_date_time" IS 'Дата и время конвертации стоп-заявки в биржевую в часовом поясе UTC.';
+COMMENT ON COLUMN "tin"."StopOrder"."expiration_time" IS 'Дата и время снятия заявки в часовом поясе UTC.';
+COMMENT ON COLUMN "tin"."StopOrder"."price_id" IS 'Цена заявки за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента.';
+COMMENT ON COLUMN "tin"."StopOrder"."stop_price_id" IS 'Цена активации стоп-заявки за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента.';
+COMMENT ON COLUMN "tin"."StopOrder"."instrument_uid" IS 'instrument_uid идентификатор инструмента.';
+
 CREATE TABLE IF NOT EXISTS "tin"."Bond" (
 	"figi" text NOT NULL,
 	"ticker" text NOT NULL,
@@ -901,37 +1673,37 @@ CREATE TABLE IF NOT EXISTS "tin"."Bond" (
 	"isin" text NOT NULL,
 	"lot" integer NOT NULL,
 	"currency" text NOT NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
+	"klong_id_units" bigint NULL,
+	"klong_id_nano" integer NULL,
+	"kshort_id_units" bigint NULL,
+	"kshort_id_nano" integer NULL,
+	"dlong_id_units" bigint NULL,
+	"dlong_id_nano" integer NULL,
+	"dshort_id_units" bigint NULL,
+	"dshort_id_nano" integer NULL,
+	"dlong_min_id_units" bigint NULL,
+	"dlong_min_id_nano" integer NULL,
+	"dshort_min_id_units" bigint NULL,
+	"dshort_min_id_nano" integer NULL,
 	"short_enabled_flag" bool NOT NULL,
 	"name" text NOT NULL,
 	"exchange" text NOT NULL,
 	"coupon_quantity_per_year" integer NOT NULL,
 	"maturity_date" timestamptz NULL,
-	"string_currency" text NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"string_currency" text NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
+	"nominal_id_currency" text NULL,
+	"nominal_id_units" bigint NULL,
+	"nominal_id_nano" integer NULL,
+	"initial_nominal_id_currency" text NULL,
+	"initial_nominal_id_units" bigint NULL,
+	"initial_nominal_id_nano" integer NULL,
 	"state_reg_date" timestamptz NULL,
 	"placement_date" timestamptz NULL,
-	"string_currency" text NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"string_currency" text NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
+	"placement_price_id_currency" text NULL,
+	"placement_price_id_units" bigint NULL,
+	"placement_price_id_nano" integer NULL,
+	"aci_value_id_currency" text NULL,
+	"aci_value_id_units" bigint NULL,
+	"aci_value_id_nano" integer NULL,
 	"country_of_risk" text NOT NULL,
 	"country_of_risk_name" text NOT NULL,
 	"sector" text NOT NULL,
@@ -945,8 +1717,8 @@ CREATE TABLE IF NOT EXISTS "tin"."Bond" (
 	"floating_coupon_flag" bool NOT NULL,
 	"perpetual_flag" bool NOT NULL,
 	"amortization_flag" bool NOT NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
+	"min_price_increment_id_units" bigint NULL,
+	"min_price_increment_id_nano" integer NULL,
 	"api_trade_available_flag" bool NOT NULL,
 	"uid" text NOT NULL,
 	"real_exchange_id" bigint NULL,
@@ -960,10 +1732,7 @@ CREATE TABLE IF NOT EXISTS "tin"."Bond" (
 	"first_1min_candle_date" timestamptz NULL,
 	"first_1day_candle_date" timestamptz NULL,
 	"risk_level_id" bigint NULL,
-	CONSTRAINT "Bond_pk" PRIMARY KEY ("uid"),
-	CONSTRAINT "Bond_trading_status_id_fk" FOREIGN KEY ("trading_status_id") REFERENCES "tin"."SecurityTradingStatus" ("id"),
-	CONSTRAINT "Bond_real_exchange_id_fk" FOREIGN KEY ("real_exchange_id") REFERENCES "tin"."RealExchange" ("id"),
-	CONSTRAINT "Bond_risk_level_id_fk" FOREIGN KEY ("risk_level_id") REFERENCES "tin"."RiskLevel" ("id")
+	CONSTRAINT "Bond_pk" PRIMARY KEY ("uid")
 );
 CREATE INDEX IF NOT EXISTS "Bond_klong_id_idx" ON "tin"."Bond" USING btree ("klong_id");
 CREATE INDEX IF NOT EXISTS "Bond_kshort_id_idx" ON "tin"."Bond" USING btree ("kshort_id");
@@ -1031,6 +1800,107 @@ COMMENT ON COLUMN "tin"."Bond"."first_1min_candle_date" IS 'Дата перво�
 COMMENT ON COLUMN "tin"."Bond"."first_1day_candle_date" IS 'Дата первой дневной свечи.';
 COMMENT ON COLUMN "tin"."Bond"."risk_level_id" IS 'Уровень риска.';
 
+CREATE TABLE IF NOT EXISTS "tin"."Trade" (
+	"figi" text NOT NULL,
+	"direction_id" bigint NULL,
+	"price_id_units" bigint NULL,
+	"price_id_nano" integer NULL,
+	"quantity" bigint NOT NULL,
+	"time" timestamptz NULL,
+	"instrument_uid" text NOT NULL,
+	CONSTRAINT "Trade_pk" PRIMARY KEY ("figi")
+);
+CREATE INDEX IF NOT EXISTS "Trade_direction_id_idx" ON "tin"."Trade" USING btree ("direction_id");
+CREATE INDEX IF NOT EXISTS "Trade_price_id_idx" ON "tin"."Trade" USING btree ("price_id");
+COMMENT ON TABLE "tin"."Trade" IS 'Информация о сделке.';
+COMMENT ON COLUMN "tin"."Trade"."figi" IS 'Figi-идентификатор инструмента.';
+COMMENT ON COLUMN "tin"."Trade"."direction_id" IS 'Направление сделки.';
+COMMENT ON COLUMN "tin"."Trade"."price_id" IS 'Цена за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента. Для перевод цен в валюту рекомендуем использовать [информацию со страницы](https://tinkoff.github.io/investAPI/faq_marketdata/)';
+COMMENT ON COLUMN "tin"."Trade"."quantity" IS 'Количество лотов.';
+COMMENT ON COLUMN "tin"."Trade"."time" IS 'Время сделки в часовом поясе UTC по времени биржи.';
+COMMENT ON COLUMN "tin"."Trade"."instrument_uid" IS 'Uid инструмента';
+
+CREATE TABLE IF NOT EXISTS "tin"."TradeInstrument" (
+	"figi" text NOT NULL,
+	"instrument_id" text NOT NULL,
+	CONSTRAINT "TradeInstrument_pk" PRIMARY KEY ("figi")
+);
+COMMENT ON TABLE "tin"."TradeInstrument" IS 'Запрос подписки на поток обезличенных сделок.';
+COMMENT ON COLUMN "tin"."TradeInstrument"."figi" IS 'Deprecated Figi-идентификатор инструмента. Необходимо использовать instrument_id.';
+COMMENT ON COLUMN "tin"."TradeInstrument"."instrument_id" IS 'Идентификатор инструмента, принимает значение figi или instrument_uid';
+
+CREATE TABLE IF NOT EXISTS "tin"."TradeSubscription" (
+	"figi" text NOT NULL,
+	"subscription_status_id" bigint NULL,
+	"instrument_uid" text NOT NULL,
+	CONSTRAINT "TradeSubscription_pk" PRIMARY KEY ("figi")
+);
+CREATE INDEX IF NOT EXISTS "TradeSubscription_subscription_status_id_idx" ON "tin"."TradeSubscription" USING btree ("subscription_status_id");
+COMMENT ON TABLE "tin"."TradeSubscription" IS 'Статус подписки.';
+COMMENT ON COLUMN "tin"."TradeSubscription"."figi" IS 'Figi-идентификатор инструмента.';
+COMMENT ON COLUMN "tin"."TradeSubscription"."subscription_status_id" IS 'Статус подписки.';
+COMMENT ON COLUMN "tin"."TradeSubscription"."instrument_uid" IS 'Uid инструмента';
+
+CREATE TABLE IF NOT EXISTS "tin"."TradingStatus" (
+	"figi" text NOT NULL,
+	"trading_status_id" bigint NULL,
+	"time" timestamptz NULL,
+	"limit_order_available_flag" bool NOT NULL,
+	"market_order_available_flag" bool NOT NULL,
+	"instrument_uid" text NOT NULL,
+	CONSTRAINT "TradingStatus_pk" PRIMARY KEY ("figi")
+);
+CREATE INDEX IF NOT EXISTS "TradingStatus_trading_status_id_idx" ON "tin"."TradingStatus" USING btree ("trading_status_id");
+COMMENT ON TABLE "tin"."TradingStatus" IS 'Пакет изменения торгового статуса.';
+COMMENT ON COLUMN "tin"."TradingStatus"."figi" IS 'Figi-идентификатор инструмента.';
+COMMENT ON COLUMN "tin"."TradingStatus"."trading_status_id" IS 'Статус торговли инструментом.';
+COMMENT ON COLUMN "tin"."TradingStatus"."time" IS 'Время изменения торгового статуса в часовом поясе UTC.';
+COMMENT ON COLUMN "tin"."TradingStatus"."limit_order_available_flag" IS 'Признак доступности выставления лимитной заявки по инструменту.';
+COMMENT ON COLUMN "tin"."TradingStatus"."market_order_available_flag" IS 'Признак доступности выставления рыночной заявки по инструменту.';
+COMMENT ON COLUMN "tin"."TradingStatus"."instrument_uid" IS 'Uid инструмента';
+
+CREATE TABLE IF NOT EXISTS "tin"."VirtualPortfolioPosition" (
+	"position_uid" text NOT NULL,
+	"instrument_uid" text NOT NULL,
+	"figi" text NOT NULL,
+	"instrument_type" text NOT NULL,
+	"quantity_id_units" bigint NULL,
+	"quantity_id_nano" integer NULL,
+	"average_position_price_id_currency" text NULL,
+	"average_position_price_id_units" bigint NULL,
+	"average_position_price_id_nano" integer NULL,
+	"expected_yield_id_units" bigint NULL,
+	"expected_yield_id_nano" integer NULL,
+	"expected_yield_fifo_id_units" bigint NULL,
+	"expected_yield_fifo_id_nano" integer NULL,
+	"expire_date" timestamptz NULL,
+	"current_price_id_currency" text NULL,
+	"current_price_id_units" bigint NULL,
+	"current_price_id_nano" integer NULL,
+	"average_position_price_fifo_id_currency" text NULL,
+	"average_position_price_fifo_id_units" bigint NULL,
+	"average_position_price_fifo_id_nano" integer NULL,
+	CONSTRAINT "VirtualPortfolioPosition_pk" PRIMARY KEY ("figi")
+);
+CREATE INDEX IF NOT EXISTS "VirtualPortfolioPosition_quantity_id_idx" ON "tin"."VirtualPortfolioPosition" USING btree ("quantity_id");
+CREATE INDEX IF NOT EXISTS "VirtualPortfolioPosition_average_position_price_id_idx" ON "tin"."VirtualPortfolioPosition" USING btree ("average_position_price_id");
+CREATE INDEX IF NOT EXISTS "VirtualPortfolioPosition_expected_yield_id_idx" ON "tin"."VirtualPortfolioPosition" USING btree ("expected_yield_id");
+CREATE INDEX IF NOT EXISTS "VirtualPortfolioPosition_expected_yield_fifo_id_idx" ON "tin"."VirtualPortfolioPosition" USING btree ("expected_yield_fifo_id");
+CREATE INDEX IF NOT EXISTS "VirtualPortfolioPosition_current_price_id_idx" ON "tin"."VirtualPortfolioPosition" USING btree ("current_price_id");
+CREATE INDEX IF NOT EXISTS "VirtualPortfolioPosition_average_position_price_fifo_id_idx" ON "tin"."VirtualPortfolioPosition" USING btree ("average_position_price_fifo_id");
+COMMENT ON TABLE "tin"."VirtualPortfolioPosition" IS '';
+COMMENT ON COLUMN "tin"."VirtualPortfolioPosition"."position_uid" IS 'position_uid-идентификатора инструмента';
+COMMENT ON COLUMN "tin"."VirtualPortfolioPosition"."instrument_uid" IS 'instrument_uid-идентификатора инструмента';
+COMMENT ON COLUMN "tin"."VirtualPortfolioPosition"."figi" IS 'Figi-идентификатора инструмента.';
+COMMENT ON COLUMN "tin"."VirtualPortfolioPosition"."instrument_type" IS 'Тип инструмента.';
+COMMENT ON COLUMN "tin"."VirtualPortfolioPosition"."quantity_id" IS 'Количество инструмента в портфеле в штуках.';
+COMMENT ON COLUMN "tin"."VirtualPortfolioPosition"."average_position_price_id" IS 'Средневзвешенная цена позиции. **Возможна задержка до секунды для пересчёта**.';
+COMMENT ON COLUMN "tin"."VirtualPortfolioPosition"."expected_yield_id" IS 'Текущая рассчитанная доходность позиции.';
+COMMENT ON COLUMN "tin"."VirtualPortfolioPosition"."expected_yield_fifo_id" IS 'Текущая рассчитанная доходность позиции.';
+COMMENT ON COLUMN "tin"."VirtualPortfolioPosition"."expire_date" IS 'Дата до которой нужно продать виртуальные бумаги, после этой даты виртуальная позиция "сгорит"';
+COMMENT ON COLUMN "tin"."VirtualPortfolioPosition"."current_price_id" IS 'Текущая цена за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента.';
+COMMENT ON COLUMN "tin"."VirtualPortfolioPosition"."average_position_price_fifo_id" IS 'Средняя цена позиции по методу FIFO. **Возможна задержка до секунды для пересчёта**.';
+
 CREATE TABLE IF NOT EXISTS "tin"."Brand" (
 	"uid" text NOT NULL,
 	"name" text NOT NULL,
@@ -1063,29 +1933,29 @@ CREATE TABLE IF NOT EXISTS "tin"."BrokerReport" (
 	"direction" text NOT NULL,
 	"name" text NOT NULL,
 	"ticker" text NOT NULL,
-	"string_currency" text NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
+	"price_id_currency" text NULL,
+	"price_id_units" bigint NULL,
+	"price_id_nano" integer NULL,
 	"quantity" bigint NOT NULL,
-	"string_currency" text NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"string_currency" text NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"string_currency" text NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"string_currency" text NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"string_currency" text NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
+	"order_amount_id_currency" text NULL,
+	"order_amount_id_units" bigint NULL,
+	"order_amount_id_nano" integer NULL,
+	"aci_value_id_units" bigint NULL,
+	"aci_value_id_nano" integer NULL,
+	"total_order_amount_id_currency" text NULL,
+	"total_order_amount_id_units" bigint NULL,
+	"total_order_amount_id_nano" integer NULL,
+	"broker_commission_id_currency" text NULL,
+	"broker_commission_id_units" bigint NULL,
+	"broker_commission_id_nano" integer NULL,
+	"exchange_commission_id_currency" text NULL,
+	"exchange_commission_id_units" bigint NULL,
+	"exchange_commission_id_nano" integer NULL,
+	"exchange_clearing_commission_id_currency" text NULL,
+	"exchange_clearing_commission_id_units" bigint NULL,
+	"exchange_clearing_commission_id_nano" integer NULL,
+	"repo_rate_id_units" bigint NULL,
+	"repo_rate_id_nano" integer NULL,
 	"party" text NOT NULL,
 	"clear_value_date" timestamptz NULL,
 	"sec_value_date" timestamptz NULL,
@@ -1133,6 +2003,94 @@ COMMENT ON COLUMN "tin"."BrokerReport"."separate_agreement_number" IS 'Номе�
 COMMENT ON COLUMN "tin"."BrokerReport"."separate_agreement_date" IS 'Дата дог.';
 COMMENT ON COLUMN "tin"."BrokerReport"."delivery_type" IS 'Тип расчёта по сделке.';
 
+CREATE TABLE IF NOT EXISTS "tin"."Candle" (
+	"figi" text NOT NULL,
+	"interval_id" bigint NULL,
+	"open_id_units" bigint NULL,
+	"open_id_nano" integer NULL,
+	"high_id_units" bigint NULL,
+	"high_id_nano" integer NULL,
+	"low_id_units" bigint NULL,
+	"low_id_nano" integer NULL,
+	"close_id_units" bigint NULL,
+	"close_id_nano" integer NULL,
+	"volume" bigint NOT NULL,
+	"time" timestamptz NULL,
+	"last_trade_ts" timestamptz NULL,
+	"instrument_uid" text NOT NULL,
+	CONSTRAINT "Candle_pk" PRIMARY KEY ("figi")
+);
+CREATE INDEX IF NOT EXISTS "Candle_interval_id_idx" ON "tin"."Candle" USING btree ("interval_id");
+CREATE INDEX IF NOT EXISTS "Candle_open_id_idx" ON "tin"."Candle" USING btree ("open_id");
+CREATE INDEX IF NOT EXISTS "Candle_high_id_idx" ON "tin"."Candle" USING btree ("high_id");
+CREATE INDEX IF NOT EXISTS "Candle_low_id_idx" ON "tin"."Candle" USING btree ("low_id");
+CREATE INDEX IF NOT EXISTS "Candle_close_id_idx" ON "tin"."Candle" USING btree ("close_id");
+COMMENT ON TABLE "tin"."Candle" IS 'Пакет свечей в рамках стрима.';
+COMMENT ON COLUMN "tin"."Candle"."figi" IS 'Figi-идентификатор инструмента.';
+COMMENT ON COLUMN "tin"."Candle"."interval_id" IS 'Интервал свечи.';
+COMMENT ON COLUMN "tin"."Candle"."open_id" IS 'Цена открытия за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента. Для перевод цен в валюту рекомендуем использовать [информацию со страницы](https://tinkoff.github.io/investAPI/faq_marketdata/)';
+COMMENT ON COLUMN "tin"."Candle"."high_id" IS 'Максимальная цена за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента. Для перевод цен в валюту рекомендуем использовать [информацию со страницы](https://tinkoff.github.io/investAPI/faq_marketdata/)';
+COMMENT ON COLUMN "tin"."Candle"."low_id" IS 'Минимальная цена за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента. Для перевод цен в валюту рекомендуем использовать [информацию со страницы](https://tinkoff.github.io/investAPI/faq_marketdata/)';
+COMMENT ON COLUMN "tin"."Candle"."close_id" IS 'Цена закрытия за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента. Для перевод цен в валюту рекомендуем использовать [информацию со страницы](https://tinkoff.github.io/investAPI/faq_marketdata/)';
+COMMENT ON COLUMN "tin"."Candle"."volume" IS 'Объём сделок в лотах.';
+COMMENT ON COLUMN "tin"."Candle"."time" IS 'Время начала интервала свечи в часовом поясе UTC.';
+COMMENT ON COLUMN "tin"."Candle"."last_trade_ts" IS 'Время последней сделки, вошедшей в свечу в часовом поясе UTC.';
+COMMENT ON COLUMN "tin"."Candle"."instrument_uid" IS 'Uid инструмента';
+
+CREATE TABLE IF NOT EXISTS "tin"."CandleInstrument" (
+	"figi" text NOT NULL,
+	"interval_id" bigint NULL,
+	"instrument_id" text NOT NULL,
+	CONSTRAINT "CandleInstrument_pk" PRIMARY KEY ("figi")
+);
+CREATE INDEX IF NOT EXISTS "CandleInstrument_interval_id_idx" ON "tin"."CandleInstrument" USING btree ("interval_id");
+COMMENT ON TABLE "tin"."CandleInstrument" IS 'Запрос изменения статус подписки на свечи.';
+COMMENT ON COLUMN "tin"."CandleInstrument"."figi" IS ' Deprecated Figi-идентификатор инструмента. Необходимо использовать instrument_id.';
+COMMENT ON COLUMN "tin"."CandleInstrument"."interval_id" IS 'Интервал свечей.';
+COMMENT ON COLUMN "tin"."CandleInstrument"."instrument_id" IS 'Идентификатор инструмента, принимает значение figi или instrument_uid';
+
+CREATE TABLE IF NOT EXISTS "tin"."CandleSubscription" (
+	"figi" text NOT NULL,
+	"interval_id" bigint NULL,
+	"subscription_status_id" bigint NULL,
+	"instrument_uid" text NOT NULL,
+	CONSTRAINT "CandleSubscription_pk" PRIMARY KEY ("figi")
+);
+CREATE INDEX IF NOT EXISTS "CandleSubscription_interval_id_idx" ON "tin"."CandleSubscription" USING btree ("interval_id");
+CREATE INDEX IF NOT EXISTS "CandleSubscription_subscription_status_id_idx" ON "tin"."CandleSubscription" USING btree ("subscription_status_id");
+COMMENT ON TABLE "tin"."CandleSubscription" IS 'Статус подписки на свечи.';
+COMMENT ON COLUMN "tin"."CandleSubscription"."figi" IS 'Figi-идентификатор инструмента.';
+COMMENT ON COLUMN "tin"."CandleSubscription"."interval_id" IS 'Интервал свечей.';
+COMMENT ON COLUMN "tin"."CandleSubscription"."subscription_status_id" IS 'Статус подписки.';
+COMMENT ON COLUMN "tin"."CandleSubscription"."instrument_uid" IS 'Uid инструмента';
+
+CREATE TABLE IF NOT EXISTS "tin"."Coupon" (
+	"figi" text NOT NULL,
+	"coupon_date" timestamptz NULL,
+	"coupon_number" bigint NOT NULL,
+	"fix_date" timestamptz NULL,
+	"pay_one_bond_id_currency" text NULL,
+	"pay_one_bond_id_units" bigint NULL,
+	"pay_one_bond_id_nano" integer NULL,
+	"coupon_type_id" bigint NULL,
+	"coupon_start_date" timestamptz NULL,
+	"coupon_end_date" timestamptz NULL,
+	"coupon_period" integer NOT NULL,
+	CONSTRAINT "Coupon_pk" PRIMARY KEY ("figi")
+);
+CREATE INDEX IF NOT EXISTS "Coupon_pay_one_bond_id_idx" ON "tin"."Coupon" USING btree ("pay_one_bond_id");
+CREATE INDEX IF NOT EXISTS "Coupon_coupon_type_id_idx" ON "tin"."Coupon" USING btree ("coupon_type_id");
+COMMENT ON TABLE "tin"."Coupon" IS 'Объект передачи информации о купоне облигации.';
+COMMENT ON COLUMN "tin"."Coupon"."figi" IS 'Figi-идентификатор инструмента.';
+COMMENT ON COLUMN "tin"."Coupon"."coupon_date" IS 'Дата выплаты купона.';
+COMMENT ON COLUMN "tin"."Coupon"."coupon_number" IS 'Номер купона.';
+COMMENT ON COLUMN "tin"."Coupon"."fix_date" IS '(Опционально) Дата фиксации реестра для выплаты купона.';
+COMMENT ON COLUMN "tin"."Coupon"."pay_one_bond_id" IS 'Выплата на одну облигацию.';
+COMMENT ON COLUMN "tin"."Coupon"."coupon_type_id" IS 'Тип купона.';
+COMMENT ON COLUMN "tin"."Coupon"."coupon_start_date" IS 'Начало купонного периода.';
+COMMENT ON COLUMN "tin"."Coupon"."coupon_end_date" IS 'Окончание купонного периода.';
+COMMENT ON COLUMN "tin"."Coupon"."coupon_period" IS 'Купонный период в днях.';
+
 CREATE TABLE IF NOT EXISTS "tin"."Currency" (
 	"figi" text NOT NULL,
 	"ticker" text NOT NULL,
@@ -1140,24 +2098,24 @@ CREATE TABLE IF NOT EXISTS "tin"."Currency" (
 	"isin" text NOT NULL,
 	"lot" integer NOT NULL,
 	"currency" text NOT NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
+	"klong_id_units" bigint NULL,
+	"klong_id_nano" integer NULL,
+	"kshort_id_units" bigint NULL,
+	"kshort_id_nano" integer NULL,
+	"dlong_id_units" bigint NULL,
+	"dlong_id_nano" integer NULL,
+	"dshort_id_units" bigint NULL,
+	"dshort_id_nano" integer NULL,
+	"dlong_min_id_units" bigint NULL,
+	"dlong_min_id_nano" integer NULL,
+	"dshort_min_id_units" bigint NULL,
+	"dshort_min_id_nano" integer NULL,
 	"short_enabled_flag" bool NOT NULL,
 	"name" text NOT NULL,
 	"exchange" text NOT NULL,
-	"string_currency" text NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
+	"nominal_id_currency" text NULL,
+	"nominal_id_units" bigint NULL,
+	"nominal_id_nano" integer NULL,
 	"country_of_risk" text NOT NULL,
 	"country_of_risk_name" text NOT NULL,
 	"trading_status_id" bigint NULL,
@@ -1165,8 +2123,8 @@ CREATE TABLE IF NOT EXISTS "tin"."Currency" (
 	"buy_available_flag" bool NOT NULL,
 	"sell_available_flag" bool NOT NULL,
 	"iso_currency_name" text NOT NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
+	"min_price_increment_id_units" bigint NULL,
+	"min_price_increment_id_nano" integer NULL,
 	"api_trade_available_flag" bool NOT NULL,
 	"uid" text NOT NULL,
 	"real_exchange_id" bigint NULL,
@@ -1177,9 +2135,7 @@ CREATE TABLE IF NOT EXISTS "tin"."Currency" (
 	"blocked_tca_flag" bool NOT NULL,
 	"first_1min_candle_date" timestamptz NULL,
 	"first_1day_candle_date" timestamptz NULL,
-	CONSTRAINT "Currency_pk" PRIMARY KEY ("uid"),
-	CONSTRAINT "Currency_trading_status_id_fk" FOREIGN KEY ("trading_status_id") REFERENCES "tin"."SecurityTradingStatus" ("id"),
-	CONSTRAINT "Currency_real_exchange_id_fk" FOREIGN KEY ("real_exchange_id") REFERENCES "tin"."RealExchange" ("id")
+	CONSTRAINT "Currency_pk" PRIMARY KEY ("uid")
 );
 CREATE INDEX IF NOT EXISTS "Currency_klong_id_idx" ON "tin"."Currency" USING btree ("klong_id");
 CREATE INDEX IF NOT EXISTS "Currency_kshort_id_idx" ON "tin"."Currency" USING btree ("kshort_id");
@@ -1227,6 +2183,22 @@ COMMENT ON COLUMN "tin"."Currency"."blocked_tca_flag" IS 'Флаг заблок�
 COMMENT ON COLUMN "tin"."Currency"."first_1min_candle_date" IS 'Дата первой минутной свечи.';
 COMMENT ON COLUMN "tin"."Currency"."first_1day_candle_date" IS 'Дата первой дневной свечи.';
 
+CREATE TABLE IF NOT EXISTS "tin"."Asset" (
+	"uid" text NOT NULL,
+	"type_id" bigint NULL,
+	"name" text NOT NULL,
+	"instruments_id" text NULL,
+	CONSTRAINT "Asset_pk" PRIMARY KEY ("uid"),
+	CONSTRAINT "Asset_instruments_id_fk" FOREIGN KEY ("instruments_id") REFERENCES "tin"."AssetInstrument" ("uid")
+);
+CREATE INDEX IF NOT EXISTS "Asset_type_id_idx" ON "tin"."Asset" USING btree ("type_id");
+CREATE INDEX IF NOT EXISTS "Asset_instruments_id_idx" ON "tin"."Asset" USING btree ("instruments_id");
+COMMENT ON TABLE "tin"."Asset" IS 'Информация об активе.';
+COMMENT ON COLUMN "tin"."Asset"."uid" IS 'Уникальный идентификатор актива.';
+COMMENT ON COLUMN "tin"."Asset"."type_id" IS 'Тип актива.';
+COMMENT ON COLUMN "tin"."Asset"."name" IS 'Наименование актива.';
+COMMENT ON COLUMN "tin"."Asset"."instruments_id" IS 'Массив идентификаторов инструментов.';
+
 CREATE TABLE IF NOT EXISTS "tin"."Etf" (
 	"figi" text NOT NULL,
 	"ticker" text NOT NULL,
@@ -1234,27 +2206,27 @@ CREATE TABLE IF NOT EXISTS "tin"."Etf" (
 	"isin" text NOT NULL,
 	"lot" integer NOT NULL,
 	"currency" text NOT NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
+	"klong_id_units" bigint NULL,
+	"klong_id_nano" integer NULL,
+	"kshort_id_units" bigint NULL,
+	"kshort_id_nano" integer NULL,
+	"dlong_id_units" bigint NULL,
+	"dlong_id_nano" integer NULL,
+	"dshort_id_units" bigint NULL,
+	"dshort_id_nano" integer NULL,
+	"dlong_min_id_units" bigint NULL,
+	"dlong_min_id_nano" integer NULL,
+	"dshort_min_id_units" bigint NULL,
+	"dshort_min_id_nano" integer NULL,
 	"short_enabled_flag" bool NOT NULL,
 	"name" text NOT NULL,
 	"exchange" text NOT NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
+	"fixed_commission_id_units" bigint NULL,
+	"fixed_commission_id_nano" integer NULL,
 	"focus_type" text NOT NULL,
 	"released_date" timestamptz NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
+	"num_shares_id_units" bigint NULL,
+	"num_shares_id_nano" integer NULL,
 	"country_of_risk" text NOT NULL,
 	"country_of_risk_name" text NOT NULL,
 	"sector" text NOT NULL,
@@ -1263,8 +2235,8 @@ CREATE TABLE IF NOT EXISTS "tin"."Etf" (
 	"otc_flag" bool NOT NULL,
 	"buy_available_flag" bool NOT NULL,
 	"sell_available_flag" bool NOT NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
+	"min_price_increment_id_units" bigint NULL,
+	"min_price_increment_id_nano" integer NULL,
 	"api_trade_available_flag" bool NOT NULL,
 	"uid" text NOT NULL,
 	"real_exchange_id" bigint NULL,
@@ -1276,9 +2248,7 @@ CREATE TABLE IF NOT EXISTS "tin"."Etf" (
 	"liquidity_flag" bool NOT NULL,
 	"first_1min_candle_date" timestamptz NULL,
 	"first_1day_candle_date" timestamptz NULL,
-	CONSTRAINT "Etf_pk" PRIMARY KEY ("uid"),
-	CONSTRAINT "Etf_trading_status_id_fk" FOREIGN KEY ("trading_status_id") REFERENCES "tin"."SecurityTradingStatus" ("id"),
-	CONSTRAINT "Etf_real_exchange_id_fk" FOREIGN KEY ("real_exchange_id") REFERENCES "tin"."RealExchange" ("id")
+	CONSTRAINT "Etf_pk" PRIMARY KEY ("uid")
 );
 CREATE INDEX IF NOT EXISTS "Etf_klong_id_idx" ON "tin"."Etf" USING btree ("klong_id");
 CREATE INDEX IF NOT EXISTS "Etf_kshort_id_idx" ON "tin"."Etf" USING btree ("kshort_id");
@@ -1332,24 +2302,46 @@ COMMENT ON COLUMN "tin"."Etf"."liquidity_flag" IS 'Флаг достаточно
 COMMENT ON COLUMN "tin"."Etf"."first_1min_candle_date" IS 'Дата первой минутной свечи.';
 COMMENT ON COLUMN "tin"."Etf"."first_1day_candle_date" IS 'Дата первой дневной свечи.';
 
+CREATE TABLE IF NOT EXISTS "tin"."FavoriteInstrument" (
+	"figi" text NOT NULL,
+	"ticker" text NOT NULL,
+	"class_code" text NOT NULL,
+	"isin" text NOT NULL,
+	"instrument_type" text NOT NULL,
+	"otc_flag" bool NOT NULL,
+	"api_trade_available_flag" bool NOT NULL,
+	"instrument_kind_id" bigint NULL,
+	CONSTRAINT "FavoriteInstrument_pk" PRIMARY KEY ("figi")
+);
+CREATE INDEX IF NOT EXISTS "FavoriteInstrument_instrument_kind_id_idx" ON "tin"."FavoriteInstrument" USING btree ("instrument_kind_id");
+COMMENT ON TABLE "tin"."FavoriteInstrument" IS 'Массив избранных инструментов.';
+COMMENT ON COLUMN "tin"."FavoriteInstrument"."figi" IS 'Figi-идентификатор инструмента.';
+COMMENT ON COLUMN "tin"."FavoriteInstrument"."ticker" IS 'Тикер инструмента.';
+COMMENT ON COLUMN "tin"."FavoriteInstrument"."class_code" IS 'Класс-код инструмента.';
+COMMENT ON COLUMN "tin"."FavoriteInstrument"."isin" IS 'Isin-идентификатор инструмента.';
+COMMENT ON COLUMN "tin"."FavoriteInstrument"."instrument_type" IS 'Тип инструмента.';
+COMMENT ON COLUMN "tin"."FavoriteInstrument"."otc_flag" IS 'Признак внебиржевой ценной бумаги.';
+COMMENT ON COLUMN "tin"."FavoriteInstrument"."api_trade_available_flag" IS 'Параметр указывает на возможность торговать инструментом через API.';
+COMMENT ON COLUMN "tin"."FavoriteInstrument"."instrument_kind_id" IS 'Тип инструмента.';
+
 CREATE TABLE IF NOT EXISTS "tin"."Future" (
 	"figi" text NOT NULL,
 	"ticker" text NOT NULL,
 	"class_code" text NOT NULL,
 	"lot" integer NOT NULL,
 	"currency" text NOT NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
+	"klong_id_units" bigint NULL,
+	"klong_id_nano" integer NULL,
+	"kshort_id_units" bigint NULL,
+	"kshort_id_nano" integer NULL,
+	"dlong_id_units" bigint NULL,
+	"dlong_id_nano" integer NULL,
+	"dshort_id_units" bigint NULL,
+	"dshort_id_nano" integer NULL,
+	"dlong_min_id_units" bigint NULL,
+	"dlong_min_id_nano" integer NULL,
+	"dshort_min_id_units" bigint NULL,
+	"dshort_min_id_nano" integer NULL,
 	"short_enabled_flag" bool NOT NULL,
 	"name" text NOT NULL,
 	"exchange" text NOT NULL,
@@ -1358,8 +2350,8 @@ CREATE TABLE IF NOT EXISTS "tin"."Future" (
 	"futures_type" text NOT NULL,
 	"asset_type" text NOT NULL,
 	"basic_asset" text NOT NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
+	"basic_asset_size_id_units" bigint NULL,
+	"basic_asset_size_id_nano" integer NULL,
 	"country_of_risk" text NOT NULL,
 	"country_of_risk_name" text NOT NULL,
 	"sector" text NOT NULL,
@@ -1368,8 +2360,8 @@ CREATE TABLE IF NOT EXISTS "tin"."Future" (
 	"otc_flag" bool NOT NULL,
 	"buy_available_flag" bool NOT NULL,
 	"sell_available_flag" bool NOT NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
+	"min_price_increment_id_units" bigint NULL,
+	"min_price_increment_id_nano" integer NULL,
 	"api_trade_available_flag" bool NOT NULL,
 	"uid" text NOT NULL,
 	"real_exchange_id" bigint NULL,
@@ -1381,9 +2373,7 @@ CREATE TABLE IF NOT EXISTS "tin"."Future" (
 	"blocked_tca_flag" bool NOT NULL,
 	"first_1min_candle_date" timestamptz NULL,
 	"first_1day_candle_date" timestamptz NULL,
-	CONSTRAINT "Future_pk" PRIMARY KEY ("uid"),
-	CONSTRAINT "Future_trading_status_id_fk" FOREIGN KEY ("trading_status_id") REFERENCES "tin"."SecurityTradingStatus" ("id"),
-	CONSTRAINT "Future_real_exchange_id_fk" FOREIGN KEY ("real_exchange_id") REFERENCES "tin"."RealExchange" ("id")
+	CONSTRAINT "Future_pk" PRIMARY KEY ("uid")
 );
 CREATE INDEX IF NOT EXISTS "Future_klong_id_idx" ON "tin"."Future" USING btree ("klong_id");
 CREATE INDEX IF NOT EXISTS "Future_kshort_id_idx" ON "tin"."Future" USING btree ("kshort_id");
@@ -1437,476 +2427,240 @@ COMMENT ON COLUMN "tin"."Future"."blocked_tca_flag" IS 'Флаг заблоки�
 COMMENT ON COLUMN "tin"."Future"."first_1min_candle_date" IS 'Дата первой минутной свечи.';
 COMMENT ON COLUMN "tin"."Future"."first_1day_candle_date" IS 'Дата первой дневной свечи.';
 
-CREATE TABLE IF NOT EXISTS "tin"."Instrument" (
+CREATE TABLE IF NOT EXISTS "tin"."GetAccruedInterestsRequest" (
 	"figi" text NOT NULL,
-	"ticker" text NOT NULL,
-	"class_code" text NOT NULL,
-	"isin" text NOT NULL,
-	"lot" integer NOT NULL,
-	"currency" text NOT NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"short_enabled_flag" bool NOT NULL,
-	"name" text NOT NULL,
-	"exchange" text NOT NULL,
-	"country_of_risk" text NOT NULL,
-	"country_of_risk_name" text NOT NULL,
-	"instrument_type" text NOT NULL,
-	"trading_status_id" bigint NULL,
-	"otc_flag" bool NOT NULL,
-	"buy_available_flag" bool NOT NULL,
-	"sell_available_flag" bool NOT NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"api_trade_available_flag" bool NOT NULL,
-	"uid" text NOT NULL,
-	"real_exchange_id" bigint NULL,
-	"position_uid" text NOT NULL,
-	"for_iis_flag" bool NOT NULL,
-	"for_qual_investor_flag" bool NOT NULL,
-	"weekend_flag" bool NOT NULL,
-	"blocked_tca_flag" bool NOT NULL,
-	"instrument_kind_id" bigint NULL,
-	"first_1min_candle_date" timestamptz NULL,
-	"first_1day_candle_date" timestamptz NULL,
-	CONSTRAINT "Instrument_pk" PRIMARY KEY ("uid"),
-	CONSTRAINT "Instrument_trading_status_id_fk" FOREIGN KEY ("trading_status_id") REFERENCES "tin"."SecurityTradingStatus" ("id"),
-	CONSTRAINT "Instrument_real_exchange_id_fk" FOREIGN KEY ("real_exchange_id") REFERENCES "tin"."RealExchange" ("id"),
-	CONSTRAINT "Instrument_instrument_kind_id_fk" FOREIGN KEY ("instrument_kind_id") REFERENCES "tin"."InstrumentType" ("id")
+	"from" timestamptz NULL,
+	"to" timestamptz NULL,
+	CONSTRAINT "GetAccruedInterestsRequest_pk" PRIMARY KEY ("figi")
 );
-CREATE INDEX IF NOT EXISTS "Instrument_klong_id_idx" ON "tin"."Instrument" USING btree ("klong_id");
-CREATE INDEX IF NOT EXISTS "Instrument_kshort_id_idx" ON "tin"."Instrument" USING btree ("kshort_id");
-CREATE INDEX IF NOT EXISTS "Instrument_dlong_id_idx" ON "tin"."Instrument" USING btree ("dlong_id");
-CREATE INDEX IF NOT EXISTS "Instrument_dshort_id_idx" ON "tin"."Instrument" USING btree ("dshort_id");
-CREATE INDEX IF NOT EXISTS "Instrument_dlong_min_id_idx" ON "tin"."Instrument" USING btree ("dlong_min_id");
-CREATE INDEX IF NOT EXISTS "Instrument_dshort_min_id_idx" ON "tin"."Instrument" USING btree ("dshort_min_id");
-CREATE INDEX IF NOT EXISTS "Instrument_trading_status_id_idx" ON "tin"."Instrument" USING btree ("trading_status_id");
-CREATE INDEX IF NOT EXISTS "Instrument_min_price_increment_id_idx" ON "tin"."Instrument" USING btree ("min_price_increment_id");
-CREATE INDEX IF NOT EXISTS "Instrument_real_exchange_id_idx" ON "tin"."Instrument" USING btree ("real_exchange_id");
-CREATE INDEX IF NOT EXISTS "Instrument_instrument_kind_id_idx" ON "tin"."Instrument" USING btree ("instrument_kind_id");
-COMMENT ON TABLE "tin"."Instrument" IS 'Объект передачи основной информации об инструменте.';
-COMMENT ON COLUMN "tin"."Instrument"."figi" IS 'Figi-идентификатор инструмента.';
-COMMENT ON COLUMN "tin"."Instrument"."ticker" IS 'Тикер инструмента.';
-COMMENT ON COLUMN "tin"."Instrument"."class_code" IS 'Класс-код инструмента.';
-COMMENT ON COLUMN "tin"."Instrument"."isin" IS 'Isin-идентификатор инструмента.';
-COMMENT ON COLUMN "tin"."Instrument"."lot" IS 'Лотность инструмента. Возможно совершение операций только на количества ценной бумаги, кратные параметру *lot*. Подробнее: [лот](https://tinkoff.github.io/investAPI/glossary#lot)';
-COMMENT ON COLUMN "tin"."Instrument"."currency" IS 'Валюта расчётов.';
-COMMENT ON COLUMN "tin"."Instrument"."klong_id" IS 'Коэффициент ставки риска длинной позиции по инструменту.';
-COMMENT ON COLUMN "tin"."Instrument"."kshort_id" IS 'Коэффициент ставки риска короткой позиции по инструменту.';
-COMMENT ON COLUMN "tin"."Instrument"."dlong_id" IS 'Ставка риска минимальной маржи в лонг. Подробнее: [ставка риска в лонг](https://help.tinkoff.ru/margin-trade/long/risk-rate/)';
-COMMENT ON COLUMN "tin"."Instrument"."dshort_id" IS 'Ставка риска минимальной маржи в шорт. Подробнее: [ставка риска в шорт](https://help.tinkoff.ru/margin-trade/short/risk-rate/)';
-COMMENT ON COLUMN "tin"."Instrument"."dlong_min_id" IS 'Ставка риска начальной маржи в лонг. Подробнее: [ставка риска в лонг](https://help.tinkoff.ru/margin-trade/long/risk-rate/)';
-COMMENT ON COLUMN "tin"."Instrument"."dshort_min_id" IS 'Ставка риска начальной маржи в шорт. Подробнее: [ставка риска в шорт](https://help.tinkoff.ru/margin-trade/short/risk-rate/)';
-COMMENT ON COLUMN "tin"."Instrument"."short_enabled_flag" IS 'Признак доступности для операций в шорт.';
-COMMENT ON COLUMN "tin"."Instrument"."name" IS 'Название инструмента.';
-COMMENT ON COLUMN "tin"."Instrument"."exchange" IS 'Торговая площадка.';
-COMMENT ON COLUMN "tin"."Instrument"."country_of_risk" IS 'Код страны риска, т.е. страны, в которой компания ведёт основной бизнес.';
-COMMENT ON COLUMN "tin"."Instrument"."country_of_risk_name" IS 'Наименование страны риска, т.е. страны, в которой компания ведёт основной бизнес.';
-COMMENT ON COLUMN "tin"."Instrument"."instrument_type" IS 'Тип инструмента.';
-COMMENT ON COLUMN "tin"."Instrument"."trading_status_id" IS 'Текущий режим торгов инструмента.';
-COMMENT ON COLUMN "tin"."Instrument"."otc_flag" IS 'Признак внебиржевой ценной бумаги.';
-COMMENT ON COLUMN "tin"."Instrument"."buy_available_flag" IS 'Признак доступности для покупки.';
-COMMENT ON COLUMN "tin"."Instrument"."sell_available_flag" IS 'Признак доступности для продажи.';
-COMMENT ON COLUMN "tin"."Instrument"."min_price_increment_id" IS 'Шаг цены.';
-COMMENT ON COLUMN "tin"."Instrument"."api_trade_available_flag" IS 'Параметр указывает на возможность торговать инструментом через API.';
-COMMENT ON COLUMN "tin"."Instrument"."uid" IS 'Уникальный идентификатор инструмента.';
-COMMENT ON COLUMN "tin"."Instrument"."real_exchange_id" IS 'Реальная площадка исполнения расчётов.';
-COMMENT ON COLUMN "tin"."Instrument"."position_uid" IS 'Уникальный идентификатор позиции инструмента.';
-COMMENT ON COLUMN "tin"."Instrument"."for_iis_flag" IS 'Признак доступности для ИИС.';
-COMMENT ON COLUMN "tin"."Instrument"."for_qual_investor_flag" IS 'Флаг отображающий доступность торговли инструментом только для квалифицированных инвесторов.';
-COMMENT ON COLUMN "tin"."Instrument"."weekend_flag" IS 'Флаг отображающий доступность торговли инструментом по выходным';
-COMMENT ON COLUMN "tin"."Instrument"."blocked_tca_flag" IS 'Флаг заблокированного ТКС';
-COMMENT ON COLUMN "tin"."Instrument"."instrument_kind_id" IS 'Тип инструмента.';
-COMMENT ON COLUMN "tin"."Instrument"."first_1min_candle_date" IS 'Дата первой минутной свечи.';
-COMMENT ON COLUMN "tin"."Instrument"."first_1day_candle_date" IS 'Дата первой дневной свечи.';
+COMMENT ON TABLE "tin"."GetAccruedInterestsRequest" IS 'Запрос НКД по облигации';
+COMMENT ON COLUMN "tin"."GetAccruedInterestsRequest"."figi" IS 'Figi-идентификатор инструмента.';
+COMMENT ON COLUMN "tin"."GetAccruedInterestsRequest"."from" IS 'Начало запрашиваемого периода в часовом поясе UTC.';
+COMMENT ON COLUMN "tin"."GetAccruedInterestsRequest"."to" IS 'Окончание запрашиваемого периода в часовом поясе UTC.';
 
-CREATE TABLE IF NOT EXISTS "tin"."InstrumentRequest" (
-	"id_type_id" bigint NULL,
-	"class_code" text NOT NULL,
-	"id" text NOT NULL,
-	CONSTRAINT "InstrumentRequest_pk" PRIMARY KEY ("id"),
-	CONSTRAINT "InstrumentRequest_id_type_id_fk" FOREIGN KEY ("id_type_id") REFERENCES "tin"."InstrumentIdType" ("id")
-);
-CREATE INDEX IF NOT EXISTS "InstrumentRequest_id_type_id_idx" ON "tin"."InstrumentRequest" USING btree ("id_type_id");
-COMMENT ON TABLE "tin"."InstrumentRequest" IS 'Запрос получения инструмента по идентификатору.';
-COMMENT ON COLUMN "tin"."InstrumentRequest"."id_type_id" IS ' Тип идентификатора инструмента. Возможные значения: figi, ticker. Подробнее об идентификации инструментов: [Идентификация инструментов](https://tinkoff.github.io/investAPI/faq_identification/)';
-COMMENT ON COLUMN "tin"."InstrumentRequest"."class_code" IS ' Идентификатор class_code. Обязателен при id_type = ticker.';
-COMMENT ON COLUMN "tin"."InstrumentRequest"."id" IS ' Идентификатор запрашиваемого инструмента.';
-
-CREATE TABLE IF NOT EXISTS "tin"."InstrumentShort" (
-	"isin" text NOT NULL,
+CREATE TABLE IF NOT EXISTS "tin"."GetBondCouponsRequest" (
 	"figi" text NOT NULL,
-	"ticker" text NOT NULL,
-	"class_code" text NOT NULL,
-	"instrument_type" text NOT NULL,
-	"name" text NOT NULL,
-	"uid" text NOT NULL,
-	"position_uid" text NOT NULL,
-	"instrument_kind_id" bigint NULL,
-	"api_trade_available_flag" bool NOT NULL,
-	"for_iis_flag" bool NOT NULL,
-	"first_1min_candle_date" timestamptz NULL,
-	"first_1day_candle_date" timestamptz NULL,
-	"for_qual_investor_flag" bool NOT NULL,
-	"weekend_flag" bool NOT NULL,
-	"blocked_tca_flag" bool NOT NULL,
-	CONSTRAINT "InstrumentShort_pk" PRIMARY KEY ("uid"),
-	CONSTRAINT "InstrumentShort_instrument_kind_id_fk" FOREIGN KEY ("instrument_kind_id") REFERENCES "tin"."InstrumentType" ("id")
+	"from" timestamptz NULL,
+	"to" timestamptz NULL,
+	CONSTRAINT "GetBondCouponsRequest_pk" PRIMARY KEY ("figi")
 );
-CREATE INDEX IF NOT EXISTS "InstrumentShort_instrument_kind_id_idx" ON "tin"."InstrumentShort" USING btree ("instrument_kind_id");
-COMMENT ON TABLE "tin"."InstrumentShort" IS 'Краткая информация об инструменте.';
-COMMENT ON COLUMN "tin"."InstrumentShort"."isin" IS 'Isin инструмента.';
-COMMENT ON COLUMN "tin"."InstrumentShort"."figi" IS 'Figi инструмента.';
-COMMENT ON COLUMN "tin"."InstrumentShort"."ticker" IS 'Ticker инструмента.';
-COMMENT ON COLUMN "tin"."InstrumentShort"."class_code" IS 'ClassCode инструмента.';
-COMMENT ON COLUMN "tin"."InstrumentShort"."instrument_type" IS 'Тип инструмента.';
-COMMENT ON COLUMN "tin"."InstrumentShort"."name" IS 'Название инструмента.';
-COMMENT ON COLUMN "tin"."InstrumentShort"."uid" IS 'Уникальный идентификатор инструмента.';
-COMMENT ON COLUMN "tin"."InstrumentShort"."position_uid" IS 'Уникальный идентификатор позиции инструмента.';
-COMMENT ON COLUMN "tin"."InstrumentShort"."instrument_kind_id" IS 'Тип инструмента.';
-COMMENT ON COLUMN "tin"."InstrumentShort"."api_trade_available_flag" IS 'Параметр указывает на возможность торговать инструментом через API.';
-COMMENT ON COLUMN "tin"."InstrumentShort"."for_iis_flag" IS 'Признак доступности для ИИС.';
-COMMENT ON COLUMN "tin"."InstrumentShort"."first_1min_candle_date" IS 'Дата первой минутной свечи.';
-COMMENT ON COLUMN "tin"."InstrumentShort"."first_1day_candle_date" IS 'Дата первой дневной свечи.';
-COMMENT ON COLUMN "tin"."InstrumentShort"."for_qual_investor_flag" IS 'Флаг отображающий доступность торговли инструментом только для квалифицированных инвесторов.';
-COMMENT ON COLUMN "tin"."InstrumentShort"."weekend_flag" IS 'Флаг отображающий доступность торговли инструментом по выходным';
-COMMENT ON COLUMN "tin"."InstrumentShort"."blocked_tca_flag" IS 'Флаг заблокированного ТКС';
+COMMENT ON TABLE "tin"."GetBondCouponsRequest" IS 'Запрос купонов по облигации.';
+COMMENT ON COLUMN "tin"."GetBondCouponsRequest"."figi" IS 'Figi-идентификатор инструмента.';
+COMMENT ON COLUMN "tin"."GetBondCouponsRequest"."from" IS 'Начало запрашиваемого периода в часовом поясе UTC. Фильтрация по coupon_date (дата выплаты купона)';
+COMMENT ON COLUMN "tin"."GetBondCouponsRequest"."to" IS 'Окончание запрашиваемого периода в часовом поясе UTC. Фильтрация по coupon_date (дата выплаты купона)';
 
-CREATE TABLE IF NOT EXISTS "tin"."Operation" (
-	"id" text NOT NULL,
-	"parent_operation_id" text NOT NULL,
-	"currency" text NOT NULL,
-	"string_currency" text NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"string_currency" text NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"state_id" bigint NULL,
-	"quantity" bigint NOT NULL,
-	"quantity_rest" bigint NOT NULL,
+CREATE TABLE IF NOT EXISTS "tin"."GetCandlesRequest" (
 	"figi" text NOT NULL,
-	"instrument_type" text NOT NULL,
-	"date" timestamptz NULL,
-	"type" text NOT NULL,
-	"operation_type_id" bigint NULL,
-	"trades_id" text NULL,
-	"asset_uid" text NOT NULL,
-	"position_uid" text NOT NULL,
-	"instrument_uid" text NOT NULL,
-	CONSTRAINT "Operation_pk" PRIMARY KEY ("id"),
-	CONSTRAINT "Operation_state_id_fk" FOREIGN KEY ("state_id") REFERENCES "tin"."OperationState" ("id"),
-	CONSTRAINT "Operation_operation_type_id_fk" FOREIGN KEY ("operation_type_id") REFERENCES "tin"."OperationType" ("id"),
-	CONSTRAINT "Operation_trades_id_fk" FOREIGN KEY ("trades_id") REFERENCES "tin"."OperationTrade" ("trade_id")
+	"from" timestamptz NULL,
+	"to" timestamptz NULL,
+	"interval_id" bigint NULL,
+	"instrument_id" text NOT NULL,
+	CONSTRAINT "GetCandlesRequest_pk" PRIMARY KEY ("figi")
 );
-CREATE INDEX IF NOT EXISTS "Operation_payment_id_idx" ON "tin"."Operation" USING btree ("payment_id");
-CREATE INDEX IF NOT EXISTS "Operation_price_id_idx" ON "tin"."Operation" USING btree ("price_id");
-CREATE INDEX IF NOT EXISTS "Operation_state_id_idx" ON "tin"."Operation" USING btree ("state_id");
-CREATE INDEX IF NOT EXISTS "Operation_operation_type_id_idx" ON "tin"."Operation" USING btree ("operation_type_id");
-CREATE INDEX IF NOT EXISTS "Operation_trades_id_idx" ON "tin"."Operation" USING btree ("trades_id");
-COMMENT ON TABLE "tin"."Operation" IS 'Данные по операции.';
-COMMENT ON COLUMN "tin"."Operation"."id" IS 'Идентификатор операции.';
-COMMENT ON COLUMN "tin"."Operation"."parent_operation_id" IS 'Идентификатор родительской операции.';
-COMMENT ON COLUMN "tin"."Operation"."currency" IS 'Валюта операции.';
-COMMENT ON COLUMN "tin"."Operation"."payment_id" IS 'Сумма операции.';
-COMMENT ON COLUMN "tin"."Operation"."price_id" IS 'Цена операции за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента.';
-COMMENT ON COLUMN "tin"."Operation"."state_id" IS 'Статус операции.';
-COMMENT ON COLUMN "tin"."Operation"."quantity" IS 'Количество единиц инструмента.';
-COMMENT ON COLUMN "tin"."Operation"."quantity_rest" IS 'Неисполненный остаток по сделке.';
-COMMENT ON COLUMN "tin"."Operation"."figi" IS 'Figi-идентификатор инструмента, связанного с операцией.';
-COMMENT ON COLUMN "tin"."Operation"."instrument_type" IS 'Тип инструмента. Возможные значения: </br>**bond** — облигация; </br>**share** — акция; </br>**currency** — валюта; </br>**etf** — фонд; </br>**futures** — фьючерс.';
-COMMENT ON COLUMN "tin"."Operation"."date" IS 'Дата и время операции в формате часовом поясе UTC.';
-COMMENT ON COLUMN "tin"."Operation"."type" IS 'Текстовое описание типа операции.';
-COMMENT ON COLUMN "tin"."Operation"."operation_type_id" IS 'Тип операции.';
-COMMENT ON COLUMN "tin"."Operation"."trades_id" IS 'Массив сделок.';
-COMMENT ON COLUMN "tin"."Operation"."asset_uid" IS 'Идентификатор актива';
-COMMENT ON COLUMN "tin"."Operation"."position_uid" IS 'position_uid-идентификатора инструмента.';
-COMMENT ON COLUMN "tin"."Operation"."instrument_uid" IS 'Уникальный идентификатор инструмента.';
+CREATE INDEX IF NOT EXISTS "GetCandlesRequest_interval_id_idx" ON "tin"."GetCandlesRequest" USING btree ("interval_id");
+COMMENT ON TABLE "tin"."GetCandlesRequest" IS 'Запрос исторических свечей.';
+COMMENT ON COLUMN "tin"."GetCandlesRequest"."figi" IS 'Deprecated Figi-идентификатор инструмента. Необходимо использовать instrument_id.';
+COMMENT ON COLUMN "tin"."GetCandlesRequest"."from" IS 'Начало запрашиваемого периода в часовом поясе UTC.';
+COMMENT ON COLUMN "tin"."GetCandlesRequest"."to" IS 'Окончание запрашиваемого периода в часовом поясе UTC.';
+COMMENT ON COLUMN "tin"."GetCandlesRequest"."interval_id" IS 'Интервал запрошенных свечей.';
+COMMENT ON COLUMN "tin"."GetCandlesRequest"."instrument_id" IS 'Идентификатор инструмента, принимает значение figi или instrument_uid.';
 
-CREATE TABLE IF NOT EXISTS "tin"."OperationTrade" (
-	"trade_id" text NOT NULL,
-	"date_time" timestamptz NULL,
-	"quantity" bigint NOT NULL,
-	"string_currency" text NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	CONSTRAINT "OperationTrade_pk" PRIMARY KEY ("trade_id")
-);
-CREATE INDEX IF NOT EXISTS "OperationTrade_price_id_idx" ON "tin"."OperationTrade" USING btree ("price_id");
-COMMENT ON TABLE "tin"."OperationTrade" IS 'Сделка по операции.';
-COMMENT ON COLUMN "tin"."OperationTrade"."trade_id" IS 'Идентификатор сделки.';
-COMMENT ON COLUMN "tin"."OperationTrade"."date_time" IS 'Дата и время сделки в часовом поясе UTC.';
-COMMENT ON COLUMN "tin"."OperationTrade"."quantity" IS 'Количество инструментов.';
-COMMENT ON COLUMN "tin"."OperationTrade"."price_id" IS 'Цена за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента.';
-
-CREATE TABLE IF NOT EXISTS "tin"."Option" (
-	"uid" text NOT NULL,
-	"position_uid" text NOT NULL,
-	"ticker" text NOT NULL,
-	"class_code" text NOT NULL,
-	"basic_asset_position_uid" text NOT NULL,
-	"trading_status_id" bigint NULL,
-	"real_exchange_id" bigint NULL,
-	"direction_id" bigint NULL,
-	"payment_type_id" bigint NULL,
-	"style_id" bigint NULL,
-	"settlement_type_id" bigint NULL,
-	"name" text NOT NULL,
-	"currency" text NOT NULL,
-	"settlement_currency" text NOT NULL,
-	"asset_type" text NOT NULL,
-	"basic_asset" text NOT NULL,
-	"exchange" text NOT NULL,
-	"country_of_risk" text NOT NULL,
-	"country_of_risk_name" text NOT NULL,
-	"sector" text NOT NULL,
-	"lot" integer NOT NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"string_currency" text NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"expiration_date" timestamptz NULL,
-	"first_trade_date" timestamptz NULL,
-	"last_trade_date" timestamptz NULL,
-	"first_1min_candle_date" timestamptz NULL,
-	"first_1day_candle_date" timestamptz NULL,
-	"short_enabled_flag" bool NOT NULL,
-	"for_iis_flag" bool NOT NULL,
-	"otc_flag" bool NOT NULL,
-	"buy_available_flag" bool NOT NULL,
-	"sell_available_flag" bool NOT NULL,
-	"for_qual_investor_flag" bool NOT NULL,
-	"weekend_flag" bool NOT NULL,
-	"blocked_tca_flag" bool NOT NULL,
-	"api_trade_available_flag" bool NOT NULL,
-	CONSTRAINT "Option_pk" PRIMARY KEY ("uid"),
-	CONSTRAINT "Option_trading_status_id_fk" FOREIGN KEY ("trading_status_id") REFERENCES "tin"."SecurityTradingStatus" ("id"),
-	CONSTRAINT "Option_real_exchange_id_fk" FOREIGN KEY ("real_exchange_id") REFERENCES "tin"."RealExchange" ("id"),
-	CONSTRAINT "Option_direction_id_fk" FOREIGN KEY ("direction_id") REFERENCES "tin"."OptionDirection" ("id"),
-	CONSTRAINT "Option_payment_type_id_fk" FOREIGN KEY ("payment_type_id") REFERENCES "tin"."OptionPaymentType" ("id"),
-	CONSTRAINT "Option_style_id_fk" FOREIGN KEY ("style_id") REFERENCES "tin"."OptionStyle" ("id"),
-	CONSTRAINT "Option_settlement_type_id_fk" FOREIGN KEY ("settlement_type_id") REFERENCES "tin"."OptionSettlementType" ("id")
-);
-CREATE INDEX IF NOT EXISTS "Option_trading_status_id_idx" ON "tin"."Option" USING btree ("trading_status_id");
-CREATE INDEX IF NOT EXISTS "Option_real_exchange_id_idx" ON "tin"."Option" USING btree ("real_exchange_id");
-CREATE INDEX IF NOT EXISTS "Option_direction_id_idx" ON "tin"."Option" USING btree ("direction_id");
-CREATE INDEX IF NOT EXISTS "Option_payment_type_id_idx" ON "tin"."Option" USING btree ("payment_type_id");
-CREATE INDEX IF NOT EXISTS "Option_style_id_idx" ON "tin"."Option" USING btree ("style_id");
-CREATE INDEX IF NOT EXISTS "Option_settlement_type_id_idx" ON "tin"."Option" USING btree ("settlement_type_id");
-CREATE INDEX IF NOT EXISTS "Option_basic_asset_size_id_idx" ON "tin"."Option" USING btree ("basic_asset_size_id");
-CREATE INDEX IF NOT EXISTS "Option_klong_id_idx" ON "tin"."Option" USING btree ("klong_id");
-CREATE INDEX IF NOT EXISTS "Option_kshort_id_idx" ON "tin"."Option" USING btree ("kshort_id");
-CREATE INDEX IF NOT EXISTS "Option_dlong_id_idx" ON "tin"."Option" USING btree ("dlong_id");
-CREATE INDEX IF NOT EXISTS "Option_dshort_id_idx" ON "tin"."Option" USING btree ("dshort_id");
-CREATE INDEX IF NOT EXISTS "Option_dlong_min_id_idx" ON "tin"."Option" USING btree ("dlong_min_id");
-CREATE INDEX IF NOT EXISTS "Option_dshort_min_id_idx" ON "tin"."Option" USING btree ("dshort_min_id");
-CREATE INDEX IF NOT EXISTS "Option_min_price_increment_id_idx" ON "tin"."Option" USING btree ("min_price_increment_id");
-CREATE INDEX IF NOT EXISTS "Option_strike_price_id_idx" ON "tin"."Option" USING btree ("strike_price_id");
-COMMENT ON TABLE "tin"."Option" IS 'Опцион.';
-COMMENT ON COLUMN "tin"."Option"."uid" IS 'Уникальный идентификатор инструмента.';
-COMMENT ON COLUMN "tin"."Option"."position_uid" IS 'Уникальный идентификатор позиции.';
-COMMENT ON COLUMN "tin"."Option"."ticker" IS 'Тикер инструмента.';
-COMMENT ON COLUMN "tin"."Option"."class_code" IS 'Класс-код.';
-COMMENT ON COLUMN "tin"."Option"."basic_asset_position_uid" IS 'Уникальный идентификатор позиции основного инструмента.';
-COMMENT ON COLUMN "tin"."Option"."trading_status_id" IS 'Текущий режим торгов инструмента.';
-COMMENT ON COLUMN "tin"."Option"."real_exchange_id" IS 'Реальная площадка исполнения расчётов. Допустимые значения: [REAL_EXCHANGE_MOEX, REAL_EXCHANGE_RTS]';
-COMMENT ON COLUMN "tin"."Option"."direction_id" IS 'Направление опциона.';
-COMMENT ON COLUMN "tin"."Option"."payment_type_id" IS 'Тип расчетов по опциону.';
-COMMENT ON COLUMN "tin"."Option"."style_id" IS 'Стиль опциона.';
-COMMENT ON COLUMN "tin"."Option"."settlement_type_id" IS 'Способ исполнения опциона.';
-COMMENT ON COLUMN "tin"."Option"."name" IS 'Название инструмента.';
-COMMENT ON COLUMN "tin"."Option"."currency" IS 'Валюта.';
-COMMENT ON COLUMN "tin"."Option"."settlement_currency" IS 'Валюта, в которой оценивается контракт.';
-COMMENT ON COLUMN "tin"."Option"."asset_type" IS 'Тип актива.';
-COMMENT ON COLUMN "tin"."Option"."basic_asset" IS 'Основной актив.';
-COMMENT ON COLUMN "tin"."Option"."exchange" IS 'Биржа.';
-COMMENT ON COLUMN "tin"."Option"."country_of_risk" IS 'Код страны рисков.';
-COMMENT ON COLUMN "tin"."Option"."country_of_risk_name" IS 'Наименование страны рисков.';
-COMMENT ON COLUMN "tin"."Option"."sector" IS 'Сектор экономики.';
-COMMENT ON COLUMN "tin"."Option"."lot" IS 'Количество бумаг в лоте.';
-COMMENT ON COLUMN "tin"."Option"."basic_asset_size_id" IS 'Размер основного актива.';
-COMMENT ON COLUMN "tin"."Option"."klong_id" IS 'Коэффициент ставки риска длинной позиции по клиенту.';
-COMMENT ON COLUMN "tin"."Option"."kshort_id" IS 'Коэффициент ставки риска короткой позиции по клиенту.';
-COMMENT ON COLUMN "tin"."Option"."dlong_id" IS 'Ставка риска минимальной маржи лонг.';
-COMMENT ON COLUMN "tin"."Option"."dshort_id" IS 'Ставка риска минимальной маржи шорт.';
-COMMENT ON COLUMN "tin"."Option"."dlong_min_id" IS 'Ставка риска начальной маржи лонг.';
-COMMENT ON COLUMN "tin"."Option"."dshort_min_id" IS 'Ставка риска начальной маржи шорт.';
-COMMENT ON COLUMN "tin"."Option"."min_price_increment_id" IS 'Минимальный шаг цены.';
-COMMENT ON COLUMN "tin"."Option"."strike_price_id" IS 'Цена страйка.';
-COMMENT ON COLUMN "tin"."Option"."expiration_date" IS 'Дата истечения срока в формате UTC.';
-COMMENT ON COLUMN "tin"."Option"."first_trade_date" IS 'Дата начала обращения контракта в формате UTC.';
-COMMENT ON COLUMN "tin"."Option"."last_trade_date" IS 'Дата исполнения в формате UTC.';
-COMMENT ON COLUMN "tin"."Option"."first_1min_candle_date" IS 'Дата первой минутной свечи в формате UTC.';
-COMMENT ON COLUMN "tin"."Option"."first_1day_candle_date" IS 'Дата первой дневной свечи в формате UTC.';
-COMMENT ON COLUMN "tin"."Option"."short_enabled_flag" IS 'Признак доступности для операций шорт.';
-COMMENT ON COLUMN "tin"."Option"."for_iis_flag" IS 'Возможность покупки/продажи на ИИС.';
-COMMENT ON COLUMN "tin"."Option"."otc_flag" IS 'Признак внебиржевой ценной бумаги.';
-COMMENT ON COLUMN "tin"."Option"."buy_available_flag" IS 'Признак доступности для покупки.';
-COMMENT ON COLUMN "tin"."Option"."sell_available_flag" IS 'Признак доступности для продажи.';
-COMMENT ON COLUMN "tin"."Option"."for_qual_investor_flag" IS 'Флаг отображающий доступность торговли инструментом только для квалифицированных инвесторов.';
-COMMENT ON COLUMN "tin"."Option"."weekend_flag" IS 'Флаг отображающий доступность торговли инструментом по выходным.';
-COMMENT ON COLUMN "tin"."Option"."blocked_tca_flag" IS 'Флаг заблокированного ТКС.';
-COMMENT ON COLUMN "tin"."Option"."api_trade_available_flag" IS 'Параметр указывает на возможность торговать инструментом через API.';
-
-CREATE TABLE IF NOT EXISTS "tin"."OrderStage" (
-	"string_currency" text NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"quantity" bigint NOT NULL,
-	"trade_id" text NOT NULL,
-	CONSTRAINT "OrderStage_pk" PRIMARY KEY ("trade_id")
-);
-CREATE INDEX IF NOT EXISTS "OrderStage_price_id_idx" ON "tin"."OrderStage" USING btree ("price_id");
-COMMENT ON TABLE "tin"."OrderStage" IS 'Сделки в рамках торгового поручения.';
-COMMENT ON COLUMN "tin"."OrderStage"."price_id" IS 'Цена за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента.';
-COMMENT ON COLUMN "tin"."OrderStage"."quantity" IS 'Количество лотов.';
-COMMENT ON COLUMN "tin"."OrderStage"."trade_id" IS 'Идентификатор сделки.';
-
-CREATE TABLE IF NOT EXISTS "tin"."OrderTrade" (
-	"date_time" timestamptz NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"quantity" bigint NOT NULL,
-	"trade_id" text NOT NULL,
-	CONSTRAINT "OrderTrade_pk" PRIMARY KEY ("trade_id")
-);
-CREATE INDEX IF NOT EXISTS "OrderTrade_price_id_idx" ON "tin"."OrderTrade" USING btree ("price_id");
-COMMENT ON TABLE "tin"."OrderTrade" IS 'Информация о сделке.';
-COMMENT ON COLUMN "tin"."OrderTrade"."date_time" IS 'Дата и время совершения сделки в часовом поясе UTC.';
-COMMENT ON COLUMN "tin"."OrderTrade"."price_id" IS 'Цена за 1 инструмент, по которой совершена сделка.';
-COMMENT ON COLUMN "tin"."OrderTrade"."quantity" IS 'Количество штук в сделке.';
-COMMENT ON COLUMN "tin"."OrderTrade"."trade_id" IS 'Идентификатор сделки.';
-
-CREATE TABLE IF NOT EXISTS "tin"."Share" (
+CREATE TABLE IF NOT EXISTS "tin"."GetDividendsRequest" (
 	"figi" text NOT NULL,
-	"ticker" text NOT NULL,
-	"class_code" text NOT NULL,
-	"isin" text NOT NULL,
-	"lot" integer NOT NULL,
-	"currency" text NOT NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"short_enabled_flag" bool NOT NULL,
-	"name" text NOT NULL,
-	"exchange" text NOT NULL,
-	"ipo_date" timestamptz NULL,
-	"issue_size" bigint NOT NULL,
-	"country_of_risk" text NOT NULL,
-	"country_of_risk_name" text NOT NULL,
-	"sector" text NOT NULL,
-	"issue_size_plan" bigint NOT NULL,
-	"string_currency" text NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"trading_status_id" bigint NULL,
-	"otc_flag" bool NOT NULL,
-	"buy_available_flag" bool NOT NULL,
-	"sell_available_flag" bool NOT NULL,
+	"from" timestamptz NULL,
+	"to" timestamptz NULL,
+	CONSTRAINT "GetDividendsRequest_pk" PRIMARY KEY ("figi")
+);
+COMMENT ON TABLE "tin"."GetDividendsRequest" IS 'Запрос дивидендов.';
+COMMENT ON COLUMN "tin"."GetDividendsRequest"."figi" IS 'Figi-идентификатор инструмента.';
+COMMENT ON COLUMN "tin"."GetDividendsRequest"."from" IS 'Начало запрашиваемого периода в часовом поясе UTC. Фильтрация происходит по параметру *record_date* (дата фиксации реестра).';
+COMMENT ON COLUMN "tin"."GetDividendsRequest"."to" IS 'Окончание запрашиваемого периода в часовом поясе UTC. Фильтрация происходит по параметру *record_date* (дата фиксации реестра).';
+
+CREATE TABLE IF NOT EXISTS "tin"."AssetEtf" (
+	"total_expense_id_units" bigint NULL,
+	"total_expense_id_nano" integer NULL,
+	"hurdle_rate_id_units" bigint NULL,
+	"hurdle_rate_id_nano" integer NULL,
+	"performance_fee_id_units" bigint NULL,
+	"performance_fee_id_nano" integer NULL,
+	"fixed_commission_id_units" bigint NULL,
+	"fixed_commission_id_nano" integer NULL,
+	"payment_type" text NOT NULL,
+	"watermark_flag" bool NOT NULL,
+	"buy_premium_id_units" bigint NULL,
+	"buy_premium_id_nano" integer NULL,
+	"sell_discount_id_units" bigint NULL,
+	"sell_discount_id_nano" integer NULL,
+	"rebalancing_flag" bool NOT NULL,
+	"rebalancing_freq" text NOT NULL,
+	"management_type" text NOT NULL,
+	"primary_index" text NOT NULL,
+	"focus_type" text NOT NULL,
+	"leveraged_flag" bool NOT NULL,
+	"num_share_id_units" bigint NULL,
+	"num_share_id_nano" integer NULL,
+	"ucits_flag" bool NOT NULL,
+	"released_date" timestamptz NULL,
+	"description" text NOT NULL,
+	"primary_index_description" text NOT NULL,
+	"primary_index_company" text NOT NULL,
+	"index_recovery_period_id_units" bigint NULL,
+	"index_recovery_period_id_nano" integer NULL,
+	"inav_code" text NOT NULL,
 	"div_yield_flag" bool NOT NULL,
-	"share_type_id" bigint NULL,
-	"int64_units" bigint NULL,
-	"int32_nano" integer NULL,
-	"api_trade_available_flag" bool NOT NULL,
-	"uid" text NOT NULL,
-	"real_exchange_id" bigint NULL,
-	"position_uid" text NOT NULL,
-	"for_iis_flag" bool NOT NULL,
-	"for_qual_investor_flag" bool NOT NULL,
-	"weekend_flag" bool NOT NULL,
-	"blocked_tca_flag" bool NOT NULL,
-	"liquidity_flag" bool NOT NULL,
-	"first_1min_candle_date" timestamptz NULL,
-	"first_1day_candle_date" timestamptz NULL,
-	CONSTRAINT "Share_pk" PRIMARY KEY ("uid"),
-	CONSTRAINT "Share_trading_status_id_fk" FOREIGN KEY ("trading_status_id") REFERENCES "tin"."SecurityTradingStatus" ("id"),
-	CONSTRAINT "Share_share_type_id_fk" FOREIGN KEY ("share_type_id") REFERENCES "tin"."ShareType" ("id"),
-	CONSTRAINT "Share_real_exchange_id_fk" FOREIGN KEY ("real_exchange_id") REFERENCES "tin"."RealExchange" ("id")
+	"expense_commission_id_units" bigint NULL,
+	"expense_commission_id_nano" integer NULL,
+	"primary_index_tracking_error_id_units" bigint NULL,
+	"primary_index_tracking_error_id_nano" integer NULL,
+	"rebalancing_plan" text NOT NULL,
+	"tax_rate" text NOT NULL,
+	"rebalancing_dates" timestamptz NULL,
+	"issue_kind" text NOT NULL,
+	"nominal_id_units" bigint NULL,
+	"nominal_id_nano" integer NULL,
+	"nominal_currency" text NOT NULL,
+	CONSTRAINT "AssetEtf_pk" PRIMARY KEY ("primary_index")
 );
-CREATE INDEX IF NOT EXISTS "Share_klong_id_idx" ON "tin"."Share" USING btree ("klong_id");
-CREATE INDEX IF NOT EXISTS "Share_kshort_id_idx" ON "tin"."Share" USING btree ("kshort_id");
-CREATE INDEX IF NOT EXISTS "Share_dlong_id_idx" ON "tin"."Share" USING btree ("dlong_id");
-CREATE INDEX IF NOT EXISTS "Share_dshort_id_idx" ON "tin"."Share" USING btree ("dshort_id");
-CREATE INDEX IF NOT EXISTS "Share_dlong_min_id_idx" ON "tin"."Share" USING btree ("dlong_min_id");
-CREATE INDEX IF NOT EXISTS "Share_dshort_min_id_idx" ON "tin"."Share" USING btree ("dshort_min_id");
-CREATE INDEX IF NOT EXISTS "Share_nominal_id_idx" ON "tin"."Share" USING btree ("nominal_id");
-CREATE INDEX IF NOT EXISTS "Share_trading_status_id_idx" ON "tin"."Share" USING btree ("trading_status_id");
-CREATE INDEX IF NOT EXISTS "Share_share_type_id_idx" ON "tin"."Share" USING btree ("share_type_id");
-CREATE INDEX IF NOT EXISTS "Share_min_price_increment_id_idx" ON "tin"."Share" USING btree ("min_price_increment_id");
-CREATE INDEX IF NOT EXISTS "Share_real_exchange_id_idx" ON "tin"."Share" USING btree ("real_exchange_id");
-COMMENT ON TABLE "tin"."Share" IS 'Объект передачи информации об акции.';
-COMMENT ON COLUMN "tin"."Share"."figi" IS 'Figi-идентификатор инструмента.';
-COMMENT ON COLUMN "tin"."Share"."ticker" IS 'Тикер инструмента.';
-COMMENT ON COLUMN "tin"."Share"."class_code" IS 'Класс-код (секция торгов).';
-COMMENT ON COLUMN "tin"."Share"."isin" IS 'Isin-идентификатор инструмента.';
-COMMENT ON COLUMN "tin"."Share"."lot" IS 'Лотность инструмента. Возможно совершение операций только на количества ценной бумаги, кратные параметру *lot*. Подробнее: [лот](https://tinkoff.github.io/investAPI/glossary#lot)';
-COMMENT ON COLUMN "tin"."Share"."currency" IS 'Валюта расчётов.';
-COMMENT ON COLUMN "tin"."Share"."klong_id" IS 'Коэффициент ставки риска длинной позиции по инструменту.';
-COMMENT ON COLUMN "tin"."Share"."kshort_id" IS 'Коэффициент ставки риска короткой позиции по инструменту.';
-COMMENT ON COLUMN "tin"."Share"."dlong_id" IS 'Ставка риска минимальной маржи в лонг. Подробнее: [ставка риска в лонг](https://help.tinkoff.ru/margin-trade/long/risk-rate/)';
-COMMENT ON COLUMN "tin"."Share"."dshort_id" IS 'Ставка риска минимальной маржи в шорт. Подробнее: [ставка риска в шорт](https://help.tinkoff.ru/margin-trade/short/risk-rate/)';
-COMMENT ON COLUMN "tin"."Share"."dlong_min_id" IS 'Ставка риска начальной маржи в лонг. Подробнее: [ставка риска в лонг](https://help.tinkoff.ru/margin-trade/long/risk-rate/)';
-COMMENT ON COLUMN "tin"."Share"."dshort_min_id" IS 'Ставка риска начальной маржи в шорт. Подробнее: [ставка риска в шорт](https://help.tinkoff.ru/margin-trade/short/risk-rate/)';
-COMMENT ON COLUMN "tin"."Share"."short_enabled_flag" IS 'Признак доступности для операций в шорт.';
-COMMENT ON COLUMN "tin"."Share"."name" IS 'Название инструмента.';
-COMMENT ON COLUMN "tin"."Share"."exchange" IS 'Торговая площадка.';
-COMMENT ON COLUMN "tin"."Share"."ipo_date" IS 'Дата IPO акции в часовом поясе UTC.';
-COMMENT ON COLUMN "tin"."Share"."issue_size" IS 'Размер выпуска.';
-COMMENT ON COLUMN "tin"."Share"."country_of_risk" IS 'Код страны риска, т.е. страны, в которой компания ведёт основной бизнес.';
-COMMENT ON COLUMN "tin"."Share"."country_of_risk_name" IS 'Наименование страны риска, т.е. страны, в которой компания ведёт основной бизнес.';
-COMMENT ON COLUMN "tin"."Share"."sector" IS 'Сектор экономики.';
-COMMENT ON COLUMN "tin"."Share"."issue_size_plan" IS 'Плановый размер выпуска.';
-COMMENT ON COLUMN "tin"."Share"."nominal_id" IS 'Номинал.';
-COMMENT ON COLUMN "tin"."Share"."trading_status_id" IS 'Текущий режим торгов инструмента.';
-COMMENT ON COLUMN "tin"."Share"."otc_flag" IS 'Признак внебиржевой ценной бумаги.';
-COMMENT ON COLUMN "tin"."Share"."buy_available_flag" IS 'Признак доступности для покупки.';
-COMMENT ON COLUMN "tin"."Share"."sell_available_flag" IS 'Признак доступности для продажи.';
-COMMENT ON COLUMN "tin"."Share"."div_yield_flag" IS 'Признак наличия дивидендной доходности.';
-COMMENT ON COLUMN "tin"."Share"."share_type_id" IS 'Тип акции. Возможные значения: [ShareType](https://tinkoff.github.io/investAPI/instruments#sharetype)';
-COMMENT ON COLUMN "tin"."Share"."min_price_increment_id" IS 'Шаг цены.';
-COMMENT ON COLUMN "tin"."Share"."api_trade_available_flag" IS 'Параметр указывает на возможность торговать инструментом через API.';
-COMMENT ON COLUMN "tin"."Share"."uid" IS 'Уникальный идентификатор инструмента.';
-COMMENT ON COLUMN "tin"."Share"."real_exchange_id" IS 'Реальная площадка исполнения расчётов.';
-COMMENT ON COLUMN "tin"."Share"."position_uid" IS 'Уникальный идентификатор позиции инструмента.';
-COMMENT ON COLUMN "tin"."Share"."for_iis_flag" IS 'Признак доступности для ИИС.';
-COMMENT ON COLUMN "tin"."Share"."for_qual_investor_flag" IS 'Флаг отображающий доступность торговли инструментом только для квалифицированных инвесторов.';
-COMMENT ON COLUMN "tin"."Share"."weekend_flag" IS 'Флаг отображающий доступность торговли инструментом по выходным';
-COMMENT ON COLUMN "tin"."Share"."blocked_tca_flag" IS 'Флаг заблокированного ТКС';
-COMMENT ON COLUMN "tin"."Share"."liquidity_flag" IS 'Флаг достаточной ликвидности';
-COMMENT ON COLUMN "tin"."Share"."first_1min_candle_date" IS 'Дата первой минутной свечи.';
-COMMENT ON COLUMN "tin"."Share"."first_1day_candle_date" IS 'Дата первой дневной свечи.';
+CREATE INDEX IF NOT EXISTS "AssetEtf_total_expense_id_idx" ON "tin"."AssetEtf" USING btree ("total_expense_id");
+CREATE INDEX IF NOT EXISTS "AssetEtf_hurdle_rate_id_idx" ON "tin"."AssetEtf" USING btree ("hurdle_rate_id");
+CREATE INDEX IF NOT EXISTS "AssetEtf_performance_fee_id_idx" ON "tin"."AssetEtf" USING btree ("performance_fee_id");
+CREATE INDEX IF NOT EXISTS "AssetEtf_fixed_commission_id_idx" ON "tin"."AssetEtf" USING btree ("fixed_commission_id");
+CREATE INDEX IF NOT EXISTS "AssetEtf_buy_premium_id_idx" ON "tin"."AssetEtf" USING btree ("buy_premium_id");
+CREATE INDEX IF NOT EXISTS "AssetEtf_sell_discount_id_idx" ON "tin"."AssetEtf" USING btree ("sell_discount_id");
+CREATE INDEX IF NOT EXISTS "AssetEtf_num_share_id_idx" ON "tin"."AssetEtf" USING btree ("num_share_id");
+CREATE INDEX IF NOT EXISTS "AssetEtf_index_recovery_period_id_idx" ON "tin"."AssetEtf" USING btree ("index_recovery_period_id");
+CREATE INDEX IF NOT EXISTS "AssetEtf_expense_commission_id_idx" ON "tin"."AssetEtf" USING btree ("expense_commission_id");
+CREATE INDEX IF NOT EXISTS "AssetEtf_primary_index_tracking_error_id_idx" ON "tin"."AssetEtf" USING btree ("primary_index_tracking_error_id");
+CREATE INDEX IF NOT EXISTS "AssetEtf_nominal_id_idx" ON "tin"."AssetEtf" USING btree ("nominal_id");
+COMMENT ON TABLE "tin"."AssetEtf" IS 'Фонд.';
+COMMENT ON COLUMN "tin"."AssetEtf"."total_expense_id" IS 'Суммарные расходы фонда (в %).';
+COMMENT ON COLUMN "tin"."AssetEtf"."hurdle_rate_id" IS 'Барьерная ставка доходности после которой фонд имеет право на perfomance fee (в процентах).';
+COMMENT ON COLUMN "tin"."AssetEtf"."performance_fee_id" IS 'Комиссия за успешные результаты фонда (в процентах).';
+COMMENT ON COLUMN "tin"."AssetEtf"."fixed_commission_id" IS 'Фиксированная комиссия за управление (в процентах).';
+COMMENT ON COLUMN "tin"."AssetEtf"."payment_type" IS 'Тип распределения доходов от выплат по бумагам.';
+COMMENT ON COLUMN "tin"."AssetEtf"."watermark_flag" IS 'Признак необходимости выхода фонда в плюс для получения комиссии.';
+COMMENT ON COLUMN "tin"."AssetEtf"."buy_premium_id" IS 'Премия (надбавка к цене) при покупке доли в фонде (в процентах).';
+COMMENT ON COLUMN "tin"."AssetEtf"."sell_discount_id" IS 'Ставка дисконта (вычет из цены) при продаже доли в фонде (в процентах).';
+COMMENT ON COLUMN "tin"."AssetEtf"."rebalancing_flag" IS 'Признак ребалансируемости портфеля фонда.';
+COMMENT ON COLUMN "tin"."AssetEtf"."rebalancing_freq" IS 'Периодичность ребалансировки.';
+COMMENT ON COLUMN "tin"."AssetEtf"."management_type" IS 'Тип управления.';
+COMMENT ON COLUMN "tin"."AssetEtf"."primary_index" IS 'Индекс, который реплицирует (старается копировать) фонд.';
+COMMENT ON COLUMN "tin"."AssetEtf"."focus_type" IS 'База ETF.';
+COMMENT ON COLUMN "tin"."AssetEtf"."leveraged_flag" IS 'Признак использования заемных активов (плечо).';
+COMMENT ON COLUMN "tin"."AssetEtf"."num_share_id" IS 'Количество акций в обращении.';
+COMMENT ON COLUMN "tin"."AssetEtf"."ucits_flag" IS 'Признак обязательства по отчетности перед регулятором.';
+COMMENT ON COLUMN "tin"."AssetEtf"."released_date" IS 'Дата выпуска.';
+COMMENT ON COLUMN "tin"."AssetEtf"."description" IS 'Описание фонда.';
+COMMENT ON COLUMN "tin"."AssetEtf"."primary_index_description" IS 'Описание индекса, за которым следует фонд.';
+COMMENT ON COLUMN "tin"."AssetEtf"."primary_index_company" IS 'Основные компании, в которые вкладывается фонд.';
+COMMENT ON COLUMN "tin"."AssetEtf"."index_recovery_period_id" IS 'Срок восстановления индекса (после просадки).';
+COMMENT ON COLUMN "tin"."AssetEtf"."inav_code" IS 'IVAV-код.';
+COMMENT ON COLUMN "tin"."AssetEtf"."div_yield_flag" IS 'Признак наличия дивидендной доходности.';
+COMMENT ON COLUMN "tin"."AssetEtf"."expense_commission_id" IS 'Комиссия на покрытие расходов фонда (в процентах).';
+COMMENT ON COLUMN "tin"."AssetEtf"."primary_index_tracking_error_id" IS 'Ошибка следования за индексом (в процентах).';
+COMMENT ON COLUMN "tin"."AssetEtf"."rebalancing_plan" IS 'Плановая ребалансировка портфеля.';
+COMMENT ON COLUMN "tin"."AssetEtf"."tax_rate" IS 'Ставки налогообложения дивидендов и купонов.';
+COMMENT ON COLUMN "tin"."AssetEtf"."rebalancing_dates" IS 'Даты ребалансировок.';
+COMMENT ON COLUMN "tin"."AssetEtf"."issue_kind" IS 'Форма выпуска.';
+COMMENT ON COLUMN "tin"."AssetEtf"."nominal_id" IS 'Номинал.';
+COMMENT ON COLUMN "tin"."AssetEtf"."nominal_currency" IS 'Валюта номинала.';
+
+CREATE TABLE IF NOT EXISTS "tin"."GetLastPricesRequest" (
+	"figi" text NOT NULL,
+	"instrument_id" text NOT NULL,
+	CONSTRAINT "GetLastPricesRequest_pk" PRIMARY KEY ("figi")
+);
+COMMENT ON TABLE "tin"."GetLastPricesRequest" IS 'Запрос получения цен последних сделок.';
+COMMENT ON COLUMN "tin"."GetLastPricesRequest"."figi" IS 'Deprecated Figi-идентификатор инструмента. Необходимо использовать instrument_id.';
+COMMENT ON COLUMN "tin"."GetLastPricesRequest"."instrument_id" IS 'Массив идентификаторов инструмента, принимает значения figi или instrument_uid.';
+
+CREATE TABLE IF NOT EXISTS "tin"."GetLastTradesRequest" (
+	"figi" text NOT NULL,
+	"from" timestamptz NULL,
+	"to" timestamptz NULL,
+	"instrument_id" text NOT NULL,
+	CONSTRAINT "GetLastTradesRequest_pk" PRIMARY KEY ("figi")
+);
+COMMENT ON TABLE "tin"."GetLastTradesRequest" IS 'Запрос обезличенных сделок за последний час.';
+COMMENT ON COLUMN "tin"."GetLastTradesRequest"."figi" IS 'Deprecated Figi-идентификатор инструмента. Необходимо использовать instrument_id.';
+COMMENT ON COLUMN "tin"."GetLastTradesRequest"."from" IS 'Начало запрашиваемого периода в часовом поясе UTC.';
+COMMENT ON COLUMN "tin"."GetLastTradesRequest"."to" IS 'Окончание запрашиваемого периода в часовом поясе UTC.';
+COMMENT ON COLUMN "tin"."GetLastTradesRequest"."instrument_id" IS 'Идентификатор инструмента, принимает значение figi или instrument_uid.';
+
+CREATE TABLE IF NOT EXISTS "tin"."AssetFull" (
+	"uid" text NOT NULL,
+	"type_id" bigint NULL,
+	"name" text NOT NULL,
+	"name_brief" text NOT NULL,
+	"description" text NOT NULL,
+	"deleted_at" timestamptz NULL,
+	"required_tests" text NOT NULL,
+	"gos_reg_code" text NOT NULL,
+	"cfi" text NOT NULL,
+	"code_nsd" text NOT NULL,
+	"status" text NOT NULL,
+	"brand_id" text NULL,
+	"updated_at" timestamptz NULL,
+	"br_code" text NOT NULL,
+	"br_code_name" text NOT NULL,
+	"instruments_id" text NULL,
+	CONSTRAINT "AssetFull_pk" PRIMARY KEY ("uid"),
+	CONSTRAINT "AssetFull_brand_id_fk" FOREIGN KEY ("brand_id") REFERENCES "tin"."Brand" ("uid"),
+	CONSTRAINT "AssetFull_instruments_id_fk" FOREIGN KEY ("instruments_id") REFERENCES "tin"."AssetInstrument" ("uid")
+);
+CREATE INDEX IF NOT EXISTS "AssetFull_type_id_idx" ON "tin"."AssetFull" USING btree ("type_id");
+CREATE INDEX IF NOT EXISTS "AssetFull_brand_id_idx" ON "tin"."AssetFull" USING btree ("brand_id");
+CREATE INDEX IF NOT EXISTS "AssetFull_instruments_id_idx" ON "tin"."AssetFull" USING btree ("instruments_id");
+COMMENT ON TABLE "tin"."AssetFull" IS '';
+COMMENT ON COLUMN "tin"."AssetFull"."uid" IS 'Уникальный идентификатор актива.';
+COMMENT ON COLUMN "tin"."AssetFull"."type_id" IS 'Тип актива.';
+COMMENT ON COLUMN "tin"."AssetFull"."name" IS 'Наименование актива.';
+COMMENT ON COLUMN "tin"."AssetFull"."name_brief" IS 'Короткое наименование актива.';
+COMMENT ON COLUMN "tin"."AssetFull"."description" IS 'Описание актива.';
+COMMENT ON COLUMN "tin"."AssetFull"."deleted_at" IS 'Дата и время удаления актива.';
+COMMENT ON COLUMN "tin"."AssetFull"."required_tests" IS 'Тестирование клиентов.';
+COMMENT ON COLUMN "tin"."AssetFull"."gos_reg_code" IS 'Номер государственной регистрации.';
+COMMENT ON COLUMN "tin"."AssetFull"."cfi" IS 'Код CFI.';
+COMMENT ON COLUMN "tin"."AssetFull"."code_nsd" IS 'Код НРД инструмента.';
+COMMENT ON COLUMN "tin"."AssetFull"."status" IS 'Статус актива.';
+COMMENT ON COLUMN "tin"."AssetFull"."brand_id" IS 'Бренд.';
+COMMENT ON COLUMN "tin"."AssetFull"."updated_at" IS 'Дата и время последнего обновления записи.';
+COMMENT ON COLUMN "tin"."AssetFull"."br_code" IS 'Код типа ц.б. по классификации Банка России.';
+COMMENT ON COLUMN "tin"."AssetFull"."br_code_name" IS 'Наименование кода типа ц.б. по классификации Банка России.';
+COMMENT ON COLUMN "tin"."AssetFull"."instruments_id" IS 'Массив идентификаторов инструментов.';
+
+CREATE TABLE IF NOT EXISTS "tin"."GetOrderBookRequest" (
+	"figi" text NOT NULL,
+	"depth" integer NOT NULL,
+	"instrument_id" text NOT NULL,
+	CONSTRAINT "GetOrderBookRequest_pk" PRIMARY KEY ("figi")
+);
+COMMENT ON TABLE "tin"."GetOrderBookRequest" IS 'Запрос стакана.';
+COMMENT ON COLUMN "tin"."GetOrderBookRequest"."figi" IS 'Deprecated Figi-идентификатор инструмента. Необходимо использовать instrument_id.';
+COMMENT ON COLUMN "tin"."GetOrderBookRequest"."depth" IS 'Глубина стакана.';
+COMMENT ON COLUMN "tin"."GetOrderBookRequest"."instrument_id" IS 'Идентификатор инструмента, принимает значение figi или instrument_uid.';
+
+CREATE TABLE IF NOT EXISTS "tin"."AssetInstrument" (
+	"uid" text NOT NULL,
+	"figi" text NOT NULL,
+	"instrument_type" text NOT NULL,
+	"ticker" text NOT NULL,
+	"class_code" text NOT NULL,
+	"links_id_type" text NULL,
+	"links_id_instrument_uid" text NULL,
+	"instrument_kind_id" bigint NULL,
+	"position_uid" text NOT NULL,
+	CONSTRAINT "AssetInstrument_pk" PRIMARY KEY ("uid")
+);
+CREATE INDEX IF NOT EXISTS "AssetInstrument_links_id_idx" ON "tin"."AssetInstrument" USING btree ("links_id");
+CREATE INDEX IF NOT EXISTS "AssetInstrument_instrument_kind_id_idx" ON "tin"."AssetInstrument" USING btree ("instrument_kind_id");
+COMMENT ON TABLE "tin"."AssetInstrument" IS 'Идентификаторы инструмента.';
+COMMENT ON COLUMN "tin"."AssetInstrument"."uid" IS 'uid идентификатор инструмента.';
+COMMENT ON COLUMN "tin"."AssetInstrument"."figi" IS 'figi идентификатор инструмента.';
+COMMENT ON COLUMN "tin"."AssetInstrument"."instrument_type" IS 'Тип инструмента.';
+COMMENT ON COLUMN "tin"."AssetInstrument"."ticker" IS 'Тикер инструмента.';
+COMMENT ON COLUMN "tin"."AssetInstrument"."class_code" IS 'Класс-код (секция торгов).';
+COMMENT ON COLUMN "tin"."AssetInstrument"."links_id" IS 'Массив связанных инструментов.';
+COMMENT ON COLUMN "tin"."AssetInstrument"."instrument_kind_id" IS 'Тип инструмента.';
+COMMENT ON COLUMN "tin"."AssetInstrument"."position_uid" IS 'id позиции.';
 

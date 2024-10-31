@@ -7,14 +7,15 @@ import (
 	"strings"
 )
 
-// CreateFiles_Message - создание одного файла ddl .sql, для message
-func CreateFiles_Message(Settings *config.SettingsINI, message1 *types.MessageElement) (string, error) {
+// CreateFile_Message - создание одного файла ddl .sql, для message
+func CreateFile_Message(Settings *config.SettingsINI, message1 *types.MessageElement) (string, int, error) {
 	Otvet := ""
+	ForeignCount := 0
 	var err error
 
 	//сообщения с 1 полем не нужны
 	if len(message1.Fields) <= 1 {
-		return Otvet, err
+		return Otvet, ForeignCount, err
 	}
 
 	TableName := message1.Name
@@ -89,21 +90,22 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `"
 		MessageF, ok := Settings.MapMessages[FieldType]
 		if ok == false {
 			log.Error("message: ", FieldName, ", field: ", FieldName, ", not found message: "+FieldType)
-			return "", nil
+			return "", ForeignCount, nil
 		}
 		for _, FieldForeign := range MessageF.Fields {
 			FieldTypeF := FieldForeign.Type
 			FieldNameF := FieldForeign.Name
-			FieldName := FieldTypeF + "_" + FieldNameF
+			FieldName1 := field1.Name
+			FieldName1 = FieldName1 + "_" + FieldNameF
 			SQLTypeForeign := ""
 			MapSQLTypes1F, ok := Settings.MapSQLTypes[FieldTypeF]
 			if ok == false {
-				log.Error("message: ", FieldName, ", field: ", FieldName, ", foreign message: ", MessageF.Name, " foreign field:", FieldNameF, ", not found type: "+FieldTypeF)
-				return "", nil
+				log.Error("message: ", message1.Name, ", field: ", FieldName, ", foreign message: ", MessageF.Name, " foreign field:", FieldNameF, ", not found type: "+FieldTypeF)
+				return "", ForeignCount, nil
 			}
 			SQLTypeForeign = MapSQLTypes1F.SQLType
 
-			Otvet = Otvet + "\t" + `"` + FieldName + `"` + " " + SQLTypeForeign + " " + TextNullable + ",\n"
+			Otvet = Otvet + "\t" + `"` + FieldName1 + `"` + " " + SQLTypeForeign + " " + TextNullable + ",\n"
 		}
 	}
 
@@ -116,7 +118,7 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `"
 		//isFoundID = true
 	} else {
 		//таблицы без идентификаторов не создаем
-		return "", err
+		return "", ForeignCount, err
 	}
 
 	//добавим CONSTRAINT
@@ -128,9 +130,19 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `"
 		}
 
 		ForeignTableName, ForeignTableColumnName := FindForeignTableNameAndColumnName(Settings, field1)
-		if ForeignTableName != "" && ForeignTableColumnName != "" {
+		if ForeignTableName == "" || ForeignTableColumnName == "" {
+			continue
+		}
+		MessageF, ok := Settings.MapMessages[ForeignTableName]
+		if ok == false {
+			continue
+		}
+
+		IdentifierName = Find_ID_Name_from_Fields(Settings, MessageF.Fields)
+		if IdentifierName != "" {
 			ConstraintName := TableName + "_" + FieldName + "_fk"
 			Otvet = Otvet + "\t" + `CONSTRAINT "` + ConstraintName + `" FOREIGN KEY ("` + FieldName + `") REFERENCES "` + Settings.DB_SCHEMA_NAME + `"."` + ForeignTableName + `" ("` + ForeignTableColumnName + `")` + ",\n"
+			ForeignCount = ForeignCount + 1
 		}
 	}
 
@@ -140,7 +152,7 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `"
 	Otvet = Otvet + ");\n"
 
 	//if isFoundID == false {
-	//	err = fmt.Errorf("CreateFiles_Message() message: %s warning: not found ID field", TableName)
+	//	err = fmt.Errorf("CreateFile_Message() message: %s warning: not found ID field", TableName)
 	//	//log.Warn(err)
 	//	return "", nil
 	//}
@@ -168,5 +180,5 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `"
 		Otvet = Otvet + `COMMENT ON COLUMN "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `"."` + FieldName + `" IS '` + Comments + `';` + "\n"
 	}
 
-	return Otvet, err
+	return Otvet, ForeignCount, err
 }
