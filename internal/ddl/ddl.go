@@ -69,8 +69,10 @@ func Start1(Settings *config.SettingsINI) (string, error) {
 			return Otvet, err
 		}
 		//Otvet = Otvet + Otvet1
-		sCount := fmt.Sprint("%09d", i, "_%09d", ForeignCount)
-		MapSQL[sCount] = Otvet1
+		sCount := fmt.Sprintf("%09d_%09d", ForeignCount, i)
+		if Otvet1 != "" {
+			MapSQL[sCount] = Otvet1
+		}
 	}
 
 	//сортируем по кол-ву внешних ключей

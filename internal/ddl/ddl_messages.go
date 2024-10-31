@@ -20,6 +20,7 @@ func CreateFile_Message(Settings *config.SettingsINI, message1 *types.MessageEle
 
 	TableName := message1.Name
 	TableComments := message1.Documentation
+	TextColumnComment := ""
 
 	//isFoundID := false
 
@@ -29,6 +30,8 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `"
 	Otvet = Otvet + Settings.TextEveryTableColumns
 
 	IdentifierName := ""
+	TextConstraint := ""
+	TextIndex := ""
 
 	//fields
 	for _, field1 := range message1.Fields {
@@ -79,34 +82,57 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `"
 			}
 		}
 
-		//одна колонка
-		if SQLType != "" || IsEnum == true || IsMessageWithTable == true {
-			//добавим колонку
-			Otvet = Otvet + "\t" + `"` + FieldName + `"` + " " + SQLType + " " + TextNullable + ",\n"
+		//много колонок для случая тип=message without table
+		if SQLType == "" && IsEnum == false && IsMessageWithTable == false {
+
+			MessageF, ok := Settings.MapMessages[FieldType]
+			if ok == false {
+				log.Error("message: ", FieldName, ", field: ", FieldName, ", not found message: "+FieldType)
+				return "", ForeignCount, nil
+			}
+			for _, FieldForeign := range MessageF.Fields {
+				FieldTypeF := FieldForeign.Type
+				FieldNameF := FieldForeign.Name
+				FieldName1 := field1.Name
+				FieldName1 = FieldName1 + "_" + FieldNameF
+				SQLTypeForeign := ""
+				MapSQLTypes1F, ok := Settings.MapSQLTypes[FieldTypeF]
+				if ok == false {
+					log.Error("message: ", message1.Name, ", field: ", FieldName, ", foreign message: ", MessageF.Name, " foreign field:", FieldNameF, ", not found type: "+FieldTypeF)
+					return "", ForeignCount, nil
+				}
+				SQLTypeForeign = MapSQLTypes1F.SQLType
+
+				Otvet = Otvet + "\t" + `"` + FieldName1 + `"` + " " + SQLTypeForeign + " " + TextNullable + ",\n"
+
+				//COLUMN COMMENTS
+				Comments := field1.Documentation + " / " + FieldForeign.Documentation
+				TextColumnComment1 := `COMMENT ON COLUMN "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `"."` + FieldName1 + `" IS '` + Comments + `';` + "\n"
+				TextColumnComment = TextColumnComment + TextColumnComment1
+			}
 			continue
 		}
 
-		//много колонок для случая тип=message without table
-		MessageF, ok := Settings.MapMessages[FieldType]
-		if ok == false {
-			log.Error("message: ", FieldName, ", field: ", FieldName, ", not found message: "+FieldType)
-			return "", ForeignCount, nil
-		}
-		for _, FieldForeign := range MessageF.Fields {
-			FieldTypeF := FieldForeign.Type
-			FieldNameF := FieldForeign.Name
-			FieldName1 := field1.Name
-			FieldName1 = FieldName1 + "_" + FieldNameF
-			SQLTypeForeign := ""
-			MapSQLTypes1F, ok := Settings.MapSQLTypes[FieldTypeF]
-			if ok == false {
-				log.Error("message: ", message1.Name, ", field: ", FieldName, ", foreign message: ", MessageF.Name, " foreign field:", FieldNameF, ", not found type: "+FieldTypeF)
-				return "", ForeignCount, nil
-			}
-			SQLTypeForeign = MapSQLTypes1F.SQLType
+		//одна колонка
+		//добавим колонку
+		Otvet = Otvet + "\t" + `"` + FieldName + `"` + " " + SQLType + " " + TextNullable + ",\n"
 
-			Otvet = Otvet + "\t" + `"` + FieldName1 + `"` + " " + SQLTypeForeign + " " + TextNullable + ",\n"
+		//CONSTRAINT
+		TextConstraint1 := FillTextConstraint1(Settings, message1, field1)
+		TextConstraint = TextConstraint + TextConstraint1
+		if TextConstraint1 != "" {
+			ForeignCount = ForeignCount + 1
 		}
+
+		//INDEX
+		TextIndex1 := FillTextIndex1(Settings, message1, field1)
+		TextIndex = TextIndex + TextIndex1
+
+		//COLUMN COMMENTS
+		Comments := field1.Documentation
+		TextColumnComment1 := `COMMENT ON COLUMN "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `"."` + FieldName + `" IS '` + Comments + `';` + "\n"
+		TextColumnComment = TextColumnComment + TextColumnComment1
+
 	}
 
 	//PRIMARY KEY
@@ -122,29 +148,30 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `"
 	}
 
 	//добавим CONSTRAINT
-	for _, field1 := range message1.Fields {
-		FieldName := FindFieldName(field1)
-		IsIdentifier := IsIdentifierField(field1)
-		if IsIdentifier == false {
-			continue
-		}
-
-		ForeignTableName, ForeignTableColumnName := FindForeignTableNameAndColumnName(Settings, field1)
-		if ForeignTableName == "" || ForeignTableColumnName == "" {
-			continue
-		}
-		MessageF, ok := Settings.MapMessages[ForeignTableName]
-		if ok == false {
-			continue
-		}
-
-		IdentifierName = Find_ID_Name_from_Fields(Settings, MessageF.Fields)
-		if IdentifierName != "" {
-			ConstraintName := TableName + "_" + FieldName + "_fk"
-			Otvet = Otvet + "\t" + `CONSTRAINT "` + ConstraintName + `" FOREIGN KEY ("` + FieldName + `") REFERENCES "` + Settings.DB_SCHEMA_NAME + `"."` + ForeignTableName + `" ("` + ForeignTableColumnName + `")` + ",\n"
-			ForeignCount = ForeignCount + 1
-		}
-	}
+	Otvet = Otvet + TextConstraint
+	//for _, field1 := range message1.Fields {
+	//	FieldName := FindFieldName(field1)
+	//	IsIdentifier := IsIdentifierField(field1)
+	//	if IsIdentifier == false {
+	//		continue
+	//	}
+	//
+	//	ForeignTableName, ForeignTableColumnName := FindForeignTableNameAndColumnName(Settings, field1)
+	//	if ForeignTableName == "" || ForeignTableColumnName == "" {
+	//		continue
+	//	}
+	//	MessageF, ok := Settings.MapMessages[ForeignTableName]
+	//	if ok == false {
+	//		continue
+	//	}
+	//
+	//	IdentifierName = Find_ID_Name_from_Fields(Settings, MessageF.Fields)
+	//	if IdentifierName != "" {
+	//		ConstraintName := TableName + "_" + FieldName + "_fk"
+	//		Otvet = Otvet + "\t" + `CONSTRAINT "` + ConstraintName + `" FOREIGN KEY ("` + FieldName + `") REFERENCES "` + Settings.DB_SCHEMA_NAME + `"."` + ForeignTableName + `" ("` + ForeignTableColumnName + `")` + ",\n"
+	//		ForeignCount = ForeignCount + 1
+	//	}
+	//}
 
 	//удалим лишние запятые
 	Otvet = strings.TrimRight(Otvet, ",\n")
@@ -158,27 +185,80 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `"
 	//}
 
 	//CREATE INDEX
-	for _, field1 := range message1.Fields {
-		FieldName := FindFieldName(field1)
-		IsIdentifier := IsIdentifierField(field1)
-		if IsIdentifier == false {
-			continue
-		}
-
-		IndexName := TableName + "_" + FieldName + "_idx"
-		Otvet = Otvet + `CREATE INDEX IF NOT EXISTS "` + IndexName + `" ON "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" USING btree ("` + FieldName + `");` + "\n"
-	}
+	Otvet = Otvet + TextIndex
+	//for _, field1 := range message1.Fields {
+	//	FieldName := FindFieldName(field1)
+	//	IsIdentifier := IsIdentifierField(field1)
+	//	if IsIdentifier == false {
+	//		continue
+	//	}
+	//
+	//	IndexName := TableName + "_" + FieldName + "_idx"
+	//	Otvet = Otvet + `CREATE INDEX IF NOT EXISTS "` + IndexName + `" ON "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" USING btree ("` + FieldName + `");` + "\n"
+	//}
 
 	//COMMENT ON TABLE
 	Otvet = Otvet + `COMMENT ON TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" IS '` + TableComments + `';` + "\n"
 
 	//COMMENT ON COLUMN
-	for _, field1 := range message1.Fields {
-		FieldName := FindFieldName(field1)
-		Comments := field1.Documentation
-
-		Otvet = Otvet + `COMMENT ON COLUMN "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `"."` + FieldName + `" IS '` + Comments + `';` + "\n"
-	}
+	Otvet = Otvet + TextColumnComment
+	//for _, field1 := range message1.Fields {
+	//	FieldName := FindFieldName(field1)
+	//	Comments := field1.Documentation
+	//	Otvet = Otvet + `COMMENT ON COLUMN "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `"."` + FieldName + `" IS '` + Comments + `';` + "\n"
+	//}
 
 	return Otvet, ForeignCount, err
+}
+
+// FillTextConstraint1 - возвращает текст SQL ограничений
+func FillTextConstraint1(Settings *config.SettingsINI, message1 *types.MessageElement, field1 *types.FieldElement) string {
+	Otvet := ""
+
+	TableName := message1.Name
+	FieldName := FindFieldName(field1)
+	IsIdentifier := IsIdentifierField(field1)
+	if IsIdentifier == false {
+		return Otvet
+	}
+
+	IdentifierName := ""
+	ForeignTableName, ForeignTableColumnName := FindForeignTableNameAndColumnName(Settings, field1)
+	if ForeignTableName == "" || ForeignTableColumnName == "" {
+		return Otvet
+	}
+	MessageF, ok := Settings.MapMessages[ForeignTableName]
+	if ok == true {
+		IdentifierName = Find_ID_Name_from_Fields(Settings, MessageF.Fields)
+	} else {
+		//enums
+		_, ok := Settings.MapEnums[ForeignTableName]
+		if ok == true {
+			IdentifierName = Settings.ENUMS_ID_COLUMN_NAME
+		}
+	}
+
+	if IdentifierName != "" {
+		ConstraintName := TableName + "_" + FieldName + "_fk"
+		Otvet = Otvet + "\t" + `CONSTRAINT "` + ConstraintName + `" FOREIGN KEY ("` + FieldName + `") REFERENCES "` + Settings.DB_SCHEMA_NAME + `"."` + ForeignTableName + `" ("` + ForeignTableColumnName + `")` + ",\n"
+	}
+
+	return Otvet
+}
+
+// FillTextIndex1 - возвращает текст SQL ограничений
+func FillTextIndex1(Settings *config.SettingsINI, message1 *types.MessageElement, field1 *types.FieldElement) string {
+	Otvet := ""
+
+	TableName := message1.Name
+	FieldName := FindFieldName(field1)
+	IsIdentifier := IsIdentifierField(field1)
+	if IsIdentifier == false {
+		return Otvet
+	}
+
+	IndexName := TableName + "_" + FieldName + "_idx"
+	Otvet = Otvet + `CREATE INDEX IF NOT EXISTS "` + IndexName + `" ON "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" USING btree ("` + FieldName + `");` + "\n"
+
+	return Otvet
 }
