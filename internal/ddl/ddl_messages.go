@@ -33,17 +33,41 @@ CREATE TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" (
 	//fields
 	for _, field1 := range message1.Fields {
 		FieldType := field1.Type
-		SQLType := FieldType
+		SQLType := ""
 		MapMappings1, ok := Settings.MapMappings[FieldType]
 		if ok == true {
+			//нашли тип SQL
 			SQLType = MapMappings1.SQLType
 		}
+
 		isNullabe := IsNullableField(field1)
 		TextNullable := TextNullable(isNullabe)
 		FieldName := FindFieldName(field1)
 
-		//добавим колонку
-		Otvet = Otvet + "\t" + `"` + FieldName + `"` + " " + SQLType + " " + TextNullable + ",\n"
+		//для тип=enum или message with table
+		IsEnum := false
+		IsMessage := false
+		IsMessageWithTable := false
+		if SQLType == "" {
+			IsEnum = IsEnumField(Settings, field1)
+			IsMessage = IsMessageField(Settings, field1)
+			if IsMessage == true {
+				ForignTableName, ForeignTableColumnName := FindForeignTableNameAndColumnName(Settings, field1)
+				if ForignTableName != "" && ForeignTableColumnName != "" {
+					IsMessageWithTable = true
+				}
+
+			}
+		}
+
+		//одна колонка
+		if SQLType != "" || IsEnum == true || IsMessageWithTable == true {
+			//добавим колонку
+			Otvet = Otvet + "\t" + `"` + FieldName + `"` + " " + SQLType + " " + TextNullable + ",\n"
+			continue
+		}
+
+		//много колонок для случая тип=message without table
 
 	}
 

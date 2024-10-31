@@ -214,3 +214,29 @@ func Find_ID_Name_from_Fields(Settings *config.SettingsINI, Fields []*types.Fiel
 
 	return Otvet
 }
+
+// IsEnumField - возвращает true, если поле enum
+func IsEnumField(Settings *config.SettingsINI, field1 *types.FieldElement) bool {
+	Otvet := false
+
+	Type := field1.Type
+	_, ok := Settings.MapEnums[Type]
+	if ok == true {
+		Otvet = true
+	}
+
+	return Otvet
+}
+
+// IsMessageField - возвращает true, если поле message
+func IsMessageField(Settings *config.SettingsINI, field1 *types.FieldElement) bool {
+	Otvet := false
+
+	Type := field1.Type
+	_, ok := Settings.MapMessages[Type]
+	if ok == true {
+		Otvet = true
+	}
+
+	return Otvet
+}
