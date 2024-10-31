@@ -31,7 +31,7 @@ func FillTypeSQL(Settings *config.SettingsINI, Proto *types.ProtoAll) {
 
 	for _, message1 := range Proto.MapMessages {
 		for _, field1 := range message1.Fields {
-			Mapping1, ok := Settings.MapMappings[field1.Type]
+			Mapping1, ok := Settings.MapSQLTypes[field1.Type]
 			if ok == false {
 				continue
 			}

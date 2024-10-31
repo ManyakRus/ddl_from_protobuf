@@ -1,7 +1,6 @@
 package ddl
 
 import (
-	"fmt"
 	"github.com/ManyakRus/ddl_from_protobuf/internal/config"
 	"github.com/ManyakRus/ddl_from_protobuf/internal/types"
 	"github.com/ManyakRus/starter/log"
@@ -21,10 +20,10 @@ func CreateFiles_Message(Settings *config.SettingsINI, message1 *types.MessageEl
 	TableName := message1.Name
 	TableComments := message1.Documentation
 
-	isFoundID := false
+	//isFoundID := false
 
 	Otvet = `
-CREATE TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" (
+CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" (
 `
 	Otvet = Otvet + Settings.TextEveryTableColumns
 
@@ -34,9 +33,8 @@ CREATE TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" (
 	for _, field1 := range message1.Fields {
 		FieldType := field1.Type
 		SQLType := ""
-		MapMappings1, ok := Settings.MapMappings[FieldType]
+		MapMappings1, ok := Settings.MapSQLTypes[FieldType]
 		if ok == true {
-			//нашли тип SQL
 			SQLType = MapMappings1.SQLType
 		}
 
@@ -51,12 +49,32 @@ CREATE TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" (
 		if SQLType == "" {
 			IsEnum = IsEnumField(Settings, field1)
 			IsMessage = IsMessageField(Settings, field1)
+			ForeignTableName, ForeignTableColumnName := FindForeignTableNameAndColumnName(Settings, field1)
 			if IsMessage == true {
-				ForignTableName, ForeignTableColumnName := FindForeignTableNameAndColumnName(Settings, field1)
-				if ForignTableName != "" && ForeignTableColumnName != "" {
+				if ForeignTableName != "" && ForeignTableColumnName != "" {
 					IsMessageWithTable = true
+
+					FieldID := &types.FieldElement{}
+					ForeignMessage1, ok := Settings.MapMessages[ForeignTableName]
+					if ok == true {
+						//это message
+						FieldID = Find_ID_from_Fields(Settings, ForeignMessage1.Fields)
+						MapMappingsID1, ok := Settings.MapSQLTypes[FieldID.Type]
+						if ok == false {
+							log.Panic("message: ", FieldName, ", field: ", FieldName, ", not found message: "+ForeignTableName)
+						}
+						SQLType = MapMappingsID1.SQLType
+					}
+
 				}
 
+			} else {
+				//это enum
+				_, ok := Settings.MapEnums[ForeignTableName]
+				if ok == false {
+					log.Panic("message: ", FieldName, ", field: ", FieldName, ", not found message: "+ForeignTableName)
+				}
+				SQLType = "bigint"
 			}
 		}
 
@@ -68,15 +86,37 @@ CREATE TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" (
 		}
 
 		//много колонок для случая тип=message without table
+		MessageF, ok := Settings.MapMessages[FieldType]
+		if ok == false {
+			log.Error("message: ", FieldName, ", field: ", FieldName, ", not found message: "+FieldType)
+			return "", nil
+		}
+		for _, FieldForeign := range MessageF.Fields {
+			FieldTypeF := FieldForeign.Type
+			FieldNameF := FieldForeign.Name
+			FieldName := FieldTypeF + "_" + FieldNameF
+			SQLTypeForeign := ""
+			MapSQLTypes1F, ok := Settings.MapSQLTypes[FieldTypeF]
+			if ok == false {
+				log.Error("message: ", FieldName, ", field: ", FieldName, ", foreign message: ", MessageF.Name, " foreign field:", FieldNameF, ", not found type: "+FieldTypeF)
+				return "", nil
+			}
+			SQLTypeForeign = MapSQLTypes1F.SQLType
 
+			Otvet = Otvet + "\t" + `"` + FieldName + `"` + " " + SQLTypeForeign + " " + TextNullable + ",\n"
+		}
 	}
 
 	//PRIMARY KEY
 	IdentifierName = Find_ID_Name_from_Fields(Settings, message1.Fields)
 	if IdentifierName != "" {
-		TextPrimaryKey := "\t" + "CONSTRAINT " + TableName + "_pk PRIMARY KEY (" + IdentifierName + "),\n"
+		ConstraintName := TableName + "_pk"
+		TextPrimaryKey := "\t" + `CONSTRAINT "` + ConstraintName + `" PRIMARY KEY ("` + IdentifierName + `"),` + "\n"
 		Otvet = Otvet + TextPrimaryKey
-		isFoundID = true
+		//isFoundID = true
+	} else {
+		//таблицы без идентификаторов не создаем
+		return "", err
 	}
 
 	//добавим CONSTRAINT
@@ -87,9 +127,10 @@ CREATE TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" (
 			continue
 		}
 
-		ForignTableName, ForeignTableColumnName := FindForeignTableNameAndColumnName(Settings, field1)
-		if ForignTableName != "" && ForeignTableColumnName != "" {
-			Otvet = Otvet + "\t" + "CONSTRAINT " + TableName + "_" + FieldName + "_fk FOREIGN KEY (" + FieldName + ") REFERENCES " + Settings.DB_SCHEMA_NAME + "." + ForignTableName + " (" + ForeignTableColumnName + ")" + ",\n"
+		ForeignTableName, ForeignTableColumnName := FindForeignTableNameAndColumnName(Settings, field1)
+		if ForeignTableName != "" && ForeignTableColumnName != "" {
+			ConstraintName := TableName + "_" + FieldName + "_fk"
+			Otvet = Otvet + "\t" + `CONSTRAINT "` + ConstraintName + `" FOREIGN KEY ("` + FieldName + `") REFERENCES "` + Settings.DB_SCHEMA_NAME + `"."` + ForeignTableName + `" ("` + ForeignTableColumnName + `")` + ",\n"
 		}
 	}
 
@@ -98,12 +139,11 @@ CREATE TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" (
 	Otvet = Otvet + "\n"
 	Otvet = Otvet + ");\n"
 
-	//таблицы без идентификаторов не создаем
-	if isFoundID == false {
-		err = fmt.Errorf("CreateFiles_Message() message: %s warning: not found ID field", TableName)
-		log.Warn(err)
-		return "", nil
-	}
+	//if isFoundID == false {
+	//	err = fmt.Errorf("CreateFiles_Message() message: %s warning: not found ID field", TableName)
+	//	//log.Warn(err)
+	//	return "", nil
+	//}
 
 	//CREATE INDEX
 	for _, field1 := range message1.Fields {
@@ -113,7 +153,8 @@ CREATE TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" (
 			continue
 		}
 
-		Otvet = Otvet + "CREATE INDEX " + TableName + "_" + FieldName + "_idx ON " + Settings.DB_SCHEMA_NAME + "." + TableName + " USING btree (" + FieldName + ");" + "\n"
+		IndexName := TableName + "_" + FieldName + "_idx"
+		Otvet = Otvet + `CREATE INDEX IF NOT EXISTS "` + IndexName + `" ON "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" USING btree ("` + FieldName + `");` + "\n"
 	}
 
 	//COMMENT ON TABLE

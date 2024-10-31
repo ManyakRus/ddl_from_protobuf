@@ -14,14 +14,14 @@ func StartAll(Settings *config.SettingsINI) {
 
 	dir := micro.ProgramDir_bin()
 
-	//MapMappings
+	//MapSQLTypes
 	Filename := dir + Settings.CONFIG_DIRECTORY_NAME + micro.SeparatorFile() + constants.DATEBASE_TYPES_FILENAME
 	MapMappings, err := load_configs_mapping.LoadMappings(Filename)
 	if err != nil {
 		err = fmt.Errorf("LoadMappings(%s) error: %w", Filename, err)
 		log.Panic(err)
 	}
-	Settings.MapMappings = MapMappings
+	Settings.MapSQLTypes = MapMappings
 
 	//TextEveryTableColumns
 	Filename = dir + Settings.CONFIG_DIRECTORY_NAME + micro.SeparatorFile() + constants.COLUMNS_EVERY_TABLE_FILENAME

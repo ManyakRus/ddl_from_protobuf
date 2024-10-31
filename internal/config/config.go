@@ -19,7 +19,7 @@ type SettingsINI struct {
 	PROTOBUF_DIRECTORY         string
 	DDL_FILENAME               string
 	CONFIG_DIRECTORY_NAME      string
-	MapMappings                map[string]load_configs_mapping.SQLMapping
+	MapSQLTypes                map[string]load_configs_mapping.SQLMapping
 	TextEveryTableColumns      string
 	DB_SCHEMA_NAME             string
 	MapMessages                map[string]*types.MessageElement
@@ -34,7 +34,7 @@ type SettingsINI struct {
 // CreateSettings - создает структуру типа SettingsINI
 func CreateSettings() SettingsINI {
 	Otvet := SettingsINI{}
-	Otvet.MapMappings = make(map[string]load_configs_mapping.SQLMapping)
+	Otvet.MapSQLTypes = make(map[string]load_configs_mapping.SQLMapping)
 	Otvet.MapMessages = make(map[string]*types.MessageElement)
 	Otvet.MapEnums = make(map[string]*types.EnumElement)
 	Otvet.MassIndexNames = make([]string, 0)
