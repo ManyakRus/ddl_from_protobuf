@@ -1,0 +1,23 @@
+#PROTOBUF_DIRECTORY - folder name with .proto files
+PROTOBUF_DIRECTORY="proto"
+
+#DDL_FILENAME - full filename with ready output .sql files
+DDL_FILENAME="./ddl.sql"
+
+#FILE_PERMISSIONS - linux file permissions, integer 438 = octal 0666
+FILE_PERMISSIONS = 438
+
+#CONFIG_DIRECTORY_NAME - folder name "config"
+CONFIG_DIRECTORY_NAME="config"
+
+#DB_SCHEMA_NAME - schema name in database
+DB_SCHEMA_NAME="tin"
+
+#PRIMARY_KEY_NAMES_FILENAME - shor filename of "primary_key_names.json" file
+PRIMARY_KEY_NAMES_FILENAME="primary_key_names.json"
+
+#ENUMS_ID_COLUMN_NAME - column name "id" for ENUM
+ENUMS_ID_COLUMN_NAME="id"
+
+#ENUMS_NAME_COLUMN_NAME - column nsme "name" for ENUM
+ENUMS_NAME_COLUMN_NAME="name"
