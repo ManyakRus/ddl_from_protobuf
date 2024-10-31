@@ -18,7 +18,7 @@ func main() {
 func StartApp() {
 	micro.Show_Version(version.Version)
 
-	config_main.LoadEnv()
+	config_main.LoadENV_or_SettingsTXT()
 
 	//заполняем настройки из файла .env
 	config.FillSettings()
