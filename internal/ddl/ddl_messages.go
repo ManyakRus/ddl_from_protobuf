@@ -21,11 +21,12 @@ func CreateFile_Message(Settings *config.SettingsINI, message1 *types.MessageEle
 	TableName := message1.Name
 	TableComments := message1.Documentation
 	TextColumnComment := ""
+	TableNameSQL := FormatNameSQL(TableName)
 
 	//isFoundID := false
 
 	Otvet = `
-CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" (
+CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL + `" (
 `
 	Otvet = Otvet + Settings.TextEveryTableColumns
 
@@ -45,6 +46,7 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `"
 		isNullabe := IsNullableField(field1)
 		TextNullable := TextNullable(isNullabe)
 		FieldName := FindFieldName(field1)
+		FieldNameSQL := FormatNameSQL(FieldName)
 
 		//для тип=enum или message with table
 		IsEnum := false
@@ -95,6 +97,7 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `"
 				FieldNameF := FieldForeign.Name
 				FieldName1 := field1.Name
 				FieldName1 = FieldName1 + "_" + FieldNameF
+				FieldNameSQL1 := FormatNameSQL(FieldName1)
 				SQLTypeForeign := ""
 				MapSQLTypes1F, ok := Settings.MapSQLTypes[FieldTypeF]
 				if ok == false {
@@ -103,11 +106,11 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `"
 				}
 				SQLTypeForeign = MapSQLTypes1F.SQLType
 
-				Otvet = Otvet + "\t" + `"` + FieldName1 + `"` + " " + SQLTypeForeign + " " + TextNullable + ",\n"
+				Otvet = Otvet + "\t" + `"` + FieldNameSQL1 + `"` + " " + SQLTypeForeign + " " + TextNullable + ",\n"
 
 				//COLUMN COMMENTS
 				Comments := field1.Documentation + " / " + FieldForeign.Documentation
-				TextColumnComment1 := `COMMENT ON COLUMN "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `"."` + FieldName1 + `" IS '` + Comments + `';` + "\n"
+				TextColumnComment1 := `COMMENT ON COLUMN "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL + `"."` + FieldNameSQL1 + `" IS '` + Comments + `';` + "\n"
 				TextColumnComment = TextColumnComment + TextColumnComment1
 			}
 			continue
@@ -115,7 +118,7 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `"
 
 		//одна колонка
 		//добавим колонку
-		Otvet = Otvet + "\t" + `"` + FieldName + `"` + " " + SQLType + " " + TextNullable + ",\n"
+		Otvet = Otvet + "\t" + `"` + FieldNameSQL + `"` + " " + SQLType + " " + TextNullable + ",\n"
 
 		//CONSTRAINT
 		TextConstraint1 := FillTextConstraint1(Settings, message1, field1)
@@ -130,7 +133,7 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `"
 
 		//COLUMN COMMENTS
 		Comments := field1.Documentation
-		TextColumnComment1 := `COMMENT ON COLUMN "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `"."` + FieldName + `" IS '` + Comments + `';` + "\n"
+		TextColumnComment1 := `COMMENT ON COLUMN "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL + `"."` + FieldNameSQL + `" IS '` + Comments + `';` + "\n"
 		TextColumnComment = TextColumnComment + TextColumnComment1
 
 	}
@@ -138,7 +141,7 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `"
 	//PRIMARY KEY
 	IdentifierName = Find_ID_Name_from_Fields(Settings, message1.Fields)
 	if IdentifierName != "" {
-		ConstraintName := TableName + "_pk"
+		ConstraintName := TableNameSQL + "_pk"
 		TextPrimaryKey := "\t" + `CONSTRAINT "` + ConstraintName + `" PRIMARY KEY ("` + IdentifierName + `"),` + "\n"
 		Otvet = Otvet + TextPrimaryKey
 		//isFoundID = true
@@ -198,14 +201,14 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `"
 	//}
 
 	//COMMENT ON TABLE
-	Otvet = Otvet + `COMMENT ON TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" IS '` + TableComments + `';` + "\n"
+	Otvet = Otvet + `COMMENT ON TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL + `" IS '` + TableComments + `';` + "\n"
 
 	//COMMENT ON COLUMN
 	Otvet = Otvet + TextColumnComment
 	//for _, field1 := range message1.Fields {
 	//	FieldName := FindFieldName(field1)
 	//	Comments := field1.Documentation
-	//	Otvet = Otvet + `COMMENT ON COLUMN "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `"."` + FieldName + `" IS '` + Comments + `';` + "\n"
+	//	Otvet = Otvet + `COMMENT ON COLUMN "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL + `"."` + FieldNameSQL + `" IS '` + Comments + `';` + "\n"
 	//}
 
 	return Otvet, ForeignCount, err
@@ -216,7 +219,9 @@ func FillTextConstraint1(Settings *config.SettingsINI, message1 *types.MessageEl
 	Otvet := ""
 
 	TableName := message1.Name
+	TableNameSQL := FormatNameSQL(TableName)
 	FieldName := FindFieldName(field1)
+	FieldNameSQL := FormatNameSQL(FieldName)
 	IsIdentifier := IsIdentifierField(field1)
 	if IsIdentifier == false {
 		return Otvet
@@ -224,6 +229,8 @@ func FillTextConstraint1(Settings *config.SettingsINI, message1 *types.MessageEl
 
 	IdentifierName := ""
 	ForeignTableName, ForeignTableColumnName := FindForeignTableNameAndColumnName(Settings, field1)
+	ForeignTableNameSQL := FormatNameSQL(ForeignTableName)
+	ForeignTableColumnNameSQL := FormatNameSQL(ForeignTableColumnName)
 	if ForeignTableName == "" || ForeignTableColumnName == "" {
 		return Otvet
 	}
@@ -239,8 +246,8 @@ func FillTextConstraint1(Settings *config.SettingsINI, message1 *types.MessageEl
 	}
 
 	if IdentifierName != "" {
-		ConstraintName := TableName + "_" + FieldName + "_fk"
-		Otvet = Otvet + "\t" + `CONSTRAINT "` + ConstraintName + `" FOREIGN KEY ("` + FieldName + `") REFERENCES "` + Settings.DB_SCHEMA_NAME + `"."` + ForeignTableName + `" ("` + ForeignTableColumnName + `")` + ",\n"
+		ConstraintName := TableNameSQL + "_" + FieldNameSQL + "_fk"
+		Otvet = Otvet + "\t" + `CONSTRAINT "` + ConstraintName + `" FOREIGN KEY ("` + FieldNameSQL + `") REFERENCES "` + Settings.DB_SCHEMA_NAME + `"."` + ForeignTableNameSQL + `" ("` + ForeignTableColumnNameSQL + `")` + ",\n"
 	}
 
 	return Otvet
@@ -251,14 +258,16 @@ func FillTextIndex1(Settings *config.SettingsINI, message1 *types.MessageElement
 	Otvet := ""
 
 	TableName := message1.Name
+	TableNameSQL := FormatNameSQL(TableName)
 	FieldName := FindFieldName(field1)
+	FieldNameSQL := FormatNameSQL(FieldName)
 	IsIdentifier := IsIdentifierField(field1)
 	if IsIdentifier == false {
 		return Otvet
 	}
 
-	IndexName := TableName + "_" + FieldName + "_idx"
-	Otvet = Otvet + `CREATE INDEX IF NOT EXISTS "` + IndexName + `" ON "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" USING btree ("` + FieldName + `");` + "\n"
+	IndexName := TableNameSQL + "_" + FieldNameSQL + "_idx"
+	Otvet = Otvet + `CREATE INDEX IF NOT EXISTS "` + IndexName + `" ON "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL + `" USING btree ("` + FieldNameSQL + `");` + "\n"
 
 	return Otvet
 }

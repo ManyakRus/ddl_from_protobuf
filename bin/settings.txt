@@ -11,7 +11,7 @@ FILE_PERMISSIONS = 438
 CONFIG_DIRECTORY_NAME="config"
 
 #DB_SCHEMA_NAME - schema name in database
-DB_SCHEMA_NAME="tin"
+DB_SCHEMA_NAME="public"
 
 #PRIMARY_KEY_NAMES_FILENAME - shor filename of "primary_key_names.json" file
 PRIMARY_KEY_NAMES_FILENAME="primary_key_names.json"

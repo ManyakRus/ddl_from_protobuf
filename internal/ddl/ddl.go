@@ -6,6 +6,7 @@ import (
 	"github.com/ManyakRus/ddl_from_protobuf/internal/types"
 	"github.com/ManyakRus/starter/log"
 	"github.com/ManyakRus/starter/micro"
+	"github.com/gobeam/stringy"
 	"os"
 	"strings"
 )
@@ -190,11 +191,6 @@ func FindForeignTableNameAndColumnName(Settings *config.SettingsINI, Field *type
 		}
 	}
 
-	////проверка
-	//if ForeignTableIDColumnName == "" {
-	//	log.Warn("Not found message or enum (ForeignTableName) with name: ", ForeignTableName)
-	//}
-
 	return
 }
 
@@ -223,6 +219,7 @@ func Find_ID_Name_from_Fields(Settings *config.SettingsINI, Fields []*types.Fiel
 	if Field1 != nil {
 		Otvet = Field1.Name
 	}
+	Otvet = FormatNameSQL(Otvet)
 
 	return Otvet
 }
@@ -249,6 +246,17 @@ func IsMessageField(Settings *config.SettingsINI, field1 *types.FieldElement) bo
 	if ok == true {
 		Otvet = true
 	}
+
+	return Otvet
+}
+
+// FormatNameSQL - возвращает наименование в формате snake_case
+func FormatNameSQL(Name string) string {
+	Otvet := Name
+
+	str := stringy.New(Otvet)
+	Otvet = str.SnakeCase("?", "").Get()
+	Otvet = strings.ToLower(Otvet)
 
 	return Otvet
 }

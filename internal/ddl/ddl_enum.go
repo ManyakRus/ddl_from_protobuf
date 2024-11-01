@@ -17,10 +17,11 @@ func CreateFiles_Enum(Settings *config.SettingsINI, enum1 *types.EnumElement) (s
 	}
 
 	TableName := enum1.Name
+	TableNameSQL := FormatNameSQL(TableName)
 	TableComments := enum1.Documentation
 
 	Otvet = `
-CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" (
+CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL + `" (
 `
 	Otvet = Otvet + Settings.TextEveryTableColumns
 
@@ -33,23 +34,23 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `"
 	Otvet = Otvet + "\t" + `"` + Name_Name + `"` + " " + Name_SQL_Type + " NOT NULL" + ",\n"
 
 	//
-	ConstraintName := TableName + "_pk"
+	ConstraintName := TableNameSQL + "_pk"
 	TextPrimaryKey := "\t" + `CONSTRAINT "` + ConstraintName + `" PRIMARY KEY ("` + ID_Name + `")` + "\n"
 	Otvet = Otvet + TextPrimaryKey + ");\n"
 
 	//CREATE INDEX
-	IndexName := TableName + "_" + ID_Name + "_idx"
-	Otvet = Otvet + `CREATE INDEX IF NOT EXISTS "` + IndexName + `" ON "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" USING btree ("` + ID_Name + `");` + "\n"
+	IndexName := TableNameSQL + "_" + ID_Name + "_idx"
+	Otvet = Otvet + `CREATE INDEX IF NOT EXISTS "` + IndexName + `" ON "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL + `" USING btree ("` + ID_Name + `");` + "\n"
 
 	//COMMENT ON TABLE
-	Otvet = Otvet + `COMMENT ON TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" IS '` + TableComments + `';` + "\n"
+	Otvet = Otvet + `COMMENT ON TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL + `" IS '` + TableComments + `';` + "\n"
 
 	//COMMENT ON ID
-	Otvet = Otvet + `COMMENT ON COLUMN "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `"."id" IS '` + "Уникальный технический идентификатор" + `';` + "\n"
-	Otvet = Otvet + `COMMENT ON COLUMN "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `"."name" IS '` + "Наименование" + `';` + "\n"
+	Otvet = Otvet + `COMMENT ON COLUMN "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL + `"."id" IS '` + "Уникальный технический идентификатор" + `';` + "\n"
+	Otvet = Otvet + `COMMENT ON COLUMN "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL + `"."name" IS '` + "Наименование" + `';` + "\n"
 
 	//insert
-	Otvet = Otvet + `INSERT INTO "` + TableName + `"(id, name) VALUES` + "\n"
+	Otvet = Otvet + `INSERT INTO "` + TableNameSQL + `"(id, name) VALUES` + "\n"
 	//Otvet1 := ""
 	Comma := ","
 	len1 := len(enum1.EnumConstants)

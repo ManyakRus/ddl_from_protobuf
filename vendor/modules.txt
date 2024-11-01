@@ -13,6 +13,9 @@ github.com/ManyakRus/starter/micro
 # github.com/emicklei/proto v1.13.2
 ## explicit; go 1.12
 github.com/emicklei/proto
+# github.com/gobeam/stringy v0.0.7
+## explicit; go 1.14
+github.com/gobeam/stringy
 # github.com/google/uuid v1.6.0
 ## explicit
 github.com/google/uuid
@@ -21,7 +24,6 @@ github.com/google/uuid
 github.com/joho/godotenv
 # github.com/tallstoat/pbparser v0.2.0
 ## explicit
-github.com/tallstoat/pbparser
 # golang.org/x/exp v0.0.0-20240909161429-701f63a606c0
 ## explicit; go 1.22.0
 golang.org/x/exp/constraints
