@@ -1,5 +1,6 @@
 The ddl_from_protobuf application is designed to create a DDL .sql file from protobuf .proto files
 A text file is created with SQL query text for creating tables, etc.
+SQL text for PostgreSQL database
 
 Can create:
 - tables
