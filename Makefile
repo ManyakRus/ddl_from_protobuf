@@ -1,10 +1,10 @@
 SERVICENAME=ddl_from_protobuf
 SERVICEURL=github.com/ManyakRus/$(SERVICENAME)
 
-FILEMAIN=./cmd/ddl_from_protobuf/main.go
-FILEAPP=./bin/ddl_from_protobuf
+FILEMAIN=./cmd/$(SERVICENAME)/main.go
+FILEAPP=./bin/$(SERVICENAME)
 
-NEW_REPO=github.com/ManyakRus/ddl_from_protobuf
+NEW_REPO=github.com/ManyakRus/$(SERVICENAME)
 
 
 run:
@@ -15,7 +15,7 @@ run:
 mod:
 	clear
 	go get -u ./...
-	go mod tidy -compat=1.18
+	go mod tidy -compat=1.22.1
 	go mod vendor
 	go fmt ./...
 build:
@@ -36,7 +36,7 @@ lint:
 run.test:
 	clear
 	go fmt ./...
-	go test -coverprofile cover.out ./internal/v0/app/...
+	go test -coverprofile cover.out ./internal/...
 	go tool cover -func=cover.out
 newrepo:
 	sed -i 's+$(SERVICEURL)+$(NEW_REPO)+g' go.mod
