@@ -67,6 +67,8 @@ type FieldElement struct {
 	Optional bool
 	Required bool
 	TypeSQL  string
+	NameSQL  string
+	NameGo   string
 }
 
 // OneOfElement is a datastructure which models

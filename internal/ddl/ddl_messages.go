@@ -106,6 +106,10 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 				}
 				SQLTypeForeign = MapSQLTypes1F.SQLType
 
+				//запомним
+				field1.NameGo = FieldName1
+				field1.NameSQL = FieldNameSQL1
+
 				Otvet = Otvet + "\t" + `"` + FieldNameSQL1 + `"` + " " + SQLTypeForeign + " " + TextNullable + ",\n"
 
 				//COLUMN COMMENTS
@@ -115,6 +119,10 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 			}
 			continue
 		}
+
+		//запомним
+		field1.NameGo = FieldName
+		field1.NameSQL = FieldNameSQL
 
 		//одна колонка
 		//добавим колонку

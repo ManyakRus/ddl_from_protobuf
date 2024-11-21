@@ -21,3 +21,16 @@ ENUMS_ID_COLUMN_NAME="id"
 
 #ENUMS_NAME_COLUMN_NAME - column nsme "name" for ENUM
 ENUMS_NAME_COLUMN_NAME="name"
+
+
+#---------------------------- convert files --------------------------------------------------------
+
+#REPOSITORY_PROTO_URL - another repository URL for protoc *.pb.go files
+REPOSITORY_PROTO_URL=
+
+#CONVERT_FOLDER_NAME - folder name for create convert .go files
+CONVERT_FOLDER_NAME="entities"
+
+#NEED_CREATE_CONVERT_FILES - true = need create convert models from protobuf to database models
+NEED_CREATE_CONVERT_FILES=false
+

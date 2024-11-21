@@ -3,8 +3,8 @@ package logic
 import (
 	"github.com/ManyakRus/ddl_from_protobuf/internal/config"
 	"github.com/ManyakRus/ddl_from_protobuf/internal/ddl"
-	"github.com/ManyakRus/ddl_from_protobuf/internal/protobuf"
 	"github.com/ManyakRus/ddl_from_protobuf/internal/types"
+	"github.com/ManyakRus/ddl_from_protobuf/pkg/protobuf"
 	"github.com/ManyakRus/starter/log"
 	"github.com/ManyakRus/starter/micro"
 )

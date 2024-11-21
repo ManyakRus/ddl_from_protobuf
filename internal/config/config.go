@@ -4,6 +4,7 @@ import (
 	"github.com/ManyakRus/ddl_from_protobuf/internal/load_configs/load_configs_mapping"
 	"github.com/ManyakRus/ddl_from_protobuf/internal/types"
 	"github.com/ManyakRus/starter/log"
+	"github.com/ManyakRus/starter/micro"
 	"io/fs"
 	"os"
 	"strconv"
@@ -29,6 +30,9 @@ type SettingsINI struct {
 	FILE_PERMISSIONS           fs.FileMode //= 0666
 	ENUMS_ID_COLUMN_NAME       string
 	ENUMS_NAME_COLUMN_NAME     string
+	REPOSITORY_PROTO_URL       string
+	CONVERT_FOLDER_NAME        string
+	NEED_CREATE_CONVERT_FILES  bool
 }
 
 // CreateSettings - создает структуру типа SettingsINI
@@ -96,6 +100,21 @@ func FillSettings() {
 	Name = "ENUMS_NAME_COLUMN_NAME"
 	s = Getenv(Name, true)
 	Settings.ENUMS_NAME_COLUMN_NAME = s
+
+	//
+	Name = "REPOSITORY_PROTO_URL"
+	s = Getenv(Name, true)
+	Settings.REPOSITORY_PROTO_URL = s
+
+	//
+	Name = "CONVERT_FOLDER_NAME"
+	s = Getenv(Name, true)
+	Settings.CONVERT_FOLDER_NAME = s
+
+	//
+	Name = "NEED_CREATE_CONVERT_FILES"
+	s = Getenv(Name, true)
+	Settings.NEED_CREATE_CONVERT_FILES = micro.BoolFromString(s)
 
 }
 

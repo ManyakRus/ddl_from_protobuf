@@ -10,54 +10,11 @@ import (
 	"os"
 )
 
-//type optionLister struct {
-//	proto.NoopVisitor
-//}
-
-//// messagesAll - хранит все message из всех .proto
-//var messagesAll []*proto.Message
-//
-//// enumsAll - хранит все enum из всех .proto
-//var enumsAll []*proto.Enum
-
 // MapMessages - хранит все сообщения из всех .proto
 var mapMessages = make(map[string]*types.MessageElement)
 
 // MapEnums - хранит все enum из всех .proto
 var mapEnums = make(map[string]*types.EnumElement)
-
-//type Message struct {
-//	Fields   []*proto.NormalField
-//	Repeated bool
-//	Optional bool
-//	Required bool
-//}
-
-// FindProtobufFiles - возвращает список файлов .proto
-func FindProtobufFiles(dir string) ([]string, error) {
-	Otvet := make([]string, 0)
-	var err error
-
-	//проверим существование директории
-	ok, err := micro.FileExists(dir)
-	if err != nil {
-		err = fmt.Errorf("FileExists(%s) error: %w", dir, err)
-		return Otvet, err
-	}
-	if ok != true {
-		err = fmt.Errorf("FileExists(%s) error: file not found", dir)
-		return Otvet, err
-	}
-
-	//
-	Otvet, err = folders.FindFiles_FromDirectory(dir, ".proto")
-	if err != nil {
-		err = fmt.Errorf("FindFiles_FromDirectory(%s) error: %w", dir, err)
-		return Otvet, err
-	}
-
-	return Otvet, err
-}
 
 // FindProtobufAll - возвращает массив описания .proto файлов в формате []pbparser.ProtoFile
 func FindProtobufAll(dir string) (types.ProtoAll, error) {
@@ -101,6 +58,32 @@ func FindProtobufAll(dir string) (types.ProtoAll, error) {
 
 	Otvet.MapMessages = mapMessages
 	Otvet.MapEnums = mapEnums
+
+	return Otvet, err
+}
+
+// FindProtobufFiles - возвращает список файлов .proto
+func FindProtobufFiles(dir string) ([]string, error) {
+	Otvet := make([]string, 0)
+	var err error
+
+	//проверим существование директории
+	ok, err := micro.FileExists(dir)
+	if err != nil {
+		err = fmt.Errorf("FileExists(%s) error: %w", dir, err)
+		return Otvet, err
+	}
+	if ok != true {
+		err = fmt.Errorf("FileExists(%s) error: file not found", dir)
+		return Otvet, err
+	}
+
+	//
+	Otvet, err = folders.FindFiles_FromDirectory(dir, ".proto")
+	if err != nil {
+		err = fmt.Errorf("FindFiles_FromDirectory(%s) error: %w", dir, err)
+		return Otvet, err
+	}
 
 	return Otvet, err
 }
