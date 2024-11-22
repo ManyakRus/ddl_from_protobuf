@@ -2,6 +2,7 @@ package logic
 
 import (
 	"github.com/ManyakRus/ddl_from_protobuf/internal/config"
+	"github.com/ManyakRus/ddl_from_protobuf/internal/create_files/convert_files"
 	"github.com/ManyakRus/ddl_from_protobuf/internal/ddl"
 	"github.com/ManyakRus/ddl_from_protobuf/pkg/protobuf"
 	"github.com/ManyakRus/starter/log"
@@ -21,15 +22,11 @@ func StartAll(Settings *config.SettingsINI) {
 	//
 	//FillTypeSQL(Settings, &Proto)
 
-	//
+	//создаём файлы .sql
 	MapTables := ddl.StartAll(Settings, Proto)
-	if MapTables == nil {
 
-	}
-	MassTables := micro.MassFrom_Map(MapTables)
-	for _, table1 := range MassTables {
-		log.Infoln(table1)
-	}
+	//создаём файлы .go
+	convert_files.CreateFiles_All(Settings, MapTables)
 }
 
 //// FillTypeSQL - заполняет типы SQL в структуре Proto.MapMessages.Fields

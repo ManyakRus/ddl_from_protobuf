@@ -2,6 +2,7 @@ package create_files
 
 import (
 	"github.com/ManyakRus/ddl_from_protobuf/internal/config"
+	"github.com/ManyakRus/ddl_from_protobuf/internal/types"
 	"github.com/gobeam/stringy"
 	"unicode"
 )
@@ -107,6 +108,55 @@ func NameGo_from_NameSQL(TableName string) string {
 	Otvet := TableName
 
 	Otvet = PascalCase(Otvet)
+
+	return Otvet
+}
+
+// Convert_GolangVariableToProtobufVariableType - возвращает имя переменной  преобразованное в тип protobuf
+func Convert_GolangVariableToProtobufVariableType(Settings *config.SettingsINI, Column1 *types.Column, VariableName, VariableType string) string {
+	Otvet := VariableName
+
+	if Column1 == nil {
+		return Otvet
+	}
+
+	TextVariableName := VariableName
+	TypeGo := Convert_ProtobufTypeNameToGolangTypeName(Settings, Column1.TypeProtobuf)
+	if VariableType != TypeGo {
+		TextVariableName = VariableType + "(" + VariableName + ")"
+	}
+
+	switch TypeGo {
+	case "time.Time":
+		Otvet = "timestamppb.New(" + VariableName + ")"
+	case "string":
+		Otvet = TextVariableName
+	case "int64":
+		Otvet = TextVariableName
+	case "int32":
+		Otvet = TextVariableName
+	case "bool":
+		Otvet = TextVariableName
+	case "float32":
+		Otvet = TextVariableName
+	case "float64":
+		Otvet = TextVariableName
+	case "uuid.UUID":
+		Otvet = VariableName + ".String()"
+	}
+
+	return Otvet
+}
+
+// Convert_TypeSQL_to_TypeGo - возвращает имя типа golang
+func Convert_TypeSQL_to_TypeGo(Settings *config.SettingsINI, TypeSQL string) string {
+	Otvet := ""
+
+	for _, v := range Settings.MapSQLTypes {
+		if v.SQLType == TypeSQL {
+			Otvet = v.GoType
+		}
+	}
 
 	return Otvet
 }

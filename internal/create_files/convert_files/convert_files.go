@@ -7,6 +7,7 @@ import (
 	"github.com/ManyakRus/ddl_from_protobuf/internal/types"
 	"github.com/ManyakRus/starter/log"
 	"github.com/ManyakRus/starter/micro"
+	"os"
 )
 
 // CreateFiles_All - создает все файлы convert
@@ -30,7 +31,7 @@ func CreateFiles_Message1(Settings *config.SettingsINI, Table1 *types.Table) err
 	TableName := Table1.NameGo
 	TableNameSQL := create_files.CamelCase(TableName)
 
-	Filename := DirReady + micro.SeparatorFile() + TableNameSQL
+	FilenameReady := DirReady + micro.SeparatorFile() + TableNameSQL
 
 	//создадим папку готовых файлов
 	folders.CreateFolder(DirReady)
@@ -56,23 +57,64 @@ func (m *` + TableName + `) ConvertToProtobuf() ` + ProtoNameMessageName + ` {
 	//каждое поле
 	MassColumns := micro.MassFrom_Map(Table1.MapColumns)
 	for _, Column1 := range MassColumns {
-		Text1 := TextConvertToProtobufField1(Settings, Column1)
+		Text1 := TextConvertToProtobufField1(Settings, Table1, Column1)
 		Text = Text + Text1
 	}
+
+	//запись файла
+	err = os.WriteFile(FilenameReady, []byte(Text), config.Settings.FILE_PERMISSIONS)
 
 	return err
 }
 
 // TextConvertToProtobufField1 - возвращает текст для 1 поля
-func TextConvertToProtobufField1(Settings *config.SettingsINI, Column1 *types.Column) string {
+func TextConvertToProtobufField1(Settings *config.SettingsINI, Table1 *types.Table, Column1 *types.Column) string {
 	Otvet := ""
 
-	//простой случай
+	IsProtobufType := create_files.IsProtobufType(Settings, Column1.TypeProtobuf)
 	NameGo := create_files.NameGo_from_NameSQL(Column1.NameSQL)
+	TypeGo := create_files.Convert_TypeSQL_to_TypeGo(Settings, Column1.TypeSQL)
 	NameProtobuf := Column1.NameProtobuf
-	Otvet = Otvet + "\tOtvet." + NameProtobuf + " = m." + NameGo + "\n"
 
-	//
+	//простой случай и случай с преобразованием типа
+	if IsProtobufType == true && Column1.NameForeignProtobuf == "" {
+		TextVariable := create_files.Convert_GolangVariableToProtobufVariableType(Settings, Column1, "m.", TypeGo)
+		Otvet = Otvet + "\tOtvet." + NameProtobuf + " = " + TextVariable + "\n"
+		return Otvet
+	}
+
+	//случай с алиасом
+	if IsProtobufType == false && Column1.NameForeignProtobuf == "" {
+		TextVariable := Column1.TypeForeignProtobuf + "(m." + NameGo + ")"
+		Otvet = Otvet + "\tOtvet." + NameProtobuf + " = " + TextVariable + "\n"
+		return Otvet
+	}
+
+	//случай с объектами, структурами
+	IsFirst := FindIsFirstForeignName(Settings, Table1, Column1)
+	if IsFirst == true {
+		TextProto := config.Settings.REPOSITORY_PROTO_URL
+		TextProto = micro.LastWord(TextProto)
+		Otvet = Otvet + "\t" + Column1.NameForeignProtobuf + " := &" + TextProto + "." + Column1.TypeForeignProtobuf + "{}\n"
+	}
+
+	return Otvet
+}
+
+// FindIsFirstForeignName - возвращает true, если эта колонка первая по порядку с таким же NameForeignProtobuf
+func FindIsFirstForeignName(Settings *config.SettingsINI, Table1 *types.Table, Column1 *types.Column) bool {
+	Otvet := false
+
+	MassColumns := micro.MassFrom_Map(Table1.MapColumns)
+	for _, ColumnMass1 := range MassColumns {
+		if Column1.NameForeignProtobuf == ColumnMass1.NameForeignProtobuf {
+			if Column1 == ColumnMass1 {
+				Otvet = true
+				return Otvet
+			}
+			break
+		}
+	}
 
 	return Otvet
 }
