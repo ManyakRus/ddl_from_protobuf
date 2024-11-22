@@ -2,13 +2,14 @@ package ddl
 
 import (
 	"github.com/ManyakRus/ddl_from_protobuf/internal/config"
+	"github.com/ManyakRus/ddl_from_protobuf/internal/create_files"
 	"github.com/ManyakRus/ddl_from_protobuf/internal/types"
 	"github.com/ManyakRus/starter/log"
 	"strings"
 )
 
 // CreateFile_Message - создание одного файла ddl .sql, для message
-func CreateFile_Message(Settings *config.SettingsINI, message1 *types.MessageElement) (string, int, error) {
+func CreateFile_Message(Settings *config.SettingsINI, MapTables map[string]*types.Table, message1 *types.MessageElement) (string, int, error) {
 	Otvet := ""
 	ForeignCount := 0
 	var err error
@@ -22,6 +23,12 @@ func CreateFile_Message(Settings *config.SettingsINI, message1 *types.MessageEle
 	TableComments := message1.Documentation
 	TextColumnComment := ""
 	TableNameSQL := FormatNameSQL(TableName)
+
+	//
+	Table1 := types.NewTable()
+	Table1.NameProtobuf = TableName
+	Table1.NameSQL = TableNameSQL
+	Table1.NameGo = create_files.NameGo_from_NameSQL(TableNameSQL)
 
 	//isFoundID := false
 
@@ -43,9 +50,9 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 			SQLType = MapMappings1.SQLType
 		}
 
-		isNullabe := IsNullableField(field1)
+		isNullabe := IsNullableField(Settings, field1)
 		TextNullable := TextNullable(isNullabe)
-		FieldName := FindFieldName(field1)
+		FieldName := FindFieldName(Settings, field1)
 		FieldNameSQL := FormatNameSQL(FieldName)
 
 		//для тип=enum или message with table
@@ -107,9 +114,19 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 				SQLTypeForeign = MapSQLTypes1F.SQLType
 
 				//запомним
-				field1.NameGo = FieldName1
-				field1.NameSQL = FieldNameSQL1
+				Column1 := types.Column{}
+				Column1.NameSQL = FieldNameSQL1
+				Column1.TypeSQL = SQLTypeForeign
+				Column1.NameProtobuf = field1.Name
+				Column1.TypeProtobuf = FieldType
+				Column1.NameForeignProtobuf = FieldNameF
+				Column1.TypeForeignProtobuf = FieldTypeF
+				//Column1.NameGo = create_files.NameGo_from_NameSQL(FieldNameSQL1)
+				//Column1.TypeGo = create_files.Convert_ProtobufTypeNameToGolangTypeName(Settings, FieldType)
+				Column1.IsObject = true
+				Table1.MapColumns[Column1.NameSQL] = &Column1
 
+				//
 				Otvet = Otvet + "\t" + `"` + FieldNameSQL1 + `"` + " " + SQLTypeForeign + " " + TextNullable + ",\n"
 
 				//COLUMN COMMENTS
@@ -121,8 +138,14 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 		}
 
 		//запомним
-		field1.NameGo = FieldName
-		field1.NameSQL = FieldNameSQL
+		Column1 := types.Column{}
+		Column1.NameSQL = FieldNameSQL
+		Column1.TypeSQL = SQLType
+		Column1.NameProtobuf = FieldName
+		Column1.TypeProtobuf = FieldType
+		//Column1.NameGo = create_files.NameGo_from_NameSQL(field1.Name)
+		//Column1.TypeGo = create_files.Convert_ProtobufTypeNameToGolangTypeName(Settings, FieldType)
+		Table1.MapColumns[Column1.NameSQL] = &Column1
 
 		//одна колонка
 		//добавим колонку
@@ -219,6 +242,9 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 	//	Otvet = Otvet + `COMMENT ON COLUMN "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL + `"."` + FieldNameSQL + `" IS '` + Comments + `';` + "\n"
 	//}
 
+	//сохраним
+	MapTables[TableNameSQL] = &Table1
+
 	return Otvet, ForeignCount, err
 }
 
@@ -228,9 +254,9 @@ func FillTextConstraint1(Settings *config.SettingsINI, message1 *types.MessageEl
 
 	TableName := message1.Name
 	TableNameSQL := FormatNameSQL(TableName)
-	FieldName := FindFieldName(field1)
+	FieldName := FindFieldName(Settings, field1)
 	FieldNameSQL := FormatNameSQL(FieldName)
-	IsIdentifier := IsIdentifierField(field1)
+	IsIdentifier := IsIdentifierField(Settings, field1)
 	if IsIdentifier == false {
 		return Otvet
 	}
@@ -267,9 +293,9 @@ func FillTextIndex1(Settings *config.SettingsINI, message1 *types.MessageElement
 
 	TableName := message1.Name
 	TableNameSQL := FormatNameSQL(TableName)
-	FieldName := FindFieldName(field1)
+	FieldName := FindFieldName(Settings, field1)
 	FieldNameSQL := FormatNameSQL(FieldName)
-	IsIdentifier := IsIdentifierField(field1)
+	IsIdentifier := IsIdentifierField(Settings, field1)
 	if IsIdentifier == false {
 		return Otvet
 	}

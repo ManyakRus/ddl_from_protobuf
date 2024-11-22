@@ -10,10 +10,11 @@ import (
 )
 
 // CreateFiles_All - создает все файлы convert
-func CreateFiles_All(Settings *config.SettingsINI, Proto *types.ProtoAll) {
+func CreateFiles_All(Settings *config.SettingsINI, MapTables map[string]*types.Table) {
 
-	for _, message1 := range Proto.MapMessages {
-		err := CreateFiles_Message1(Settings, message1)
+	MassTables := micro.MassFrom_Map(MapTables)
+	for _, Table1 := range MassTables {
+		err := CreateFiles_Message1(Settings, Table1)
 		if err != nil {
 			log.Errorln(err)
 			return
@@ -21,15 +22,15 @@ func CreateFiles_All(Settings *config.SettingsINI, Proto *types.ProtoAll) {
 	}
 }
 
-func CreateFiles_Message1(Settings *config.SettingsINI, Message1 *types.MessageElement) error {
+func CreateFiles_Message1(Settings *config.SettingsINI, Table1 *types.Table) error {
 	var err error
 
 	dir := micro.ProgramDir_bin()
 	DirReady := dir + Settings.CONFIG_DIRECTORY_NAME + micro.SeparatorFile() + Settings.CONVERT_FOLDER_NAME
-	MessageName := Message1.Name
-	MessageNameCamelCase := create_files.CamelCase(MessageName)
+	TableName := Table1.NameGo
+	TableNameSQL := create_files.CamelCase(TableName)
 
-	Filename := DirReady + micro.SeparatorFile() + MessageNameCamelCase
+	Filename := DirReady + micro.SeparatorFile() + TableNameSQL
 
 	//создадим папку готовых файлов
 	folders.CreateFolder(DirReady)
@@ -37,24 +38,25 @@ func CreateFiles_Message1(Settings *config.SettingsINI, Message1 *types.MessageE
 	//
 	ProtoURL := Settings.REPOSITORY_PROTO_URL
 	ProtoName := micro.LastWord(ProtoURL)
-	ProtoNameMessageName := ProtoName + "." + MessageName
+	ProtoNameMessageName := ProtoName + "." + TableName
 
 	//
-	Text := `package ` + MessageNameCamelCase + `
+	Text := `package ` + TableNameSQL + `
 
 import (
 	"` + ProtoURL + `"
 )
 
 // ConvertToProtobuf - создаёт модель protobuf из модели crud
-func (m *` + MessageName + `) ConvertToProtobuf() ` + ProtoNameMessageName + ` {
+func (m *` + TableName + `) ConvertToProtobuf() ` + ProtoNameMessageName + ` {
 	Otvet := ` + ProtoNameMessageName + `{}
 
 `
 
 	//каждое поле
-	for _, field1 := range Message1.Fields {
-		Text1 := TextConvertToProtobufField1(Settings, field1)
+	MassColumns := micro.MassFrom_Map(Table1.MapColumns)
+	for _, Column1 := range MassColumns {
+		Text1 := TextConvertToProtobufField1(Settings, Column1)
 		Text = Text + Text1
 	}
 
@@ -62,12 +64,13 @@ func (m *` + MessageName + `) ConvertToProtobuf() ` + ProtoNameMessageName + ` {
 }
 
 // TextConvertToProtobufField1 - возвращает текст для 1 поля
-func TextConvertToProtobufField1(Settings *config.SettingsINI, Field1 *types.FieldElement) string {
+func TextConvertToProtobufField1(Settings *config.SettingsINI, Column1 *types.Column) string {
 	Otvet := ""
 
 	//простой случай
-	FieldNameGo := Field1.NameGo
-	Otvet = Otvet + "\tOtvet." + FieldNameGo + " = m." + Field1.Name + "\n"
+	NameGo := create_files.NameGo_from_NameSQL(Column1.NameSQL)
+	NameProtobuf := Column1.NameProtobuf
+	Otvet = Otvet + "\tOtvet." + NameProtobuf + " = m." + NameGo + "\n"
 
 	//
 

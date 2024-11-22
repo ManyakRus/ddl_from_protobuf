@@ -20,7 +20,7 @@ type SettingsINI struct {
 	PROTOBUF_DIRECTORY         string
 	DDL_FILENAME               string
 	CONFIG_DIRECTORY_NAME      string
-	MapSQLTypes                map[string]load_configs_mapping.SQLMapping
+	MapSQLTypes                map[string]load_configs_mapping.SQLMapping //map[ProtobufType]SQLMapping
 	TextEveryTableColumns      string
 	DB_SCHEMA_NAME             string
 	MapMessages                map[string]*types.MessageElement

@@ -2,12 +2,13 @@ package ddl
 
 import (
 	"github.com/ManyakRus/ddl_from_protobuf/internal/config"
+	"github.com/ManyakRus/ddl_from_protobuf/internal/create_files"
 	"github.com/ManyakRus/ddl_from_protobuf/internal/types"
 	"strconv"
 )
 
 // CreateFiles_Enum - создание одного файла ddl .sql, для enum
-func CreateFiles_Enum(Settings *config.SettingsINI, enum1 *types.EnumElement) (string, error) {
+func CreateFiles_Enum(Settings *config.SettingsINI, MapTables map[string]*types.Table, enum1 *types.EnumElement) (string, error) {
 	Otvet := ""
 	var err error
 
@@ -16,10 +17,12 @@ func CreateFiles_Enum(Settings *config.SettingsINI, enum1 *types.EnumElement) (s
 		return Otvet, err
 	}
 
+	//
 	TableName := enum1.Name
 	TableNameSQL := FormatNameSQL(TableName)
 	TableComments := enum1.Documentation
 
+	//
 	Otvet = `
 CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL + `" (
 `
@@ -49,6 +52,13 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 	Otvet = Otvet + `COMMENT ON COLUMN "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL + `"."id" IS '` + "Уникальный технический идентификатор" + `';` + "\n"
 	Otvet = Otvet + `COMMENT ON COLUMN "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL + `"."name" IS '` + "Наименование" + `';` + "\n"
 
+	//
+	Table1 := types.NewTable()
+	Table1.NameProtobuf = TableName
+	Table1.NameSQL = TableNameSQL
+	Table1.NameGo = create_files.NameGo_from_NameSQL(TableNameSQL)
+	Table1.IsEnum = true
+
 	//insert
 	Otvet = Otvet + `INSERT INTO "` + TableNameSQL + `"(id, name) VALUES` + "\n"
 	//Otvet1 := ""
@@ -67,6 +77,29 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 		Otvet = Otvet + Otvet1
 
 	}
+
+	//ID
+	Column1 := types.Column{}
+	Column1.NameSQL = ID_Name
+	Column1.TypeSQL = ID_SQL_TYPE
+	Column1.NameProtobuf = ""
+	Column1.TypeProtobuf = ""
+	//Column1.NameGo = "ID"
+	//Column1.TypeGo = "int64"
+	Table1.MapColumns[ID_Name] = &Column1
+
+	//Name
+	Column2 := types.Column{}
+	Column2.NameSQL = Name_Name
+	Column2.TypeSQL = Name_SQL_Type
+	Column2.NameProtobuf = ""
+	Column2.TypeProtobuf = ""
+	//Column1.NameGo = "Name"
+	//Column1.TypeGo = "string"
+	Table1.MapColumns[ID_Name] = &Column2
+
+	//
+	MapTables[TableNameSQL] = &Table1
 
 	return Otvet, err
 }

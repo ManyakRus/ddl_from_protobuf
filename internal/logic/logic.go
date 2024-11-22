@@ -3,7 +3,6 @@ package logic
 import (
 	"github.com/ManyakRus/ddl_from_protobuf/internal/config"
 	"github.com/ManyakRus/ddl_from_protobuf/internal/ddl"
-	"github.com/ManyakRus/ddl_from_protobuf/internal/types"
 	"github.com/ManyakRus/ddl_from_protobuf/pkg/protobuf"
 	"github.com/ManyakRus/starter/log"
 	"github.com/ManyakRus/starter/micro"
@@ -20,22 +19,29 @@ func StartAll(Settings *config.SettingsINI) {
 	}
 
 	//
-	FillTypeSQL(Settings, &Proto)
+	//FillTypeSQL(Settings, &Proto)
 
 	//
-	ddl.StartAll(Settings, Proto)
-}
+	MapTables := ddl.StartAll(Settings, Proto)
+	if MapTables == nil {
 
-// FillTypeSQL - заполняет типы SQL в структуре Proto.MapMessages.Fields
-func FillTypeSQL(Settings *config.SettingsINI, Proto *types.ProtoAll) {
-
-	for _, message1 := range Proto.MapMessages {
-		for _, field1 := range message1.Fields {
-			Mapping1, ok := Settings.MapSQLTypes[field1.Type]
-			if ok == false {
-				continue
-			}
-			field1.TypeSQL = Mapping1.SQLType
-		}
+	}
+	MassTables := micro.MassFrom_Map(MapTables)
+	for _, table1 := range MassTables {
+		log.Infoln(table1)
 	}
 }
+
+//// FillTypeSQL - заполняет типы SQL в структуре Proto.MapMessages.Fields
+//func FillTypeSQL(Settings *config.SettingsINI, Proto *types.ProtoAll) {
+//
+//	for _, message1 := range Proto.MapMessages {
+//		for _, field1 := range message1.Fields {
+//			Mapping1, ok := Settings.MapSQLTypes[field1.Type]
+//			if ok == false {
+//				continue
+//			}
+//			field1.TypeSQL = Mapping1.SQLType
+//		}
+//	}
+//}

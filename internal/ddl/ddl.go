@@ -3,6 +3,7 @@ package ddl
 import (
 	"fmt"
 	"github.com/ManyakRus/ddl_from_protobuf/internal/config"
+	"github.com/ManyakRus/ddl_from_protobuf/internal/create_files"
 	"github.com/ManyakRus/ddl_from_protobuf/internal/types"
 	"github.com/ManyakRus/starter/log"
 	"github.com/ManyakRus/starter/micro"
@@ -12,7 +13,7 @@ import (
 )
 
 // StartAll - создание всех файлов ddl .sql
-func StartAll(Settings *config.SettingsINI, Proto types.ProtoAll) {
+func StartAll(Settings *config.SettingsINI, Proto types.ProtoAll) map[string]*types.Table {
 	var err error
 
 	//FillMapMessages(Settings, MassProto)
@@ -24,7 +25,7 @@ func StartAll(Settings *config.SettingsINI, Proto types.ProtoAll) {
 	//создадим 1 общий текст SQL
 	TextSQL := ""
 	//for _, proto1 := range MassProto {
-	TextSQL1, err := Start1(Settings)
+	TextSQL1, MapTables, err := Start1(Settings)
 	if err != nil {
 		err = fmt.Errorf("Start1() error: %w", err)
 		log.Panic(err)
@@ -40,21 +41,23 @@ func StartAll(Settings *config.SettingsINI, Proto types.ProtoAll) {
 		log.Panic(err)
 	}
 
+	return MapTables
 }
 
 // Start1 - создание 1 файл ddl .sql, для одного .proto
 // возвращает текст SQL для одного .proto
-func Start1(Settings *config.SettingsINI) (string, error) {
+func Start1(Settings *config.SettingsINI) (string, map[string]*types.Table, error) {
 	Otvet := ""
+	MapTables := make(map[string]*types.Table)
 	var err error
 
 	//enums отсортированно
 	MassEnums := micro.MassFrom_Map(Settings.MapEnums)
 	for _, enum1 := range MassEnums {
-		Otvet1, err := CreateFiles_Enum(Settings, enum1)
+		Otvet1, err := CreateFiles_Enum(Settings, MapTables, enum1)
 		if err != nil {
 			err = fmt.Errorf("CreateFiles_Enum(%s) error: %w", enum1.Name, err)
-			return Otvet, err
+			return Otvet, MapTables, err
 		}
 		Otvet = Otvet + Otvet1 + "\n"
 	}
@@ -64,10 +67,10 @@ func Start1(Settings *config.SettingsINI) (string, error) {
 	MapSQL := make(map[string]string, len(Settings.MapMessages))
 	MassMessages := micro.MassFrom_Map(Settings.MapMessages)
 	for i, message1 := range MassMessages {
-		Otvet1, ForeignCount, err := CreateFile_Message(Settings, message1)
+		Otvet1, ForeignCount, err := CreateFile_Message(Settings, MapTables, message1)
 		if err != nil {
 			err = fmt.Errorf("CreateFile_Message(%s) error: %w", message1.Name, err)
-			return Otvet, err
+			return Otvet, MapTables, err
 		}
 		//Otvet = Otvet + Otvet1
 		sCount := fmt.Sprintf("%09d_%09d", ForeignCount, i)
@@ -82,11 +85,11 @@ func Start1(Settings *config.SettingsINI) (string, error) {
 		Otvet = Otvet + SQL1
 	}
 
-	return Otvet, err
+	return Otvet, MapTables, err
 }
 
 // IsNullableField - возвращает true, если поле nullable
-func IsNullableField(Field *types.FieldElement) bool {
+func IsNullableField(Settings *config.SettingsINI, Field *types.FieldElement) bool {
 	Otvet := false
 
 	TypeName := Field.Type
@@ -98,7 +101,7 @@ func IsNullableField(Field *types.FieldElement) bool {
 	}
 
 	//
-	if IsIdentifierField(Field) == true {
+	if IsIdentifierField(Settings, Field) == true {
 		Otvet = true
 		return Otvet
 	}
@@ -117,7 +120,7 @@ func IsTimestampType(stype string) bool {
 }
 
 // IsIdentifierField - возвращает true, если поле ИД
-func IsIdentifierField(Field *types.FieldElement) bool {
+func IsIdentifierField(Settings *config.SettingsINI, Field *types.FieldElement) bool {
 	Otvet := false
 
 	//
@@ -126,7 +129,7 @@ func IsIdentifierField(Field *types.FieldElement) bool {
 	}
 
 	//ИД
-	if Field.TypeSQL == "" {
+	if create_files.IsProtobufType(Settings, Field.Type) == false {
 		Otvet = true
 		return Otvet
 	}
@@ -147,10 +150,10 @@ func TextNullable(IsNullable bool) string {
 }
 
 // FindFieldName - возвращает имя поля
-func FindFieldName(field1 *types.FieldElement) string {
+func FindFieldName(Settings *config.SettingsINI, field1 *types.FieldElement) string {
 	Otvet := field1.Name
 
-	IsIdentifierField := IsIdentifierField(field1)
+	IsIdentifierField := IsIdentifierField(Settings, field1)
 	if IsIdentifierField == true {
 		Otvet = AddText_id(Otvet)
 	}
@@ -173,7 +176,7 @@ func AddText_id(Text string) string {
 func FindForeignTableNameAndColumnName(Settings *config.SettingsINI, Field *types.FieldElement) (ForeignTableName string, ForeignTableIDColumnName string) {
 
 	//ИД
-	if Field.TypeSQL != "" {
+	if IsIdentifierField(Settings, Field) == false {
 		return
 	}
 
