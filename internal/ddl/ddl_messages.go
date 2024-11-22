@@ -54,6 +54,9 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 		TextNullable := TextNullable(isNullabe)
 		FieldName := FindFieldName(Settings, field1)
 		FieldNameSQL := FormatNameSQL(FieldName)
+		ForeignName := ""
+		ForeignType := ""
+		//
 
 		//для тип=enum или message with table
 		IsEnum := false
@@ -72,11 +75,17 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 					if ok == true {
 						//это message
 						FieldID = Find_ID_from_Fields(Settings, ForeignMessage1.Fields)
+
+						//тип
 						MapMappingsID1, ok := Settings.MapSQLTypes[FieldID.Type]
 						if ok == false {
 							log.Panic("message: ", FieldName, ", field: ", FieldName, ", not found message: "+ForeignTableName)
 						}
 						SQLType = MapMappingsID1.SQLType
+
+						//запомним MapTables
+						ForeignName = ForeignTableName
+						ForeignType = ForeignTableName
 					}
 
 				}
@@ -88,6 +97,10 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 					log.Panic("message: ", FieldName, ", field: ", FieldName, ", not found message: "+ForeignTableName)
 				}
 				SQLType = "bigint"
+
+				//запомним MapTables
+				ForeignName = ForeignTableName
+				ForeignType = ForeignTableName
 			}
 		}
 
@@ -143,8 +156,8 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 		Column1.TypeSQL = SQLType
 		Column1.NameProtobuf = FieldName
 		Column1.TypeProtobuf = FieldType
-		//Column1.NameGo = create_files.NameGo_from_NameSQL(field1.Name)
-		//Column1.TypeGo = create_files.Convert_ProtobufTypeNameToGolangTypeName(Settings, FieldType)
+		Column1.NameForeignProtobuf = ForeignName
+		Column1.TypeForeignProtobuf = ForeignType
 		Table1.MapColumns[Column1.NameSQL] = &Column1
 
 		//одна колонка

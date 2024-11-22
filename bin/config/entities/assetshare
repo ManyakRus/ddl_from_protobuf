@@ -1,0 +1,25 @@
+package assetshare
+
+import (
+	"google.golang.org/protobuf/types/known/timestamppb"
+	"github.com/ManyakRus/tinkoff_invest/api/invest_api/investapi"
+)
+
+// ConvertToProtobuf - создаёт модель protobuf из модели crud
+func (m *AssetShare) ConvertToProtobuf() investapi.AssetShare {
+	Otvet := investapi.AssetShare{}
+
+	Otvet.div_yield_flag = m.
+	nano := &investapi.nano{}
+	Otvet.nano = nano	units := &investapi.units{}
+	Otvet.units = units	Otvet.ipo_date = timestamppb.New(m.)
+	Otvet.issue_kind = m.
+	Otvet.nano = nano	Otvet.nano = nano	Otvet.units = units	Otvet.units = units	Otvet.nominal_currency = m.
+	Otvet.nano = nano	Otvet.units = units	Otvet.placement_date = timestamppb.New(m.)
+	Otvet.preferred_share_type = m.
+	Otvet.primary_index = m.
+	Otvet.registry_date = timestamppb.New(m.)
+	Otvet.repres_isin = m.
+	Otvet.nano = nano	Otvet.units = units	ShareType := &investapi.ShareType{}
+	Otvet.ShareType = ShareType	return Otvet
+}

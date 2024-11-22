@@ -1,0 +1,35 @@
+package assetetf
+
+import (
+	"google.golang.org/protobuf/types/known/timestamppb"
+	"github.com/ManyakRus/tinkoff_invest/api/invest_api/investapi"
+)
+
+// ConvertToProtobuf - создаёт модель protobuf из модели crud
+func (m *AssetEtf) ConvertToProtobuf() investapi.AssetEtf {
+	Otvet := investapi.AssetEtf{}
+
+	nano := &investapi.nano{}
+	Otvet.nano = nano	units := &investapi.units{}
+	Otvet.units = units	Otvet.description = m.
+	Otvet.div_yield_flag = m.
+	Otvet.nano = nano	Otvet.units = units	Otvet.nano = nano	Otvet.units = units	Otvet.focus_type = m.
+	Otvet.nano = nano	Otvet.units = units	Otvet.inav_code = m.
+	Otvet.nano = nano	Otvet.units = units	Otvet.issue_kind = m.
+	Otvet.leveraged_flag = m.
+	Otvet.management_type = m.
+	Otvet.nominal_currency = m.
+	Otvet.nano = nano	Otvet.units = units	Otvet.nano = nano	Otvet.units = units	Otvet.payment_type = m.
+	Otvet.nano = nano	Otvet.units = units	Otvet.primary_index = m.
+	Otvet.primary_index_company = m.
+	Otvet.primary_index_description = m.
+	Otvet.nano = nano	Otvet.units = units	Otvet.rebalancing_dates = timestamppb.New(m.)
+	Otvet.rebalancing_flag = m.
+	Otvet.rebalancing_freq = m.
+	Otvet.rebalancing_plan = m.
+	Otvet.released_date = timestamppb.New(m.)
+	Otvet.nano = nano	Otvet.units = units	Otvet.tax_rate = m.
+	Otvet.nano = nano	Otvet.units = units	Otvet.ucits_flag = m.
+	Otvet.watermark_flag = m.
+	return Otvet
+}

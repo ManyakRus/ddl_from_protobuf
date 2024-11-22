@@ -26,7 +26,9 @@ func StartAll(Settings *config.SettingsINI) {
 	MapTables := ddl.StartAll(Settings, Proto)
 
 	//создаём файлы .go
-	convert_files.CreateFiles_All(Settings, MapTables)
+	if config.Settings.NEED_CREATE_CONVERT_FILES == true {
+		convert_files.CreateFiles_All(Settings, MapTables)
+	}
 }
 
 //// FillTypeSQL - заполняет типы SQL в структуре Proto.MapMessages.Fields

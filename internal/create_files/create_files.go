@@ -3,7 +3,10 @@ package create_files
 import (
 	"github.com/ManyakRus/ddl_from_protobuf/internal/config"
 	"github.com/ManyakRus/ddl_from_protobuf/internal/types"
+	"github.com/ManyakRus/starter/log"
+	"github.com/ManyakRus/starter/micro"
 	"github.com/gobeam/stringy"
+	"strings"
 	"unicode"
 )
 
@@ -157,6 +160,207 @@ func Convert_TypeSQL_to_TypeGo(Settings *config.SettingsINI, TypeSQL string) str
 			Otvet = v.GoType
 		}
 	}
+
+	return Otvet
+}
+
+// AddImport - добавляет RepositoryURL в секцию Import, если его там нет
+func AddImport(Text, RepositoryURL string) string {
+	Otvet := Text
+
+	//если уже есть импорт
+	pos1 := strings.Index(Otvet, `"`+RepositoryURL+`"`+"\n")
+	if pos1 >= 0 {
+		return Otvet
+	}
+
+	//
+	TextFind := "import ("
+	LenFind := len(TextFind)
+	pos1 = strings.Index(Otvet, TextFind)
+	if pos1 < 0 {
+		log.Error("not found word: import (")
+		return Otvet
+	}
+
+	Otvet = Otvet[:pos1+LenFind] + "\n\t" + `"` + RepositoryURL + `"` + Otvet[pos1+LenFind:]
+
+	return Otvet
+}
+
+// CheckAndAdd_Import - добавляет URL в секцию Import, если его там нет, если он нужен
+func CheckAndAdd_Import(Text, URL string) string {
+	Otvet := Text
+
+	//проверим используется или нет
+	ModuleName := micro.LastWord(URL)
+	pos1 := strings.Index(Otvet, ModuleName+".")
+	if pos1 < 0 {
+		return Otvet
+	}
+
+	Otvet = AddImport(Text, URL)
+
+	return Otvet
+}
+
+// AddImport_Time - добавляет пакет в секцию Import, если его там нет
+func AddImport_Time(Text string) string {
+	Otvet := Text
+
+	RepositoryURL := `time`
+	Otvet = AddImport(Text, RepositoryURL)
+
+	return Otvet
+}
+
+// CheckAndAdd_ImportStrconv - добавляет пакет в секцию Import, если его там нет
+func CheckAndAdd_ImportStrconv(Text string) string {
+	Otvet := Text
+
+	RepositoryURL := `strconv`
+	Otvet = CheckAndAdd_Import(Text, RepositoryURL)
+
+	return Otvet
+}
+
+// CheckAndAdd_ImportFmt - добавляет пакет fmt в секцию Import, если его там нет
+func CheckAndAdd_ImportFmt(Text string) string {
+	Otvet := Text
+
+	RepositoryURL := `fmt`
+	Otvet = CheckAndAdd_Import(Text, RepositoryURL)
+
+	return Otvet
+}
+
+// AddImport_UUID - добавляет пакет в секцию Import, если его там нет
+func AddImport_UUID(Text string) string {
+	Otvet := Text
+
+	//если уже есть импорт
+	RepositoryURL := `github.com/google/uuid`
+	Otvet = AddImport(Text, RepositoryURL)
+	//pos1 := strings.Index(Otvet, RepositoryURL)
+	//if pos1 >= 0 {
+	//	return Otvet
+	//}
+	//
+	////
+	//TextImport := "import ("
+	//pos1 = strings.Index(Otvet, TextImport)
+	//if pos1 < 0 {
+	//	log.Error("not found word: ", TextImport)
+	//	return TextModel
+	//}
+	//
+	//Otvet = Otvet[:pos1+len(TextImport)] + "\n\t" + RepositoryURL + Otvet[pos1+len(TextImport):]
+
+	return Otvet
+}
+
+// AddImport_Gorm - добавляет пакет в секцию Import, если его там нет
+func AddImport_Gorm(Text string) string {
+	Otvet := Text
+
+	//если уже есть импорт
+	RepositoryURL := `gorm.io/gorm`
+	Otvet = AddImport(Text, RepositoryURL)
+	//pos1 := strings.Index(Otvet, RepositoryURL)
+	//if pos1 >= 0 {
+	//	return Otvet
+	//}
+	//
+	////
+	//TextImport := "import ("
+	//pos1 = strings.Index(Otvet, TextImport)
+	//if pos1 < 0 {
+	//	log.Error("not found word: ", TextImport)
+	//	return TextModel
+	//}
+	//
+	//Otvet = Otvet[:pos1+len(TextImport)] + "\n\t" + RepositoryURL + Otvet[pos1+len(TextImport):]
+
+	return Otvet
+}
+
+// AddImport_Timestamp - добавляет покет в секцию Import, если его там нет
+func AddImport_Timestamp(Text string) string {
+	Otvet := Text
+
+	RepositoryURL := `google.golang.org/protobuf/types/known/timestamppb`
+	Otvet = AddImport(Text, RepositoryURL)
+
+	////если уже есть импорт
+	//pos1 := strings.Index(Otvet, `"google.golang.org/protobuf/types/known/timestamppb"`)
+	//if pos1 >= 0 {
+	//	return Otvet
+	//}
+	//
+	////
+	//pos1 = strings.Index(Otvet, "import (")
+	//if pos1 < 0 {
+	//	log.Error("not found word: import (")
+	//	return TextModel
+	//}
+	//
+	//Otvet = Otvet[:pos1+8] + "\n\t" + `"google.golang.org/protobuf/types/known/timestamppb"` + Otvet[pos1+8:]
+
+	return Otvet
+}
+
+// CheckAndAdd_ImportTime_FromText - добавляет пакет "time" в секцию Import, если его там нет
+func CheckAndAdd_ImportTime_FromText(Text string) string {
+	Otvet := Text
+
+	pos1 := strings.Index(Text, " time.")
+	if pos1 < 0 {
+		return Otvet
+	}
+
+	Otvet = AddImport_Time(Otvet)
+
+	return Otvet
+}
+
+// CheckAndAdd_ImportUUID_FromText - добавляет пакет "uuid" в секцию Import, если его там нет
+func CheckAndAdd_ImportUUID_FromText(Text string) string {
+	Otvet := Text
+
+	pos1 := strings.Index(Text, "uuid.")
+	if pos1 < 0 {
+		return Otvet
+	}
+
+	Otvet = AddImport_UUID(Otvet)
+
+	return Otvet
+}
+
+// CheckAndAdd_ImportGorm_FromText - добавляет пакет "gorm.io/gorm" в секцию Import, если его там нет
+func CheckAndAdd_ImportGorm_FromText(Text string) string {
+	Otvet := Text
+
+	pos1 := strings.Index(Text, `"gorm.io/gorm"`)
+	if pos1 < 0 {
+		return Otvet
+	}
+
+	Otvet = AddImport_Gorm(Otvet)
+
+	return Otvet
+}
+
+// CheckAndAdd_ImportTimestamp_FromText - добавляет пакет "time" в секцию Import, если его там нет
+func CheckAndAdd_ImportTimestamp_FromText(Text string) string {
+	Otvet := Text
+
+	pos1 := strings.Index(Text, " timestamppb.")
+	if pos1 < 0 {
+		return Otvet
+	}
+
+	Otvet = AddImport_Timestamp(Otvet)
 
 	return Otvet
 }

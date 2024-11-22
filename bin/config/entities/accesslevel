@@ -1,0 +1,11 @@
+package accesslevel
+
+import (
+	"github.com/ManyakRus/tinkoff_invest/api/invest_api/investapi"
+)
+
+// ConvertToProtobuf - создаёт модель protobuf из модели crud
+func (m *AccessLevel) ConvertToProtobuf() investapi.AccessLevel {
+	Otvet := investapi.AccessLevel{}
+
+	Otvet. = (m.Name)

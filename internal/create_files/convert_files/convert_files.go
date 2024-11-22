@@ -26,6 +26,10 @@ func CreateFiles_All(Settings *config.SettingsINI, MapTables map[string]*types.T
 func CreateFiles_Message1(Settings *config.SettingsINI, Table1 *types.Table) error {
 	var err error
 
+	if Table1.IsEnum == true {
+		return err
+	}
+
 	dir := micro.ProgramDir_bin()
 	DirReady := dir + Settings.CONFIG_DIRECTORY_NAME + micro.SeparatorFile() + Settings.CONVERT_FOLDER_NAME
 	TableName := Table1.NameGo
@@ -51,7 +55,6 @@ import (
 // ConvertToProtobuf - создаёт модель protobuf из модели crud
 func (m *` + TableName + `) ConvertToProtobuf() ` + ProtoNameMessageName + ` {
 	Otvet := ` + ProtoNameMessageName + `{}
-
 `
 
 	//каждое поле
@@ -60,6 +63,11 @@ func (m *` + TableName + `) ConvertToProtobuf() ` + ProtoNameMessageName + ` {
 		Text1 := TextConvertToProtobufField1(Settings, Table1, Column1)
 		Text = Text + Text1
 	}
+
+	//
+	Text = Text + "\n\treturn Otvet\n}\n"
+
+	Text = create_files.CheckAndAdd_ImportTimestamp_FromText(Text)
 
 	//запись файла
 	err = os.WriteFile(FilenameReady, []byte(Text), config.Settings.FILE_PERMISSIONS)
@@ -75,6 +83,7 @@ func TextConvertToProtobufField1(Settings *config.SettingsINI, Table1 *types.Tab
 	NameGo := create_files.NameGo_from_NameSQL(Column1.NameSQL)
 	TypeGo := create_files.Convert_TypeSQL_to_TypeGo(Settings, Column1.TypeSQL)
 	NameProtobuf := Column1.NameProtobuf
+	NameForeignProtobuf := Column1.NameForeignProtobuf
 
 	//простой случай и случай с преобразованием типа
 	if IsProtobufType == true && Column1.NameForeignProtobuf == "" {
@@ -91,12 +100,17 @@ func TextConvertToProtobufField1(Settings *config.SettingsINI, Table1 *types.Tab
 	}
 
 	//случай с объектами, структурами
+
+	//создаём объект
 	IsFirst := FindIsFirstForeignName(Settings, Table1, Column1)
 	if IsFirst == true {
 		TextProto := config.Settings.REPOSITORY_PROTO_URL
 		TextProto = micro.LastWord(TextProto)
-		Otvet = Otvet + "\t" + Column1.NameForeignProtobuf + " := &" + TextProto + "." + Column1.TypeForeignProtobuf + "{}\n"
+		Otvet = Otvet + "\n\t" + NameForeignProtobuf + " := &" + TextProto + "." + NameForeignProtobuf + "{}\n"
 	}
+
+	//присваиваем объект
+	Otvet = Otvet + "\tOtvet." + NameForeignProtobuf + " = " + NameForeignProtobuf + "\n"
 
 	return Otvet
 }

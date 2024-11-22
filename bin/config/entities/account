@@ -1,0 +1,23 @@
+package account
+
+import (
+	"google.golang.org/protobuf/types/known/timestamppb"
+	"github.com/ManyakRus/tinkoff_invest/api/invest_api/investapi"
+)
+
+// ConvertToProtobuf - создаёт модель protobuf из модели crud
+func (m *Account) ConvertToProtobuf() investapi.Account {
+	Otvet := investapi.Account{}
+
+	AccessLevel := &investapi.AccessLevel{}
+	Otvet.AccessLevel = AccessLevel
+	Otvet.closed_date = timestamppb.New(m.)
+	Otvet.id = m.
+	Otvet.name = m.
+	Otvet.opened_date = timestamppb.New(m.)
+	AccountStatus := &investapi.AccountStatus{}
+	Otvet.AccountStatus = AccountStatus
+	AccountType := &investapi.AccountType{}
+	Otvet.AccountType = AccountType
+	return Otvet
+}

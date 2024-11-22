@@ -1,0 +1,29 @@
+package assetfull
+
+import (
+	"google.golang.org/protobuf/types/known/timestamppb"
+	"github.com/ManyakRus/tinkoff_invest/api/invest_api/investapi"
+)
+
+// ConvertToProtobuf - создаёт модель protobuf из модели crud
+func (m *AssetFull) ConvertToProtobuf() investapi.AssetFull {
+	Otvet := investapi.AssetFull{}
+
+	Otvet.br_code = m.
+	Otvet.br_code_name = m.
+	Brand := &investapi.Brand{}
+	Otvet.Brand = Brand	Otvet.cfi = m.
+	Otvet.code_nsd = m.
+	Otvet.deleted_at = timestamppb.New(m.)
+	Otvet.description = m.
+	Otvet.gos_reg_code = m.
+	AssetInstrument := &investapi.AssetInstrument{}
+	Otvet.AssetInstrument = AssetInstrument	Otvet.name = m.
+	Otvet.name_brief = m.
+	Otvet.required_tests = m.
+	Otvet.status = m.
+	AssetType := &investapi.AssetType{}
+	Otvet.AssetType = AssetType	Otvet.uid = m.
+	Otvet.updated_at = timestamppb.New(m.)
+	return Otvet
+}
