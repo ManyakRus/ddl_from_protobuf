@@ -25,7 +25,8 @@ type Column struct {
 	TypeForeignProtobuf string
 	//NameGo              string
 	//TypeGo              string
-	IsObject bool
+	IsObject     bool
+	IsPrimaryKey bool
 }
 
 // NewTable - создает новую структуру Table

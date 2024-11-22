@@ -364,3 +364,27 @@ func CheckAndAdd_ImportTimestamp_FromText(Text string) string {
 
 	return Otvet
 }
+
+// FindColumn_from_NameProtobuf - находит Column по имени Protobuf
+func FindColumn_from_NameProtobuf(MapColumns map[string]*types.Column, NameProtobuf string) *types.Column {
+	var Otvet *types.Column
+
+	for _, Column1 := range MapColumns {
+		if Column1.NameProtobuf == NameProtobuf {
+			Otvet = Column1
+			return Otvet
+		}
+	}
+
+	return Otvet
+}
+
+// Find_ColumnPK - находит Column Primary KEY
+func Find_ColumnPK(Table1 *types.Table) *types.Column {
+	for _, Column1 := range Table1.MapColumns {
+		if Column1.IsPrimaryKey == true {
+			return Column1
+		}
+	}
+	return nil
+}

@@ -15,7 +15,7 @@ func CreateFiles_All(Settings *config.SettingsINI, MapTables map[string]*types.T
 
 	MassTables := micro.MassFrom_Map(MapTables)
 	for _, Table1 := range MassTables {
-		err := CreateFiles_Message1(Settings, Table1)
+		err := CreateFiles_Message1(Settings, MapTables, Table1)
 		if err != nil {
 			log.Errorln(err)
 			return
@@ -23,7 +23,7 @@ func CreateFiles_All(Settings *config.SettingsINI, MapTables map[string]*types.T
 	}
 }
 
-func CreateFiles_Message1(Settings *config.SettingsINI, Table1 *types.Table) error {
+func CreateFiles_Message1(Settings *config.SettingsINI, MapTables map[string]*types.Table, Table1 *types.Table) error {
 	var err error
 
 	if Table1.IsEnum == true {
@@ -60,7 +60,7 @@ func (m *` + TableName + `) ConvertToProtobuf() ` + ProtoNameMessageName + ` {
 	//каждое поле
 	MassColumns := micro.MassFrom_Map(Table1.MapColumns)
 	for _, Column1 := range MassColumns {
-		Text1 := TextConvertToProtobufField1(Settings, Table1, Column1)
+		Text1 := TextConvertToProtobufField1(Settings, MapTables, Table1, Column1)
 		Text = Text + Text1
 	}
 
@@ -76,7 +76,7 @@ func (m *` + TableName + `) ConvertToProtobuf() ` + ProtoNameMessageName + ` {
 }
 
 // TextConvertToProtobufField1 - возвращает текст для 1 поля
-func TextConvertToProtobufField1(Settings *config.SettingsINI, Table1 *types.Table, Column1 *types.Column) string {
+func TextConvertToProtobufField1(Settings *config.SettingsINI, MapTables map[string]*types.Table, Table1 *types.Table, Column1 *types.Column) string {
 	Otvet := ""
 
 	IsProtobufType := create_files.IsProtobufType(Settings, Column1.TypeProtobuf)
@@ -108,6 +108,18 @@ func TextConvertToProtobufField1(Settings *config.SettingsINI, Table1 *types.Tab
 		TextProto = micro.LastWord(TextProto)
 		Otvet = Otvet + "\n\t" + NameForeignProtobuf + " := &" + TextProto + "." + NameForeignProtobuf + "{}\n"
 	}
+
+	//заполним ИД
+	TableF, ok := MapTables[Column1.NameForeignProtobuf]
+	if ok == false {
+		log.Panic("message: ", Table1.NameProtobuf, ", field: ", Column1.NameProtobuf, ", not found table: ", Column1.NameSQL)
+	}
+	ColumnPKF := create_files.Find_ColumnPK(TableF)
+	if ColumnPKF == nil {
+		log.Panic("message: ", Table1.NameProtobuf, ", field: ", Column1.NameProtobuf, ", not found PK")
+	}
+	NameGoF := create_files.NameGo_from_NameSQL(ColumnPKF.NameSQL)
+	Otvet = Otvet + "\tOtvet." + ColumnPKF.NameProtobuf + " = " + "m." + NameGoF + "\n"
 
 	//присваиваем объект
 	Otvet = Otvet + "\tOtvet." + NameForeignProtobuf + " = " + NameForeignProtobuf + "\n"

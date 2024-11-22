@@ -189,6 +189,10 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 		TextPrimaryKey := "\t" + `CONSTRAINT "` + ConstraintName + `" PRIMARY KEY ("` + IdentifierName + `"),` + "\n"
 		Otvet = Otvet + TextPrimaryKey
 		//isFoundID = true
+
+		//
+		ColumnPK := create_files.FindColumn_from_NameProtobuf(Table1.MapColumns, IdentifierName)
+		ColumnPK.IsPrimaryKey = true
 	} else {
 		//таблицы без идентификаторов не создаем
 		return "", ForeignCount, err
@@ -196,64 +200,20 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 
 	//добавим CONSTRAINT
 	Otvet = Otvet + TextConstraint
-	//for _, field1 := range message1.Fields {
-	//	FieldName := FindFieldName(field1)
-	//	IsIdentifier := IsIdentifierField(field1)
-	//	if IsIdentifier == false {
-	//		continue
-	//	}
-	//
-	//	ForeignTableName, ForeignTableColumnName := FindForeignTableNameAndColumnName(Settings, field1)
-	//	if ForeignTableName == "" || ForeignTableColumnName == "" {
-	//		continue
-	//	}
-	//	MessageF, ok := Settings.MapMessages[ForeignTableName]
-	//	if ok == false {
-	//		continue
-	//	}
-	//
-	//	IdentifierName = Find_ID_Name_from_Fields(Settings, MessageF.Fields)
-	//	if IdentifierName != "" {
-	//		ConstraintName := TableName + "_" + FieldName + "_fk"
-	//		Otvet = Otvet + "\t" + `CONSTRAINT "` + ConstraintName + `" FOREIGN KEY ("` + FieldName + `") REFERENCES "` + Settings.DB_SCHEMA_NAME + `"."` + ForeignTableName + `" ("` + ForeignTableColumnName + `")` + ",\n"
-	//		ForeignCount = ForeignCount + 1
-	//	}
-	//}
 
 	//удалим лишние запятые
 	Otvet = strings.TrimRight(Otvet, ",\n")
 	Otvet = Otvet + "\n"
 	Otvet = Otvet + ");\n"
 
-	//if isFoundID == false {
-	//	err = fmt.Errorf("CreateFile_Message() message: %s warning: not found ID field", TableName)
-	//	//log.Warn(err)
-	//	return "", nil
-	//}
-
 	//CREATE INDEX
 	Otvet = Otvet + TextIndex
-	//for _, field1 := range message1.Fields {
-	//	FieldName := FindFieldName(field1)
-	//	IsIdentifier := IsIdentifierField(field1)
-	//	if IsIdentifier == false {
-	//		continue
-	//	}
-	//
-	//	IndexName := TableName + "_" + FieldName + "_idx"
-	//	Otvet = Otvet + `CREATE INDEX IF NOT EXISTS "` + IndexName + `" ON "` + Settings.DB_SCHEMA_NAME + `"."` + TableName + `" USING btree ("` + FieldName + `");` + "\n"
-	//}
 
 	//COMMENT ON TABLE
 	Otvet = Otvet + `COMMENT ON TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL + `" IS '` + TableComments + `';` + "\n"
 
 	//COMMENT ON COLUMN
 	Otvet = Otvet + TextColumnComment
-	//for _, field1 := range message1.Fields {
-	//	FieldName := FindFieldName(field1)
-	//	Comments := field1.Documentation
-	//	Otvet = Otvet + `COMMENT ON COLUMN "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL + `"."` + FieldNameSQL + `" IS '` + Comments + `';` + "\n"
-	//}
 
 	//сохраним
 	MapTables[TableNameSQL] = &Table1
@@ -316,5 +276,18 @@ func FillTextIndex1(Settings *config.SettingsINI, message1 *types.MessageElement
 	IndexName := TableNameSQL + "_" + FieldNameSQL + "_idx"
 	Otvet = Otvet + `CREATE INDEX IF NOT EXISTS "` + IndexName + `" ON "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL + `" USING btree ("` + FieldNameSQL + `");` + "\n"
 
+	return Otvet
+}
+
+// Find_Field_ByName - находит FieldElement по имени
+func Find_Field_ByName(MassFields []*types.FieldElement, IdentifierName string) *types.FieldElement {
+	var Otvet *types.FieldElement
+
+	for _, field1 := range MassFields {
+		if field1.Name == IdentifierName {
+			Otvet = field1
+			return Otvet
+		}
+	}
 	return Otvet
 }
