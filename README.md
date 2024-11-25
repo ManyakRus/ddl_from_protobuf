@@ -26,6 +26,13 @@ All columns that are in message are created, including:
 For columns of links to other tables, the suffix "_id" is added
 Table and column names for SQL are formatted in the snake_case standard, in lowercase letters (since uppercase letters must be written in quotes)
 
+2) You can also generate the .go source code for converting from the Protobuf type to the Entities type for working with the database.
+To do this, fill in the (.env) settings.txt file:
+NEED_CREATE_CONVERT_FILES=true
+REPOSITORY_PROTO_URL=
+
+
+
 Installation procedure:
 1. Compile this repository
 >make build

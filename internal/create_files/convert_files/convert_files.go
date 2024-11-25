@@ -30,7 +30,7 @@ func CreateFiles_Message1(Settings *config.SettingsINI, MapTables map[string]*ty
 		return err
 	}
 
-	dir := micro.ProgramDir_bin()
+	dir := micro.ProgramDir()
 	DirReady := dir + Settings.CONVERT_FOLDER_NAME
 	TableName := Table1.NameGo
 	TableNameSQL := Table1.NameSQL
