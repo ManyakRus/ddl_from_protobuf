@@ -6,6 +6,7 @@ import (
 	"github.com/ManyakRus/starter/log"
 	"github.com/ManyakRus/starter/micro"
 	"github.com/gobeam/stringy"
+	"strconv"
 	"strings"
 	"unicode"
 )
@@ -463,14 +464,28 @@ func Find_ColumnPK(Table1 *types.Table) *types.Column {
 // Convert_ProtoName_to_GRPCName - преобразование имени Protobuf в имя
 // access_level = AccessLevel
 func Convert_ProtoName_to_GRPCName(NameProtobuf string) string {
+	Otvet := ""
 
 	//if ProtoName == "id" {
 	//	return "Id"
 	//}
 
-	Otvet := PascalCase(NameProtobuf)
+	//Otvet := PascalCase(NameProtobuf)
 	//if (strings.HasSuffix(ProtoName, "_id") == true) && (strings.HasSuffix(Otvet, "ID") == true) {
 	//	Otvet = Otvet[:len(Otvet)-2] + "ID"
 	//}
+
+	str := stringy.New(NameProtobuf)
+	MassConvert := make([]string, 0)
+
+	for i := 0; i < 11; i++ {
+		s2 := strconv.Itoa(i)
+		MassConvert = append(MassConvert, "_"+s2)
+		MassConvert = append(MassConvert, "_"+s2)
+	}
+
+	Otvet = str.PascalCase(MassConvert...).Get()
+	Otvet = pascalCaseReformatNumbers(Otvet)
+
 	return Otvet
 }

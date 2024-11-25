@@ -33,12 +33,13 @@ func CreateFiles_Message1(Settings *config.SettingsINI, MapTables map[string]*ty
 	dir := micro.ProgramDir_bin()
 	DirReady := dir + Settings.CONVERT_FOLDER_NAME
 	TableName := Table1.NameGo
-	TableNameSQL := create_files.CamelCase(TableName)
+	TableNameSQL := Table1.NameSQL
 
-	FilenameReady := DirReady + micro.SeparatorFile() + TableNameSQL + config.Settings.SUFFIX_CONVERT + ".go"
+	DirReadyEntity := DirReady + micro.SeparatorFile() + TableNameSQL
+	FilenameReady := DirReadyEntity + micro.SeparatorFile() + TableNameSQL + config.Settings.SUFFIX_CONVERT + ".go"
 
 	//создадим папку готовых файлов
-	folders.CreateFolder(DirReady)
+	folders.CreateFolder(DirReadyEntity)
 
 	//
 	ProtoURL := Settings.REPOSITORY_PROTO_URL
@@ -99,7 +100,7 @@ func TextConvertFromProtobufField1(Settings *config.SettingsINI, MapTables map[s
 	NameGoFromSQL := create_files.NameGo_from_NameSQL(Column1.SQLName)
 	//ProtoName := create_files.Convert_ProtoName_to_GRPCName(Column1.ProtoName)
 	ProtoName := create_files.Convert_ProtoName_to_GRPCName(Column1.ProtoName)
-	ProtoForeignTableName := Column1.ProtoForeignTableName
+	//ProtoForeignTableName := Column1.ProtoForeignTableName
 	ProtoForeignColumnName := create_files.Convert_ProtoName_to_GRPCName(Column1.ProtoForeignColumnName)
 	//ProtoForeignColumnType := Column1.ProtoForeignColumnType
 	TypeGoFromSQL := create_files.Convert_TypeSQL_to_TypeGo(Settings, Column1.SQLType)
@@ -133,7 +134,7 @@ func TextConvertFromProtobufField1(Settings *config.SettingsINI, MapTables map[s
 
 	//случай с объектами, структурами
 	if IsProtobufType == false && Column1.IsObject == true {
-		Otvet = Otvet + "\tm." + NameGoFromSQL + " = i." + ProtoForeignTableName + "." + ProtoForeignColumnName + "\n"
+		Otvet = Otvet + "\tm." + NameGoFromSQL + " = i." + ProtoName + "." + ProtoForeignColumnName + "\n"
 	}
 
 	return Otvet
