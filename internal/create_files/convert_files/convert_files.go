@@ -52,15 +52,30 @@ import (
 	"` + ProtoURL + `"
 )
 
-// ConvertToProtobuf - создаёт модель protobuf из модели crud
-func (m *` + TableName + `) ConvertToProtobuf() ` + ProtoNameMessageName + ` {
-	Otvet := ` + ProtoNameMessageName + `{}
-`
+//// ConvertToProtobuf - создаёт модель protobuf из модели crud
+//func (m *` + TableName + `) ConvertToProtobuf() ` + ProtoNameMessageName + ` {
+//	Otvet := ` + ProtoNameMessageName + `{}
+//`
+	//
+	//	//каждое поле
+	//	MassColumns := micro.MassFrom_Map(Table1.MapColumns)
+	//	for _, Column1 := range MassColumns {
+	//		Text1 := TextConvertToProtobufField1(Settings, MapTables, Table1, Column1)
+	//		Text = Text + Text1
+	//	}
+	//
+	//	//
+	//	Text = Text + "\n\treturn Otvet\n}\n"
+
+	Text = Text + `
+	// ConvertFromProtobuf - создаёт модель protobuf из модели crud
+	func (m *` + TableName + `) ConvertFromProtobuf(i ProtoNameMessageName)  {
+		`
 
 	//каждое поле
 	MassColumns := micro.MassFrom_Map(Table1.MapColumns)
 	for _, Column1 := range MassColumns {
-		Text1 := TextConvertToProtobufField1(Settings, MapTables, Table1, Column1)
+		Text1 := TextConvertFromProtobufField1(Settings, MapTables, Table1, Column1)
 		Text = Text + Text1
 	}
 
@@ -75,65 +90,99 @@ func (m *` + TableName + `) ConvertToProtobuf() ` + ProtoNameMessageName + ` {
 	return err
 }
 
-// TextConvertToProtobufField1 - возвращает текст для 1 поля
-func TextConvertToProtobufField1(Settings *config.SettingsINI, MapTables map[string]*types.Table, Table1 *types.Table, Column1 *types.Column) string {
+// TextConvertFromProtobufField1 - возвращает текст для 1 поля
+func TextConvertFromProtobufField1(Settings *config.SettingsINI, MapTables map[string]*types.Table, Table1 *types.Table, Column1 *types.Column) string {
 	Otvet := ""
 
 	IsProtobufType := create_files.IsProtobufType(Settings, Column1.TypeProtobuf)
-	NameGo := create_files.NameGo_from_NameSQL(Column1.NameSQL)
-	TypeGo := create_files.Convert_TypeSQL_to_TypeGo(Settings, Column1.TypeSQL)
+	NameGoFromSQL := create_files.NameGo_from_NameSQL(Column1.NameSQL)
 	NameProtobuf := Column1.NameProtobuf
-	NameForeignProtobuf := Column1.NameForeignProtobuf
+	NameForeignProtobuf := Column1.ProtoForeignTableName
+	TypeGoFromProto := create_files.Convert_ProtobufTypeNameToGolangTypeName(Settings, Column1.TypeForeignProtobuf)
 
 	//простой случай и случай с преобразованием типа
-	if IsProtobufType == true && Column1.NameForeignProtobuf == "" {
-		TextVariable := create_files.Convert_GolangVariableToProtobufVariableType(Settings, Column1, "m.", TypeGo)
-		Otvet = Otvet + "\tOtvet." + NameProtobuf + " = " + TextVariable + "\n"
+	if IsProtobufType == true {
+		Otvet = Otvet + "\tm." + Column1.NameProtobuf + " = i." + Column1.NameProtobuf + "\n"
 		return Otvet
 	}
 
 	//случай с алиасом
-	if IsProtobufType == false && Column1.NameForeignProtobuf == "" {
-		TextVariable := Column1.TypeForeignProtobuf + "(m." + NameGo + ")"
-		Otvet = Otvet + "\tOtvet." + NameProtobuf + " = " + TextVariable + "\n"
+	if IsProtobufType == false && NameForeignProtobuf == "" {
+		if Column1.TypeForeignProtobuf != TypeGoFromProto {
+			Otvet = Otvet + "\tm." + NameProtobuf + " = " + TypeGoFromProto + "(i." + NameProtobuf + ")\n"
+		} else {
+			Otvet = Otvet + "\tm." + NameProtobuf + " = i." + NameProtobuf + "\n"
+		}
 		return Otvet
 	}
 
 	//случай с объектами, структурами
-
-	//создаём объект
-	IsFirst := FindIsFirstForeignName(Settings, Table1, Column1)
-	if IsFirst == true {
-		TextProto := config.Settings.REPOSITORY_PROTO_URL
-		TextProto = micro.LastWord(TextProto)
-		Otvet = Otvet + "\n\t" + NameForeignProtobuf + " := &" + TextProto + "." + NameForeignProtobuf + "{}\n"
+	if IsProtobufType == false && Column1.ProtoForeignTableName != "" {
+		Otvet = Otvet + "\tm." + NameGoFromSQL + " = i." + NameProtobuf + "." + NameForeignProtobuf + "\n"
 	}
-
-	//заполним ИД
-	TableF, ok := MapTables[Column1.NameForeignProtobuf]
-	if ok == false {
-		log.Panic("message: ", Table1.NameProtobuf, ", field: ", Column1.NameProtobuf, ", not found table: ", Column1.NameSQL)
-	}
-	ColumnPKF := create_files.Find_ColumnPK(TableF)
-	if ColumnPKF == nil {
-		log.Panic("message: ", Table1.NameProtobuf, ", field: ", Column1.NameProtobuf, ", not found PK")
-	}
-	NameGoF := create_files.NameGo_from_NameSQL(ColumnPKF.NameSQL)
-	Otvet = Otvet + "\tOtvet." + ColumnPKF.NameProtobuf + " = " + "m." + NameGoF + "\n"
-
-	//присваиваем объект
-	Otvet = Otvet + "\tOtvet." + NameForeignProtobuf + " = " + NameForeignProtobuf + "\n"
 
 	return Otvet
 }
 
-// FindIsFirstForeignName - возвращает true, если эта колонка первая по порядку с таким же NameForeignProtobuf
+//// TextConvertToProtobufField1 - возвращает текст для 1 поля
+//func TextConvertToProtobufField1(Settings *config.SettingsINI, MapTables map[string]*types.Table, Table1 *types.Table, Column1 *types.Column) string {
+//	Otvet := ""
+//
+//	IsProtobufType := create_files.IsProtobufType(Settings, Column1.TypeProtobuf)
+//	NameGo := create_files.NameGo_from_NameSQL(Column1.NameSQL)
+//	TypeGo := create_files.Convert_TypeSQL_to_TypeGo(Settings, Column1.TypeSQL)
+//	NameProtobuf := Column1.NameProtobuf
+//	ProtoForeignTableName := Column1.ProtoForeignTableName
+//
+//	//простой случай и случай с преобразованием типа
+//	if IsProtobufType == true && Column1.ProtoForeignTableName == "" {
+//		TextVariable := create_files.Convert_GolangVariableToProtobufVariableType(Settings, Column1, "m.", TypeGo)
+//		Otvet = Otvet + "\tOtvet." + NameProtobuf + " = " + TextVariable + "\n"
+//		return Otvet
+//	}
+//
+//	//случай с алиасом
+//	if IsProtobufType == false && Column1.ProtoForeignTableName == "" {
+//		TextVariable := Column1.TypeForeignProtobuf + "(m." + NameGo + ")"
+//		Otvet = Otvet + "\tOtvet." + NameProtobuf + " = " + TextVariable + "\n"
+//		return Otvet
+//	}
+//
+//	//случай с объектами, структурами
+//
+//	//создаём объект
+//	IsFirst := FindIsFirstForeignName(Settings, Table1, Column1)
+//	if IsFirst == true {
+//		TextProto := config.Settings.REPOSITORY_PROTO_URL
+//		TextProto = micro.LastWord(TextProto)
+//		Otvet = Otvet + "\n\t" + ProtoForeignTableName + " := &" + TextProto + "." + ProtoForeignTableName + "{}\n"
+//	}
+//
+//	//заполним ИД
+//	TableF, ok := MapTables[Column1.ProtoForeignTableName]
+//	if ok == false {
+//		log.Panic("message: ", Table1.NameProtobuf, ", field: ", Column1.NameProtobuf, ", not found table: ", Column1.NameSQL)
+//	}
+//	ColumnPKF := create_files.Find_ColumnPK(TableF)
+//	if ColumnPKF == nil {
+//		log.Panic("message: ", Table1.NameProtobuf, ", field: ", Column1.NameProtobuf, ", not found PK")
+//	}
+//	NameGoF := create_files.NameGo_from_NameSQL(ColumnPKF.NameSQL)
+//	Otvet = Otvet + "\tOtvet." + ColumnPKF.NameProtobuf + " = " + "m." + NameGoF + "\n"
+//
+//	//присваиваем объект
+//	Otvet = Otvet + "\tOtvet." + ProtoForeignTableName + " = " + ProtoForeignTableName + "\n"
+//
+//	return Otvet
+//}
+
+// FindIsFirstForeignName - возвращает true, если эта колонка первая по порядку с таким же ProtoForeignTableName
 func FindIsFirstForeignName(Settings *config.SettingsINI, Table1 *types.Table, Column1 *types.Column) bool {
 	Otvet := false
 
 	MassColumns := micro.MassFrom_Map(Table1.MapColumns)
 	for _, ColumnMass1 := range MassColumns {
-		if Column1.NameForeignProtobuf == ColumnMass1.NameForeignProtobuf {
+		if Column1.ProtoForeignTableName == ColumnMass1.ProtoForeignTableName {
 			if Column1 == ColumnMass1 {
 				Otvet = true
 				return Otvet

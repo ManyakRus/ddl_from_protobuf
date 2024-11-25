@@ -13,7 +13,11 @@ import (
 func StartAll(Settings *config.SettingsINI) {
 	//пропарсим все .proto
 	dir := micro.ProgramDir()
-	Proto, err := protobuf.FindProtobufAll(dir + config.Settings.PROTOBUF_DIRECTORY)
+	SettingsProto := protobuf.SettingsProto{}
+	SettingsProto.Dir = dir + config.Settings.PROTOBUF_DIRECTORY
+	SettingsProto.FILTER_MESSAGE_NAME = config.Settings.FILTER_MESSAGE_NAME
+	SettingsProto.FILTER_ENUM_NAME = config.Settings.FILTER_ENUM_NAME
+	Proto, err := protobuf.FindProtobufAll(SettingsProto)
 	if err != nil {
 		log.Errorln(err)
 		return

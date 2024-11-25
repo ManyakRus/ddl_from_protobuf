@@ -54,8 +54,8 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 		TextNullable := TextNullable(isNullabe)
 		FieldName := FindFieldName(Settings, field1)
 		FieldNameSQL := FormatNameSQL(FieldName)
-		ForeignName := ""
-		ForeignType := ""
+		ProtoForeignTableName := ""
+		ProtoForeignColumnName := ""
 		//
 
 		//для тип=enum или message with table
@@ -84,12 +84,9 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 						SQLType = MapMappingsID1.SQLType
 
 						//запомним MapTables
-						ForeignName = ForeignTableName
-						ForeignType = ForeignTableName
+						ForeignTableName = ForeignTableName
+						ProtoForeignColumnName = ForeignTableColumnName
 					}
-
-				}
-
 			} else {
 				//это enum
 				_, ok := Settings.MapEnums[ForeignTableName]
@@ -99,8 +96,8 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 				SQLType = "bigint"
 
 				//запомним MapTables
-				ForeignName = ForeignTableName
-				ForeignType = ForeignTableName
+				ForeignTableName = ForeignTableName
+				ProtoForeignColumnName = ForeignTableColumnName
 			}
 		}
 
@@ -132,10 +129,8 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 				Column1.TypeSQL = SQLTypeForeign
 				Column1.NameProtobuf = field1.Name
 				Column1.TypeProtobuf = FieldType
-				Column1.NameForeignProtobuf = FieldNameF
-				Column1.TypeForeignProtobuf = FieldTypeF
-				//Column1.NameGo = create_files.NameGo_from_NameSQL(FieldNameSQL1)
-				//Column1.TypeGo = create_files.Convert_ProtobufTypeNameToGolangTypeName(Settings, FieldType)
+				Column1.ProtoForeignTableName = FieldNameF
+				Column1.ProtoForeignColumnName = FieldForeign.Name
 				Column1.IsObject = true
 				Table1.MapColumns[Column1.NameSQL] = &Column1
 
@@ -156,8 +151,8 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 		Column1.TypeSQL = SQLType
 		Column1.NameProtobuf = FieldName
 		Column1.TypeProtobuf = FieldType
-		Column1.NameForeignProtobuf = ForeignName
-		Column1.TypeForeignProtobuf = ForeignType
+		Column1.ProtoForeignTableName = ProtoForeignTableName
+		Column1.ProtoForeignColumnName = ProtoForeignColumnName
 		Table1.MapColumns[Column1.NameSQL] = &Column1
 
 		//одна колонка

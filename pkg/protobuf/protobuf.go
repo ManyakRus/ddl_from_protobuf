@@ -8,6 +8,7 @@ import (
 	"github.com/emicklei/proto"
 	"log"
 	"os"
+	"regexp"
 )
 
 // MapMessages - хранит все сообщения из всех .proto
@@ -16,19 +17,30 @@ var mapMessages = make(map[string]*types.MessageElement)
 // MapEnums - хранит все enum из всех .proto
 var mapEnums = make(map[string]*types.EnumElement)
 
+type SettingsProto struct {
+	Dir                 string
+	FILTER_MESSAGE_NAME string
+	FILTER_ENUM_NAME    string
+}
+
+// Settings - структура для хранения всех нужных настроек
+var Settings = SettingsProto{}
+
 // FindProtobufAll - возвращает массив описания .proto файлов в формате []pbparser.ProtoFile
-func FindProtobufAll(dir string) (types.ProtoAll, error) {
+func FindProtobufAll(settings SettingsProto) (types.ProtoAll, error) {
 	Otvet := types.ProtoAll{}
 	var err error
 
+	Settings = settings
+
 	//найдём все файлы .proto
-	Files, err := FindProtobufFiles(dir)
+	Files, err := FindProtobufFiles(settings.Dir)
 	if err != nil {
-		err = fmt.Errorf("FindProtobufFiles(%s) error: %w", dir, err)
+		err = fmt.Errorf("FindProtobufFiles(%s) error: %w", settings.Dir, err)
 		return Otvet, err
 	}
 	if len(Files) == 0 {
-		err = fmt.Errorf("FindProtobufFiles(%s) error: files not found", dir)
+		err = fmt.Errorf("FindProtobufFiles(%s) error: files not found", settings.Dir)
 		return Otvet, err
 	}
 
@@ -93,6 +105,18 @@ func handleMessage(m *proto.Message) {
 	//var err error
 
 	//
+	MessageName := m.Name
+
+	//фильтр
+	Filter := Settings.FILTER_MESSAGE_NAME
+	if Filter != "" {
+		IsFound, _ := regexp.MatchString(Settings.FILTER_MESSAGE_NAME, MessageName)
+		if IsFound == false {
+			return
+		}
+	}
+
+	//
 	documentation := ""
 	if m.Comment != nil {
 		documentation = m.Comment.Message()
@@ -150,6 +174,18 @@ func handleMessage(m *proto.Message) {
 // handleEnums - обрабатывает 1 enum
 func handleEnum(e *proto.Enum) {
 	var err error
+
+	//
+	EnumName := e.Name
+
+	//фильтр
+	Filter := Settings.FILTER_ENUM_NAME
+	if Filter != "" {
+		IsFound, _ := regexp.MatchString(Settings.FILTER_MESSAGE_NAME, EnumName)
+		if IsFound == false {
+			return
+		}
+	}
 
 	documentation := ""
 	if e.Comment != nil {

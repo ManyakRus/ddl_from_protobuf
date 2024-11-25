@@ -17,12 +17,13 @@ type Table struct {
 
 // Column - структура для хранения столбцов
 type Column struct {
-	NameSQL             string
-	TypeSQL             string
-	NameProtobuf        string
-	TypeProtobuf        string
-	NameForeignProtobuf string
-	TypeForeignProtobuf string
+	NameSQL                string
+	TypeSQL                string
+	NameProtobuf           string
+	TypeProtobuf           string
+	ProtoForeignTableName  string
+	ProtoForeignColumnName string
+	//TypeForeignProtobuf   string
 	//NameGo              string
 	//TypeGo              string
 	IsObject     bool

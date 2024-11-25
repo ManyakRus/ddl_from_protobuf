@@ -1,0 +1,19 @@
+package asset
+
+import (
+	"github.com/ManyakRus/tinkoff_invest/api/invest_api/investapi"
+)
+
+//// ConvertToProtobuf - создаёт модель protobuf из модели crud
+//func (m *Asset) ConvertToProtobuf() investapi.Asset {
+//	Otvet := investapi.Asset{}
+//
+	// ConvertFromProtobuf - создаёт модель protobuf из модели crud
+	func (m *Asset) ConvertFromProtobuf(i ProtoNameMessageName)  {
+			m.InstrumentsId = i.instruments_id.AssetInstrument
+	m.name = i.name
+	m.TypeId = i.type_id.AssetType
+	m.uid = i.uid
+
+	return Otvet
+}

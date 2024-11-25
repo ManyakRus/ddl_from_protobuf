@@ -1,35 +1,57 @@
 package assetetf
 
 import (
-	"google.golang.org/protobuf/types/known/timestamppb"
 	"github.com/ManyakRus/tinkoff_invest/api/invest_api/investapi"
 )
 
-// ConvertToProtobuf - создаёт модель protobuf из модели crud
-func (m *AssetEtf) ConvertToProtobuf() investapi.AssetEtf {
-	Otvet := investapi.AssetEtf{}
+//// ConvertToProtobuf - создаёт модель protobuf из модели crud
+//func (m *AssetEtf) ConvertToProtobuf() investapi.AssetEtf {
+//	Otvet := investapi.AssetEtf{}
+//
+	// ConvertFromProtobuf - создаёт модель protobuf из модели crud
+	func (m *AssetEtf) ConvertFromProtobuf(i ProtoNameMessageName)  {
+			m.BuyPremiumNano = i.buy_premium.nano
+	m.BuyPremiumUnits = i.buy_premium.units
+	m.description = i.description
+	m.div_yield_flag = i.div_yield_flag
+	m.ExpenseCommissionNano = i.expense_commission.nano
+	m.ExpenseCommissionUnits = i.expense_commission.units
+	m.FixedCommissionNano = i.fixed_commission.nano
+	m.FixedCommissionUnits = i.fixed_commission.units
+	m.focus_type = i.focus_type
+	m.HurdleRateNano = i.hurdle_rate.nano
+	m.HurdleRateUnits = i.hurdle_rate.units
+	m.inav_code = i.inav_code
+	m.IndexRecoveryPeriodNano = i.index_recovery_period.nano
+	m.IndexRecoveryPeriodUnits = i.index_recovery_period.units
+	m.issue_kind = i.issue_kind
+	m.leveraged_flag = i.leveraged_flag
+	m.management_type = i.management_type
+	m.nominal_currency = i.nominal_currency
+	m.NominalNano = i.nominal.nano
+	m.NominalUnits = i.nominal.units
+	m.NumShareNano = i.num_share.nano
+	m.NumShareUnits = i.num_share.units
+	m.payment_type = i.payment_type
+	m.PerformanceFeeNano = i.performance_fee.nano
+	m.PerformanceFeeUnits = i.performance_fee.units
+	m.primary_index = i.primary_index
+	m.primary_index_company = i.primary_index_company
+	m.primary_index_description = i.primary_index_description
+	m.PrimaryIndexTrackingErrorNano = i.primary_index_tracking_error.nano
+	m.PrimaryIndexTrackingErrorUnits = i.primary_index_tracking_error.units
+	m.rebalancing_dates = i.rebalancing_dates
+	m.rebalancing_flag = i.rebalancing_flag
+	m.rebalancing_freq = i.rebalancing_freq
+	m.rebalancing_plan = i.rebalancing_plan
+	m.released_date = i.released_date
+	m.SellDiscountNano = i.sell_discount.nano
+	m.SellDiscountUnits = i.sell_discount.units
+	m.tax_rate = i.tax_rate
+	m.TotalExpenseNano = i.total_expense.nano
+	m.TotalExpenseUnits = i.total_expense.units
+	m.ucits_flag = i.ucits_flag
+	m.watermark_flag = i.watermark_flag
 
-	nano := &investapi.nano{}
-	Otvet.nano = nano	units := &investapi.units{}
-	Otvet.units = units	Otvet.description = m.
-	Otvet.div_yield_flag = m.
-	Otvet.nano = nano	Otvet.units = units	Otvet.nano = nano	Otvet.units = units	Otvet.focus_type = m.
-	Otvet.nano = nano	Otvet.units = units	Otvet.inav_code = m.
-	Otvet.nano = nano	Otvet.units = units	Otvet.issue_kind = m.
-	Otvet.leveraged_flag = m.
-	Otvet.management_type = m.
-	Otvet.nominal_currency = m.
-	Otvet.nano = nano	Otvet.units = units	Otvet.nano = nano	Otvet.units = units	Otvet.payment_type = m.
-	Otvet.nano = nano	Otvet.units = units	Otvet.primary_index = m.
-	Otvet.primary_index_company = m.
-	Otvet.primary_index_description = m.
-	Otvet.nano = nano	Otvet.units = units	Otvet.rebalancing_dates = timestamppb.New(m.)
-	Otvet.rebalancing_flag = m.
-	Otvet.rebalancing_freq = m.
-	Otvet.rebalancing_plan = m.
-	Otvet.released_date = timestamppb.New(m.)
-	Otvet.nano = nano	Otvet.units = units	Otvet.tax_rate = m.
-	Otvet.nano = nano	Otvet.units = units	Otvet.ucits_flag = m.
-	Otvet.watermark_flag = m.
 	return Otvet
 }

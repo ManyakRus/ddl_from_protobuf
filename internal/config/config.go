@@ -33,6 +33,8 @@ type SettingsINI struct {
 	REPOSITORY_PROTO_URL       string
 	CONVERT_FOLDER_NAME        string
 	NEED_CREATE_CONVERT_FILES  bool
+	FILTER_MESSAGE_NAME        string
+	FILTER_ENUM_NAME           string
 }
 
 // CreateSettings - создает структуру типа SettingsINI
@@ -115,6 +117,16 @@ func FillSettings() {
 	Name = "NEED_CREATE_CONVERT_FILES"
 	s = Getenv(Name, true)
 	Settings.NEED_CREATE_CONVERT_FILES = micro.BoolFromString(s)
+
+	//
+	Name = "FILTER_MESSAGE_NAME"
+	s = Getenv(Name, false)
+	Settings.FILTER_MESSAGE_NAME = s
+
+	//
+	Name = "FILTER_ENUM_NAME"
+	s = Getenv(Name, false)
+	Settings.FILTER_ENUM_NAME = s
 
 }
 

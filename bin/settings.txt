@@ -22,6 +22,12 @@ ENUMS_ID_COLUMN_NAME="id"
 #ENUMS_NAME_COLUMN_NAME - column nsme "name" for ENUM
 ENUMS_NAME_COLUMN_NAME="name"
 
+#FILTER_MESSAGE_NAME - regular expression, need only this messages
+FILTER_MESSAGE_NAME=""
+
+#FILTER_ENUM_NAME - regular expression, need only this messages
+FILTER_ENUM_NAME=""
+
 
 #---------------------------- convert files --------------------------------------------------------
 
