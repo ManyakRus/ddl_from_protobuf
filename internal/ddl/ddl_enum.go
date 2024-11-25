@@ -80,20 +80,20 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 
 	//ID
 	Column1 := types.Column{}
-	Column1.NameSQL = ID_Name
-	Column1.TypeSQL = ID_SQL_TYPE
-	Column1.NameProtobuf = ""
-	Column1.TypeProtobuf = ""
+	Column1.SQLName = ID_Name
+	Column1.SQLType = ID_SQL_TYPE
+	Column1.ProtoName = ""
+	Column1.ProtoType = ""
 	//Column1.NameGo = "ID"
 	//Column1.TypeGo = "int64"
 	Table1.MapColumns[ID_Name] = &Column1
 
 	//Name
 	Column2 := types.Column{}
-	Column2.NameSQL = Name_Name
-	Column2.TypeSQL = Name_SQL_Type
-	Column2.NameProtobuf = ""
-	Column2.TypeProtobuf = ""
+	Column2.SQLName = Name_Name
+	Column2.SQLType = Name_SQL_Type
+	Column2.ProtoName = ""
+	Column2.ProtoType = ""
 	//Column1.NameGo = "Name"
 	//Column1.TypeGo = "string"
 	Table1.MapColumns[ID_Name] = &Column2

@@ -153,10 +153,10 @@ func TextNullable(IsNullable bool) string {
 func FindFieldName(Settings *config.SettingsINI, field1 *types.FieldElement) string {
 	Otvet := field1.Name
 
-	IsIdentifierField := IsIdentifierField(Settings, field1)
-	if IsIdentifierField == true {
-		Otvet = AddText_id(Otvet)
-	}
+	//IsIdentifierField := IsIdentifierField(Settings, field1)
+	//if IsIdentifierField == true {
+	//	Otvet = AddText_id(Otvet)
+	//}
 
 	return Otvet
 }

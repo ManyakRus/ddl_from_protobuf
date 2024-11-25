@@ -31,11 +31,11 @@ func CreateFiles_Message1(Settings *config.SettingsINI, MapTables map[string]*ty
 	}
 
 	dir := micro.ProgramDir_bin()
-	DirReady := dir + Settings.CONFIG_DIRECTORY_NAME + micro.SeparatorFile() + Settings.CONVERT_FOLDER_NAME
+	DirReady := dir + Settings.CONVERT_FOLDER_NAME
 	TableName := Table1.NameGo
 	TableNameSQL := create_files.CamelCase(TableName)
 
-	FilenameReady := DirReady + micro.SeparatorFile() + TableNameSQL
+	FilenameReady := DirReady + micro.SeparatorFile() + TableNameSQL + config.Settings.SUFFIX_CONVERT + ".go"
 
 	//создадим папку готовых файлов
 	folders.CreateFolder(DirReady)
@@ -51,11 +51,12 @@ func CreateFiles_Message1(Settings *config.SettingsINI, MapTables map[string]*ty
 import (
 	"` + ProtoURL + `"
 )
+`
 
-//// ConvertToProtobuf - создаёт модель protobuf из модели crud
-//func (m *` + TableName + `) ConvertToProtobuf() ` + ProtoNameMessageName + ` {
-//	Otvet := ` + ProtoNameMessageName + `{}
-//`
+	//// ConvertToProtobuf - создаёт модель protobuf из модели crud
+	//func (m *` + TableName + `) ConvertToProtobuf() ` + ProtoNameMessageName + ` {
+	//	Otvet := ` + ProtoNameMessageName + `{}
+	//`
 	//
 	//	//каждое поле
 	//	MassColumns := micro.MassFrom_Map(Table1.MapColumns)
@@ -68,9 +69,9 @@ import (
 	//	Text = Text + "\n\treturn Otvet\n}\n"
 
 	Text = Text + `
-	// ConvertFromProtobuf - создаёт модель protobuf из модели crud
-	func (m *` + TableName + `) ConvertFromProtobuf(i ProtoNameMessageName)  {
-		`
+// ConvertFromProtobuf - создаёт модель protobuf из модели crud
+func (m *` + TableName + `) ConvertFromProtobuf(i ` + ProtoNameMessageName + `)  {
+`
 
 	//каждое поле
 	MassColumns := micro.MassFrom_Map(Table1.MapColumns)
@@ -80,7 +81,7 @@ import (
 	}
 
 	//
-	Text = Text + "\n\treturn Otvet\n}\n"
+	Text = Text + "\n\treturn\n}\n"
 
 	Text = create_files.CheckAndAdd_ImportTimestamp_FromText(Text)
 
@@ -94,31 +95,45 @@ import (
 func TextConvertFromProtobufField1(Settings *config.SettingsINI, MapTables map[string]*types.Table, Table1 *types.Table, Column1 *types.Column) string {
 	Otvet := ""
 
-	IsProtobufType := create_files.IsProtobufType(Settings, Column1.TypeProtobuf)
-	NameGoFromSQL := create_files.NameGo_from_NameSQL(Column1.NameSQL)
-	NameProtobuf := Column1.NameProtobuf
-	NameForeignProtobuf := Column1.ProtoForeignTableName
-	TypeGoFromProto := create_files.Convert_ProtobufTypeNameToGolangTypeName(Settings, Column1.TypeForeignProtobuf)
+	IsProtobufType := create_files.IsProtobufType(Settings, Column1.ProtoType)
+	NameGoFromSQL := create_files.NameGo_from_NameSQL(Column1.SQLName)
+	//ProtoName := create_files.Convert_ProtoName_to_GRPCName(Column1.ProtoName)
+	ProtoName := create_files.Convert_ProtoName_to_GRPCName(Column1.ProtoName)
+	ProtoForeignTableName := Column1.ProtoForeignTableName
+	ProtoForeignColumnName := create_files.Convert_ProtoName_to_GRPCName(Column1.ProtoForeignColumnName)
+	//ProtoForeignColumnType := Column1.ProtoForeignColumnType
+	TypeGoFromSQL := create_files.Convert_TypeSQL_to_TypeGo(Settings, Column1.SQLType)
+	ProtoType := Column1.ProtoType
 
-	//простой случай и случай с преобразованием типа
-	if IsProtobufType == true {
-		Otvet = Otvet + "\tm." + Column1.NameProtobuf + " = i." + Column1.NameProtobuf + "\n"
+	//простой случай без преобразованиея типа
+	if IsProtobufType == true && ProtoType == TypeGoFromSQL {
+		Otvet = Otvet + "\tm." + NameGoFromSQL + " = i." + ProtoName + "\n"
+		return Otvet
+	}
+
+	//случай с преобразованием типа
+	if IsProtobufType == true && ProtoType != TypeGoFromSQL {
+		TextVariable, GolangCode := create_files.Convert_ProtobufVariableToGolangVariable(Settings, Column1, "i.", ProtoName)
+		if GolangCode != "" {
+			Otvet = Otvet + GolangCode
+		}
+		Otvet = Otvet + "\tm." + NameGoFromSQL + " = " + TextVariable + "\n"
 		return Otvet
 	}
 
 	//случай с алиасом
-	if IsProtobufType == false && NameForeignProtobuf == "" {
-		if Column1.TypeForeignProtobuf != TypeGoFromProto {
-			Otvet = Otvet + "\tm." + NameProtobuf + " = " + TypeGoFromProto + "(i." + NameProtobuf + ")\n"
+	if IsProtobufType == false && Column1.IsObject == false {
+		if Column1.ProtoForeignColumnType != TypeGoFromSQL {
+			Otvet = Otvet + "\tm." + NameGoFromSQL + " = " + TypeGoFromSQL + "(i." + ProtoName + ")\n"
 		} else {
-			Otvet = Otvet + "\tm." + NameProtobuf + " = i." + NameProtobuf + "\n"
+			Otvet = Otvet + "\tm." + NameGoFromSQL + " = i." + ProtoName + "\n"
 		}
 		return Otvet
 	}
 
 	//случай с объектами, структурами
-	if IsProtobufType == false && Column1.ProtoForeignTableName != "" {
-		Otvet = Otvet + "\tm." + NameGoFromSQL + " = i." + NameProtobuf + "." + NameForeignProtobuf + "\n"
+	if IsProtobufType == false && Column1.IsObject == true {
+		Otvet = Otvet + "\tm." + NameGoFromSQL + " = i." + ProtoForeignTableName + "." + ProtoForeignColumnName + "\n"
 	}
 
 	return Otvet
@@ -128,23 +143,23 @@ func TextConvertFromProtobufField1(Settings *config.SettingsINI, MapTables map[s
 //func TextConvertToProtobufField1(Settings *config.SettingsINI, MapTables map[string]*types.Table, Table1 *types.Table, Column1 *types.Column) string {
 //	Otvet := ""
 //
-//	IsProtobufType := create_files.IsProtobufType(Settings, Column1.TypeProtobuf)
-//	NameGo := create_files.NameGo_from_NameSQL(Column1.NameSQL)
-//	TypeGo := create_files.Convert_TypeSQL_to_TypeGo(Settings, Column1.TypeSQL)
-//	NameProtobuf := Column1.NameProtobuf
+//	IsProtobufType := create_files.IsProtobufType(Settings, Column1.ProtoType)
+//	NameGo := create_files.NameGo_from_NameSQL(Column1.SQLName)
+//	TypeGo := create_files.Convert_TypeSQL_to_TypeGo(Settings, Column1.SQLType)
+//	ProtoName := Column1.ProtoName
 //	ProtoForeignTableName := Column1.ProtoForeignTableName
 //
 //	//простой случай и случай с преобразованием типа
 //	if IsProtobufType == true && Column1.ProtoForeignTableName == "" {
 //		TextVariable := create_files.Convert_GolangVariableToProtobufVariableType(Settings, Column1, "m.", TypeGo)
-//		Otvet = Otvet + "\tOtvet." + NameProtobuf + " = " + TextVariable + "\n"
+//		Otvet = Otvet + "\tOtvet." + ProtoName + " = " + TextVariable + "\n"
 //		return Otvet
 //	}
 //
 //	//случай с алиасом
 //	if IsProtobufType == false && Column1.ProtoForeignTableName == "" {
-//		TextVariable := Column1.TypeForeignProtobuf + "(m." + NameGo + ")"
-//		Otvet = Otvet + "\tOtvet." + NameProtobuf + " = " + TextVariable + "\n"
+//		TextVariable := Column1.ProtoForeignColumnType + "(m." + NameGo + ")"
+//		Otvet = Otvet + "\tOtvet." + ProtoName + " = " + TextVariable + "\n"
 //		return Otvet
 //	}
 //
@@ -161,14 +176,14 @@ func TextConvertFromProtobufField1(Settings *config.SettingsINI, MapTables map[s
 //	//заполним ИД
 //	TableF, ok := MapTables[Column1.ProtoForeignTableName]
 //	if ok == false {
-//		log.Panic("message: ", Table1.NameProtobuf, ", field: ", Column1.NameProtobuf, ", not found table: ", Column1.NameSQL)
+//		log.Panic("message: ", Table1.ProtoName, ", field: ", Column1.ProtoName, ", not found table: ", Column1.SQLName)
 //	}
 //	ColumnPKF := create_files.Find_ColumnPK(TableF)
 //	if ColumnPKF == nil {
-//		log.Panic("message: ", Table1.NameProtobuf, ", field: ", Column1.NameProtobuf, ", not found PK")
+//		log.Panic("message: ", Table1.ProtoName, ", field: ", Column1.ProtoName, ", not found PK")
 //	}
-//	NameGoF := create_files.NameGo_from_NameSQL(ColumnPKF.NameSQL)
-//	Otvet = Otvet + "\tOtvet." + ColumnPKF.NameProtobuf + " = " + "m." + NameGoF + "\n"
+//	NameGoF := create_files.NameGo_from_NameSQL(ColumnPKF.SQLName)
+//	Otvet = Otvet + "\tOtvet." + ColumnPKF.ProtoName + " = " + "m." + NameGoF + "\n"
 //
 //	//присваиваем объект
 //	Otvet = Otvet + "\tOtvet." + ProtoForeignTableName + " = " + ProtoForeignTableName + "\n"

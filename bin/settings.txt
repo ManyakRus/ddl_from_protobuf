@@ -40,3 +40,5 @@ CONVERT_FOLDER_NAME="entities"
 #NEED_CREATE_CONVERT_FILES - true = need create convert models from protobuf to database models
 NEED_CREATE_CONVERT_FILES=false
 
+#SUFFIX_CONVERT - text suffix for go convert filenames
+SUFFIX_CONVERT="_convert"

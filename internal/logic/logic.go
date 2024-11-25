@@ -44,7 +44,7 @@ func StartAll(Settings *config.SettingsINI) {
 //			if ok == false {
 //				continue
 //			}
-//			field1.TypeSQL = Mapping1.SQLType
+//			field1.SQLType = Mapping1.SQLType
 //		}
 //	}
 //}

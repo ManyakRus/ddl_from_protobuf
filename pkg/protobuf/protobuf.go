@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"regexp"
+	"strings"
 )
 
 // MapMessages - хранит все сообщения из всех .proto
@@ -147,6 +148,7 @@ func handleMessage(m *proto.Message) {
 		if documentation == "" && NormalField.InlineComment != nil {
 			documentation = NormalField.InlineComment.Message()
 		}
+		documentation = strings.TrimSpace(documentation)
 
 		Options := make([]types.OptionElement, 0)
 		for _, option := range NormalField.Options {
@@ -191,6 +193,7 @@ func handleEnum(e *proto.Enum) {
 	if e.Comment != nil {
 		documentation = e.Comment.Message()
 	}
+	documentation = strings.TrimSpace(documentation)
 
 	Enum1 := types.EnumElement{}
 	Enum1.Name = e.Name

@@ -10,20 +10,20 @@ type SQL_ForeignCount struct {
 type Table struct {
 	NameSQL      string
 	NameProtobuf string
-	MapColumns   map[string]*Column //map[NameSQL]*Column
+	MapColumns   map[string]*Column //map[SQLName]*Column
 	NameGo       string
 	IsEnum       bool
 }
 
 // Column - структура для хранения столбцов
 type Column struct {
-	NameSQL                string
-	TypeSQL                string
-	NameProtobuf           string
-	TypeProtobuf           string
+	SQLName                string
+	SQLType                string
+	ProtoName              string
+	ProtoType              string
 	ProtoForeignTableName  string
 	ProtoForeignColumnName string
-	//TypeForeignProtobuf   string
+	ProtoForeignColumnType string
 	//NameGo              string
 	//TypeGo              string
 	IsObject     bool

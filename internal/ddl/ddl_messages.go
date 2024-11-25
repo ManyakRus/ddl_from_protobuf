@@ -52,10 +52,11 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 
 		isNullabe := IsNullableField(Settings, field1)
 		TextNullable := TextNullable(isNullabe)
-		FieldName := FindFieldName(Settings, field1)
-		FieldNameSQL := FormatNameSQL(FieldName)
+		FieldNameProto := FindFieldName(Settings, field1)
+		FieldNameSQL := FormatNameSQL(FieldNameProto)
 		ProtoForeignTableName := ""
 		ProtoForeignColumnName := ""
+		TypeForeignProtobuf := ""
 		//
 
 		//для тип=enum или message with table
@@ -79,25 +80,29 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 						//тип
 						MapMappingsID1, ok := Settings.MapSQLTypes[FieldID.Type]
 						if ok == false {
-							log.Panic("message: ", FieldName, ", field: ", FieldName, ", not found message: "+ForeignTableName)
+							log.Panic("message: ", FieldNameProto, ", field: ", FieldNameProto, ", not found message: "+ForeignTableName)
 						}
 						SQLType = MapMappingsID1.SQLType
 
 						//запомним MapTables
 						ForeignTableName = ForeignTableName
 						ProtoForeignColumnName = ForeignTableColumnName
+						TypeForeignProtobuf = FieldID.Type
 					}
+				}
 			} else {
 				//это enum
 				_, ok := Settings.MapEnums[ForeignTableName]
 				if ok == false {
-					log.Panic("message: ", FieldName, ", field: ", FieldName, ", not found message: "+ForeignTableName)
+					log.Panic("message: ", FieldNameProto, ", field: ", FieldNameProto, ", not found message: "+ForeignTableName)
 				}
 				SQLType = "bigint"
 
 				//запомним MapTables
-				ForeignTableName = ForeignTableName
+				ProtoForeignTableName = ForeignTableName
 				ProtoForeignColumnName = ForeignTableColumnName
+				TypeForeignProtobuf = ForeignTableName //"int64"
+				FieldNameSQL = AddText_id(FieldNameSQL)
 			}
 		}
 
@@ -106,7 +111,7 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 
 			MessageF, ok := Settings.MapMessages[FieldType]
 			if ok == false {
-				log.Error("message: ", FieldName, ", field: ", FieldName, ", not found message: "+FieldType)
+				log.Error("message: ", FieldNameProto, ", field: ", FieldNameProto, ", not found message: "+FieldType)
 				return "", ForeignCount, nil
 			}
 			for _, FieldForeign := range MessageF.Fields {
@@ -118,21 +123,22 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 				SQLTypeForeign := ""
 				MapSQLTypes1F, ok := Settings.MapSQLTypes[FieldTypeF]
 				if ok == false {
-					log.Error("message: ", message1.Name, ", field: ", FieldName, ", foreign message: ", MessageF.Name, " foreign field:", FieldNameF, ", not found type: "+FieldTypeF)
+					log.Error("message: ", message1.Name, ", field: ", FieldNameProto, ", foreign message: ", MessageF.Name, " foreign field:", FieldNameF, ", not found type: "+FieldTypeF)
 					return "", ForeignCount, nil
 				}
 				SQLTypeForeign = MapSQLTypes1F.SQLType
 
 				//запомним
 				Column1 := types.Column{}
-				Column1.NameSQL = FieldNameSQL1
-				Column1.TypeSQL = SQLTypeForeign
-				Column1.NameProtobuf = field1.Name
-				Column1.TypeProtobuf = FieldType
+				Column1.SQLName = FieldNameSQL1
+				Column1.SQLType = SQLTypeForeign
+				Column1.ProtoName = field1.Name
+				Column1.ProtoType = FieldType
 				Column1.ProtoForeignTableName = FieldNameF
 				Column1.ProtoForeignColumnName = FieldForeign.Name
+				Column1.ProtoForeignColumnType = FieldTypeF
 				Column1.IsObject = true
-				Table1.MapColumns[Column1.NameSQL] = &Column1
+				Table1.MapColumns[Column1.SQLName] = &Column1
 
 				//
 				Otvet = Otvet + "\t" + `"` + FieldNameSQL1 + `"` + " " + SQLTypeForeign + " " + TextNullable + ",\n"
@@ -147,13 +153,14 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 
 		//запомним
 		Column1 := types.Column{}
-		Column1.NameSQL = FieldNameSQL
-		Column1.TypeSQL = SQLType
-		Column1.NameProtobuf = FieldName
-		Column1.TypeProtobuf = FieldType
+		Column1.SQLName = FieldNameSQL
+		Column1.SQLType = SQLType
+		Column1.ProtoName = FieldNameProto
+		Column1.ProtoType = FieldType
 		Column1.ProtoForeignTableName = ProtoForeignTableName
 		Column1.ProtoForeignColumnName = ProtoForeignColumnName
-		Table1.MapColumns[Column1.NameSQL] = &Column1
+		Column1.ProtoForeignColumnType = TypeForeignProtobuf
+		Table1.MapColumns[Column1.SQLName] = &Column1
 
 		//одна колонка
 		//добавим колонку

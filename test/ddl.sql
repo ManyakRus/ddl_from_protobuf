@@ -657,19 +657,19 @@ CREATE TABLE IF NOT EXISTS "tin"."account" (
 	"closed_date" timestamptz NULL,
 	"access_level_id" bigint NULL,
 	CONSTRAINT "account_pk" PRIMARY KEY ("id"),
-	CONSTRAINT "account_type_id_fk" FOREIGN KEY ("type_id") REFERENCES "tin"."account_type" ("id"),
-	CONSTRAINT "account_status_id_fk" FOREIGN KEY ("status_id") REFERENCES "tin"."account_status" ("id"),
-	CONSTRAINT "account_access_level_id_fk" FOREIGN KEY ("access_level_id") REFERENCES "tin"."access_level" ("id")
+	CONSTRAINT "account_type_fk" FOREIGN KEY ("type") REFERENCES "tin"."account_type" ("id"),
+	CONSTRAINT "account_status_fk" FOREIGN KEY ("status") REFERENCES "tin"."account_status" ("id"),
+	CONSTRAINT "account_access_level_fk" FOREIGN KEY ("access_level") REFERENCES "tin"."access_level" ("id")
 );
-CREATE INDEX IF NOT EXISTS "account_type_id_idx" ON "tin"."account" USING btree ("type_id");
-CREATE INDEX IF NOT EXISTS "account_status_id_idx" ON "tin"."account" USING btree ("status_id");
-CREATE INDEX IF NOT EXISTS "account_access_level_id_idx" ON "tin"."account" USING btree ("access_level_id");
+CREATE INDEX IF NOT EXISTS "account_type_idx" ON "tin"."account" USING btree ("type");
+CREATE INDEX IF NOT EXISTS "account_status_idx" ON "tin"."account" USING btree ("status");
+CREATE INDEX IF NOT EXISTS "account_access_level_idx" ON "tin"."account" USING btree ("access_level");
 COMMENT ON TABLE "tin"."account" IS 'Информация о счёте.';
-COMMENT ON COLUMN "tin"."account"."id" IS ' Идентификатор счёта.';
-COMMENT ON COLUMN "tin"."account"."type_id" IS ' Тип счёта.';
-COMMENT ON COLUMN "tin"."account"."name" IS ' Название счёта.';
-COMMENT ON COLUMN "tin"."account"."status_id" IS ' Статус счёта.';
-COMMENT ON COLUMN "tin"."account"."opened_date" IS ' Дата открытия счёта в часовом поясе UTC.';
-COMMENT ON COLUMN "tin"."account"."closed_date" IS ' Дата закрытия счёта в часовом поясе UTC.';
-COMMENT ON COLUMN "tin"."account"."access_level_id" IS ' Уровень доступа к текущему счёту (определяется токеном).';
+COMMENT ON COLUMN "tin"."account"."id" IS 'Идентификатор счёта.';
+COMMENT ON COLUMN "tin"."account"."type_id" IS 'Тип счёта.';
+COMMENT ON COLUMN "tin"."account"."name" IS 'Название счёта.';
+COMMENT ON COLUMN "tin"."account"."status_id" IS 'Статус счёта.';
+COMMENT ON COLUMN "tin"."account"."opened_date" IS 'Дата открытия счёта в часовом поясе UTC.';
+COMMENT ON COLUMN "tin"."account"."closed_date" IS 'Дата закрытия счёта в часовом поясе UTC.';
+COMMENT ON COLUMN "tin"."account"."access_level_id" IS 'Уровень доступа к текущему счёту (определяется токеном).';
 

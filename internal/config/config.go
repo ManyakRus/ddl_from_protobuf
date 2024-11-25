@@ -20,7 +20,7 @@ type SettingsINI struct {
 	PROTOBUF_DIRECTORY         string
 	DDL_FILENAME               string
 	CONFIG_DIRECTORY_NAME      string
-	MapSQLTypes                map[string]load_configs_mapping.SQLMapping //map[ProtobufType]SQLMapping
+	MapSQLTypes                map[string]load_configs_mapping.SQLMapping //map[ProtoType]SQLMapping
 	TextEveryTableColumns      string
 	DB_SCHEMA_NAME             string
 	MapMessages                map[string]*types.MessageElement
@@ -35,6 +35,7 @@ type SettingsINI struct {
 	NEED_CREATE_CONVERT_FILES  bool
 	FILTER_MESSAGE_NAME        string
 	FILTER_ENUM_NAME           string
+	SUFFIX_CONVERT             string
 }
 
 // CreateSettings - создает структуру типа SettingsINI
@@ -127,6 +128,11 @@ func FillSettings() {
 	Name = "FILTER_ENUM_NAME"
 	s = Getenv(Name, false)
 	Settings.FILTER_ENUM_NAME = s
+
+	//
+	Name = "SUFFIX_CONVERT"
+	s = Getenv(Name, false)
+	Settings.SUFFIX_CONVERT = s
 
 }
 

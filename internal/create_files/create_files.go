@@ -107,10 +107,17 @@ func Convert_ProtobufTypeNameToGolangTypeName(Settings *config.SettingsINI, Type
 }
 
 // NameGo_from_NameSQL - возвращает имя Go из имени SQL
-func NameGo_from_NameSQL(TableName string) string {
-	Otvet := TableName
+func NameGo_from_NameSQL(TableNameSQL string) string {
+	Otvet := TableNameSQL
+
+	if TableNameSQL == "id" {
+		return "ID"
+	}
 
 	Otvet = PascalCase(Otvet)
+	if (strings.HasSuffix(TableNameSQL, "_id") == true) && (strings.HasSuffix(Otvet, "Id") == true) {
+		Otvet = Otvet[:len(Otvet)-2] + "ID"
+	}
 
 	return Otvet
 }
@@ -124,7 +131,7 @@ func Convert_GolangVariableToProtobufVariableType(Settings *config.SettingsINI, 
 	}
 
 	TextVariableName := VariableName
-	TypeGo := Convert_ProtobufTypeNameToGolangTypeName(Settings, Column1.TypeProtobuf)
+	TypeGo := Convert_ProtobufTypeNameToGolangTypeName(Settings, Column1.ProtoType)
 	if VariableType != TypeGo {
 		TextVariableName = VariableType + "(" + VariableName + ")"
 	}
@@ -149,6 +156,70 @@ func Convert_GolangVariableToProtobufVariableType(Settings *config.SettingsINI, 
 	}
 
 	return Otvet
+}
+
+// Convert_ProtobufVariableToGolangVariableType - возвращает имя переменной  преобразованное в тип protobuf
+func Convert_ProtobufVariableToGolangVariableType(Settings *config.SettingsINI, Column1 *types.Column, VariableName, VariableType string) string {
+	Otvet := VariableName
+
+	if Column1 == nil {
+		return Otvet
+	}
+
+	TextVariableName := VariableName
+	TypeGo := Convert_ProtobufTypeNameToGolangTypeName(Settings, Column1.ProtoType)
+	if VariableType != TypeGo {
+		TextVariableName = VariableType + "(" + VariableName + ")"
+	}
+
+	switch TypeGo {
+	case "time.Time":
+		Otvet = "timestamppb.New(" + VariableName + ")"
+	case "string":
+		Otvet = TextVariableName
+	case "int64":
+		Otvet = TextVariableName
+	case "int32":
+		Otvet = TextVariableName
+	case "bool":
+		Otvet = TextVariableName
+	case "float32":
+		Otvet = TextVariableName
+	case "float64":
+		Otvet = TextVariableName
+	case "uuid.UUID":
+		Otvet = VariableName + ".String()"
+	}
+
+	return Otvet
+}
+
+// Convert_ProtobufVariableToGolangVariable - возвращает имя переменной +  имя колонки, преобразованное в тип golang из protobuf
+// VariableName - вводить "i."
+func Convert_ProtobufVariableToGolangVariable(Settings *config.SettingsINI, Column1 *types.Column, VariablePrefix, VariableName string) (VariableColumn string, GolangCode string) {
+	//time.Time в timestamppb
+
+	TypeGo := Convert_ProtobufTypeNameToGolangTypeName(Settings, Column1.ProtoType)
+	ProtoName := Column1.ProtoName
+	switch TypeGo {
+	case "time.Time":
+		{
+			VariableColumn = VariablePrefix + VariableName + ".AsTime()"
+			return VariableColumn, GolangCode
+		}
+	case "uuid.UUID":
+		{
+			VariableColumn = VariableName
+			GolangCode = ProtoName + `, err := uuid.FromBytes([]byte(` + VariablePrefix + VariableName + `))
+	if err != nil {
+		return
+	}
+`
+			return VariableColumn, GolangCode
+		}
+	}
+
+	return VariableColumn, GolangCode
 }
 
 // Convert_TypeSQL_to_TypeGo - возвращает имя типа golang
@@ -370,7 +441,7 @@ func FindColumn_from_NameProtobuf(MapColumns map[string]*types.Column, NameProto
 	var Otvet *types.Column
 
 	for _, Column1 := range MapColumns {
-		if Column1.NameProtobuf == NameProtobuf {
+		if Column1.ProtoName == NameProtobuf {
 			Otvet = Column1
 			return Otvet
 		}
@@ -387,4 +458,19 @@ func Find_ColumnPK(Table1 *types.Table) *types.Column {
 		}
 	}
 	return nil
+}
+
+// Convert_ProtoName_to_GRPCName - преобразование имени Protobuf в имя
+// access_level = AccessLevel
+func Convert_ProtoName_to_GRPCName(NameProtobuf string) string {
+
+	//if ProtoName == "id" {
+	//	return "Id"
+	//}
+
+	Otvet := PascalCase(NameProtobuf)
+	//if (strings.HasSuffix(ProtoName, "_id") == true) && (strings.HasSuffix(Otvet, "ID") == true) {
+	//	Otvet = Otvet[:len(Otvet)-2] + "ID"
+	//}
+	return Otvet
 }

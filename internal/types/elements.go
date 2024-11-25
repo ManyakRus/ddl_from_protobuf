@@ -66,8 +66,8 @@ type FieldElement struct {
 	Repeated bool
 	Optional bool
 	Required bool
-	//TypeSQL  string
-	//NameSQL  string
+	//SQLType  string
+	//SQLName  string
 	//NameGo   string
 }
 

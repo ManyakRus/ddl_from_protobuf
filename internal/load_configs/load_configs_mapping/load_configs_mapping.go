@@ -37,7 +37,7 @@ type SQLMapping struct {
 }
 
 // LoadMappings process the json for mappings to load sql mappings
-// map[ProtobufType]SQLMapping
+// map[ProtoType]SQLMapping
 func LoadMappings(Filename string) (map[string]SQLMapping, error) {
 	var Otvet = make(map[string]SQLMapping, 0)
 	var err error
