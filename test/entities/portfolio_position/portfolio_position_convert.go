@@ -11,8 +11,6 @@ func (m *PortfolioPosition) ConvertFromProtobuf(i investapi.PortfolioPosition)  
 	m.AveragePositionPriceFifoNano = i.AveragePositionPriceFifo.Nano
 	m.AveragePositionPriceFifoUnits = i.AveragePositionPriceFifo.Units
 	m.AveragePositionPriceNano = i.AveragePositionPrice.Nano
-	m.AveragePositionPricePtNano = i.AveragePositionPricePt.Nano
-	m.AveragePositionPricePtUnits = i.AveragePositionPricePt.Units
 	m.AveragePositionPriceUnits = i.AveragePositionPrice.Units
 	m.Blocked = i.Blocked
 	m.BlockedLotsNano = i.BlockedLots.Nano
@@ -31,8 +29,6 @@ func (m *PortfolioPosition) ConvertFromProtobuf(i investapi.PortfolioPosition)  
 	m.InstrumentType = i.InstrumentType
 	m.InstrumentUid = i.InstrumentUid
 	m.PositionUid = i.PositionUid
-	m.QuantityLotsNano = i.QuantityLots.Nano
-	m.QuantityLotsUnits = i.QuantityLots.Units
 	m.QuantityNano = i.Quantity.Nano
 	m.QuantityUnits = i.Quantity.Units
 	m.VarMarginCurrency = i.VarMargin.Currency

@@ -882,26 +882,22 @@ CREATE TABLE IF NOT EXISTS "tin"."get_last_prices_request" (
 COMMENT ON TABLE "tin"."get_last_prices_request" IS 'Запрос получения цен последних сделок.';
 
 CREATE TABLE IF NOT EXISTS "tin"."get_last_trades_request" (
-	"figi" text NOT NULL,
 	"from" timestamptz NULL,
 	"to" timestamptz NULL,
 	"instrument_id" text NOT NULL,
 	CONSTRAINT "get_last_trades_request_pk" PRIMARY KEY ("figi")
 );
 COMMENT ON TABLE "tin"."get_last_trades_request" IS 'Запрос обезличенных сделок за последний час.';
-COMMENT ON COLUMN "tin"."get_last_trades_request"."figi" IS 'Deprecated Figi-идентификатор инструмента. Необходимо использовать instrument_id.';
 COMMENT ON COLUMN "tin"."get_last_trades_request"."from" IS 'Начало запрашиваемого периода в часовом поясе UTC.';
 COMMENT ON COLUMN "tin"."get_last_trades_request"."to" IS 'Окончание запрашиваемого периода в часовом поясе UTC.';
 COMMENT ON COLUMN "tin"."get_last_trades_request"."instrument_id" IS 'Идентификатор инструмента, принимает значение figi или instrument_uid.';
 
 CREATE TABLE IF NOT EXISTS "tin"."get_order_book_request" (
-	"figi" text NOT NULL,
 	"depth" integer NOT NULL,
 	"instrument_id" text NOT NULL,
 	CONSTRAINT "get_order_book_request_pk" PRIMARY KEY ("figi")
 );
 COMMENT ON TABLE "tin"."get_order_book_request" IS 'Запрос стакана.';
-COMMENT ON COLUMN "tin"."get_order_book_request"."figi" IS 'Deprecated Figi-идентификатор инструмента. Необходимо использовать instrument_id.';
 COMMENT ON COLUMN "tin"."get_order_book_request"."depth" IS 'Глубина стакана.';
 COMMENT ON COLUMN "tin"."get_order_book_request"."instrument_id" IS 'Идентификатор инструмента, принимает значение figi или instrument_uid.';
 
@@ -939,21 +935,17 @@ COMMENT ON COLUMN "tin"."get_order_book_response"."orderbook_ts" IS 'Время 
 COMMENT ON COLUMN "tin"."get_order_book_response"."instrument_uid" IS 'Uid инструмента.';
 
 CREATE TABLE IF NOT EXISTS "tin"."get_trading_status_request" (
-	"figi" text NOT NULL,
 	"instrument_id" text NOT NULL,
 	CONSTRAINT "get_trading_status_request_pk" PRIMARY KEY ("figi")
 );
 COMMENT ON TABLE "tin"."get_trading_status_request" IS 'Запрос получения торгового статуса.';
-COMMENT ON COLUMN "tin"."get_trading_status_request"."figi" IS 'Deprecated Figi-идентификатор инструмента. Необходимо использовать instrument_id.';
 COMMENT ON COLUMN "tin"."get_trading_status_request"."instrument_id" IS 'Идентификатор инструмента, принимает значение figi или instrument_uid.';
 
 CREATE TABLE IF NOT EXISTS "tin"."info_instrument" (
-	"figi" text NOT NULL,
 	"instrument_id" text NOT NULL,
 	CONSTRAINT "info_instrument_pk" PRIMARY KEY ("figi")
 );
 COMMENT ON TABLE "tin"."info_instrument" IS 'Запрос подписки на торговый статус.';
-COMMENT ON COLUMN "tin"."info_instrument"."figi" IS 'Deprecated Figi-идентификатор инструмента. Необходимо использовать instrument_id.';
 COMMENT ON COLUMN "tin"."info_instrument"."instrument_id" IS 'Идентификатор инструмента, принимает значение figi или instrument_uid';
 
 CREATE TABLE IF NOT EXISTS "tin"."instrument_close_price_response" (
@@ -987,12 +979,10 @@ COMMENT ON COLUMN "tin"."last_price"."time" IS 'Время получения п
 COMMENT ON COLUMN "tin"."last_price"."instrument_uid" IS 'Uid инструмента';
 
 CREATE TABLE IF NOT EXISTS "tin"."last_price_instrument" (
-	"figi" text NOT NULL,
 	"instrument_id" text NOT NULL,
 	CONSTRAINT "last_price_instrument_pk" PRIMARY KEY ("figi")
 );
 COMMENT ON TABLE "tin"."last_price_instrument" IS 'Запрос подписки на последнюю цену.';
-COMMENT ON COLUMN "tin"."last_price_instrument"."figi" IS 'Deprecated Figi-идентификатор инструмента. Необходимо использовать instrument_id.';
 COMMENT ON COLUMN "tin"."last_price_instrument"."instrument_id" IS 'Идентификатор инструмента, принимает значение figi или instrument_uid';
 
 CREATE TABLE IF NOT EXISTS "tin"."operation_trade" (
@@ -1036,13 +1026,11 @@ COMMENT ON COLUMN "tin"."order_book"."limit_down_nano" IS 'Нижний лими
 COMMENT ON COLUMN "tin"."order_book"."instrument_uid" IS 'Uid инструмента';
 
 CREATE TABLE IF NOT EXISTS "tin"."order_book_instrument" (
-	"figi" text NOT NULL,
 	"depth" integer NOT NULL,
 	"instrument_id" text NOT NULL,
 	CONSTRAINT "order_book_instrument_pk" PRIMARY KEY ("figi")
 );
 COMMENT ON TABLE "tin"."order_book_instrument" IS 'Запрос подписки на стаканы.';
-COMMENT ON COLUMN "tin"."order_book_instrument"."figi" IS 'Deprecated Figi-идентификатор инструмента. Необходимо использовать instrument_id.';
 COMMENT ON COLUMN "tin"."order_book_instrument"."depth" IS 'Глубина стакана.';
 COMMENT ON COLUMN "tin"."order_book_instrument"."instrument_id" IS 'Идентификатор инструмента, принимает значение figi или instrument_uid';
 
@@ -1089,16 +1077,12 @@ CREATE TABLE IF NOT EXISTS "tin"."portfolio_position" (
 	"current_nkd_currency" text NULL,
 	"current_nkd_units" bigint NULL,
 	"current_nkd_nano" integer NULL,
-	"average_position_price_pt_units" bigint NULL,
-	"average_position_price_pt_nano" integer NULL,
 	"current_price_currency" text NULL,
 	"current_price_units" bigint NULL,
 	"current_price_nano" integer NULL,
 	"average_position_price_fifo_currency" text NULL,
 	"average_position_price_fifo_units" bigint NULL,
 	"average_position_price_fifo_nano" integer NULL,
-	"quantity_lots_units" bigint NULL,
-	"quantity_lots_nano" integer NULL,
 	"blocked" bool NOT NULL,
 	"blocked_lots_units" bigint NULL,
 	"blocked_lots_nano" integer NULL,
@@ -1124,16 +1108,12 @@ COMMENT ON COLUMN "tin"."portfolio_position"."expected_yield_nano" IS 'Теку�
 COMMENT ON COLUMN "tin"."portfolio_position"."current_nkd_currency" IS 'Текущий НКД. / строковый ISO-код валюты';
 COMMENT ON COLUMN "tin"."portfolio_position"."current_nkd_units" IS 'Текущий НКД. / целая часть суммы, может быть отрицательным числом';
 COMMENT ON COLUMN "tin"."portfolio_position"."current_nkd_nano" IS 'Текущий НКД. / дробная часть суммы, может быть отрицательным числом';
-COMMENT ON COLUMN "tin"."portfolio_position"."average_position_price_pt_units" IS 'Deprecated Средняя цена позиции в пунктах (для фьючерсов). **Возможна задержка до секунды для пересчёта**. / целая часть суммы, может быть отрицательным числом';
-COMMENT ON COLUMN "tin"."portfolio_position"."average_position_price_pt_nano" IS 'Deprecated Средняя цена позиции в пунктах (для фьючерсов). **Возможна задержка до секунды для пересчёта**. / дробная часть суммы, может быть отрицательным числом';
 COMMENT ON COLUMN "tin"."portfolio_position"."current_price_currency" IS 'Текущая цена за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента. / строковый ISO-код валюты';
 COMMENT ON COLUMN "tin"."portfolio_position"."current_price_units" IS 'Текущая цена за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента. / целая часть суммы, может быть отрицательным числом';
 COMMENT ON COLUMN "tin"."portfolio_position"."current_price_nano" IS 'Текущая цена за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента. / дробная часть суммы, может быть отрицательным числом';
 COMMENT ON COLUMN "tin"."portfolio_position"."average_position_price_fifo_currency" IS 'Средняя цена позиции по методу FIFO. **Возможна задержка до секунды для пересчёта**. / строковый ISO-код валюты';
 COMMENT ON COLUMN "tin"."portfolio_position"."average_position_price_fifo_units" IS 'Средняя цена позиции по методу FIFO. **Возможна задержка до секунды для пересчёта**. / целая часть суммы, может быть отрицательным числом';
 COMMENT ON COLUMN "tin"."portfolio_position"."average_position_price_fifo_nano" IS 'Средняя цена позиции по методу FIFO. **Возможна задержка до секунды для пересчёта**. / дробная часть суммы, может быть отрицательным числом';
-COMMENT ON COLUMN "tin"."portfolio_position"."quantity_lots_units" IS 'Deprecated Количество лотов в портфеле. / целая часть суммы, может быть отрицательным числом';
-COMMENT ON COLUMN "tin"."portfolio_position"."quantity_lots_nano" IS 'Deprecated Количество лотов в портфеле. / дробная часть суммы, может быть отрицательным числом';
 COMMENT ON COLUMN "tin"."portfolio_position"."blocked" IS 'Заблокировано на бирже.';
 COMMENT ON COLUMN "tin"."portfolio_position"."blocked_lots_units" IS 'Количество бумаг, заблокированных выставленными заявками. / целая часть суммы, может быть отрицательным числом';
 COMMENT ON COLUMN "tin"."portfolio_position"."blocked_lots_nano" IS 'Количество бумаг, заблокированных выставленными заявками. / дробная часть суммы, может быть отрицательным числом';
@@ -1180,12 +1160,10 @@ COMMENT ON COLUMN "tin"."positions_securities"."exchange_blocked" IS 'Забло
 COMMENT ON COLUMN "tin"."positions_securities"."instrument_type" IS 'Тип инструмента.';
 
 CREATE TABLE IF NOT EXISTS "tin"."trade_instrument" (
-	"figi" text NOT NULL,
 	"instrument_id" text NOT NULL,
 	CONSTRAINT "trade_instrument_pk" PRIMARY KEY ("figi")
 );
 COMMENT ON TABLE "tin"."trade_instrument" IS 'Запрос подписки на поток обезличенных сделок.';
-COMMENT ON COLUMN "tin"."trade_instrument"."figi" IS 'Deprecated Figi-идентификатор инструмента. Необходимо использовать instrument_id.';
 COMMENT ON COLUMN "tin"."trade_instrument"."instrument_id" IS 'Идентификатор инструмента, принимает значение figi или instrument_uid';
 
 CREATE TABLE IF NOT EXISTS "tin"."virtual_portfolio_position" (
@@ -1350,7 +1328,6 @@ COMMENT ON COLUMN "tin"."candle"."last_trade_ts" IS 'Время последне
 COMMENT ON COLUMN "tin"."candle"."instrument_uid" IS 'Uid инструмента';
 
 CREATE TABLE IF NOT EXISTS "tin"."candle_instrument" (
-	"figi" text NOT NULL,
 	"interval_id" bigint NULL,
 	"instrument_id" text NOT NULL,
 	CONSTRAINT "candle_instrument_pk" PRIMARY KEY ("figi"),
@@ -1358,7 +1335,6 @@ CREATE TABLE IF NOT EXISTS "tin"."candle_instrument" (
 );
 CREATE INDEX IF NOT EXISTS "candle_instrument_interval_idx" ON "tin"."candle_instrument" USING btree ("interval");
 COMMENT ON TABLE "tin"."candle_instrument" IS 'Запрос изменения статус подписки на свечи.';
-COMMENT ON COLUMN "tin"."candle_instrument"."figi" IS 'Deprecated Figi-идентификатор инструмента. Необходимо использовать instrument_id.';
 COMMENT ON COLUMN "tin"."candle_instrument"."interval_id" IS 'Интервал свечей.';
 COMMENT ON COLUMN "tin"."candle_instrument"."instrument_id" IS 'Идентификатор инструмента, принимает значение figi или instrument_uid';
 
@@ -1415,7 +1391,6 @@ COMMENT ON COLUMN "tin"."favorite_instrument"."api_trade_available_flag" IS 'П�
 COMMENT ON COLUMN "tin"."favorite_instrument"."instrument_kind_id" IS 'Тип инструмента.';
 
 CREATE TABLE IF NOT EXISTS "tin"."get_candles_request" (
-	"figi" text NOT NULL,
 	"from" timestamptz NULL,
 	"to" timestamptz NULL,
 	"interval_id" bigint NULL,
@@ -1425,7 +1400,6 @@ CREATE TABLE IF NOT EXISTS "tin"."get_candles_request" (
 );
 CREATE INDEX IF NOT EXISTS "get_candles_request_interval_idx" ON "tin"."get_candles_request" USING btree ("interval");
 COMMENT ON TABLE "tin"."get_candles_request" IS 'Запрос исторических свечей.';
-COMMENT ON COLUMN "tin"."get_candles_request"."figi" IS 'Deprecated Figi-идентификатор инструмента. Необходимо использовать instrument_id.';
 COMMENT ON COLUMN "tin"."get_candles_request"."from" IS 'Начало запрашиваемого периода в часовом поясе UTC.';
 COMMENT ON COLUMN "tin"."get_candles_request"."to" IS 'Окончание запрашиваемого периода в часовом поясе UTC.';
 COMMENT ON COLUMN "tin"."get_candles_request"."interval_id" IS 'Интервал запрошенных свечей.';
@@ -2041,7 +2015,6 @@ COMMENT ON COLUMN "tin"."operation"."position_uid" IS 'position_uid-иденти
 COMMENT ON COLUMN "tin"."operation"."instrument_uid" IS 'Уникальный идентификатор инструмента.';
 
 CREATE TABLE IF NOT EXISTS "tin"."post_order_request" (
-	"figi" text NOT NULL,
 	"quantity" bigint NOT NULL,
 	"price_units" bigint NULL,
 	"price_nano" integer NULL,
@@ -2057,7 +2030,6 @@ CREATE TABLE IF NOT EXISTS "tin"."post_order_request" (
 CREATE INDEX IF NOT EXISTS "post_order_request_direction_idx" ON "tin"."post_order_request" USING btree ("direction");
 CREATE INDEX IF NOT EXISTS "post_order_request_order_type_idx" ON "tin"."post_order_request" USING btree ("order_type");
 COMMENT ON TABLE "tin"."post_order_request" IS 'Запрос выставления торгового поручения.';
-COMMENT ON COLUMN "tin"."post_order_request"."figi" IS 'Deprecated Figi-идентификатор инструмента. Необходимо использовать instrument_id.';
 COMMENT ON COLUMN "tin"."post_order_request"."quantity" IS 'Количество лотов.';
 COMMENT ON COLUMN "tin"."post_order_request"."price_units" IS 'Цена за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента. Игнорируется для рыночных поручений. / целая часть суммы, может быть отрицательным числом';
 COMMENT ON COLUMN "tin"."post_order_request"."price_nano" IS 'Цена за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента. Игнорируется для рыночных поручений. / дробная часть суммы, может быть отрицательным числом';
@@ -2524,7 +2496,6 @@ COMMENT ON COLUMN "tin"."post_order_response"."initial_order_price_pt_nano" IS '
 COMMENT ON COLUMN "tin"."post_order_response"."instrument_uid" IS 'UID идентификатор инструмента.';
 
 CREATE TABLE IF NOT EXISTS "tin"."post_stop_order_request" (
-	"figi" text NOT NULL,
 	"quantity" bigint NOT NULL,
 	"price_units" bigint NULL,
 	"price_nano" integer NULL,
@@ -2545,7 +2516,6 @@ CREATE INDEX IF NOT EXISTS "post_stop_order_request_direction_idx" ON "tin"."pos
 CREATE INDEX IF NOT EXISTS "post_stop_order_request_expiration_type_idx" ON "tin"."post_stop_order_request" USING btree ("expiration_type");
 CREATE INDEX IF NOT EXISTS "post_stop_order_request_stop_order_type_idx" ON "tin"."post_stop_order_request" USING btree ("stop_order_type");
 COMMENT ON TABLE "tin"."post_stop_order_request" IS 'Запрос выставления стоп-заявки.';
-COMMENT ON COLUMN "tin"."post_stop_order_request"."figi" IS 'Deprecated Figi-идентификатор инструмента. Необходимо использовать instrument_id.';
 COMMENT ON COLUMN "tin"."post_stop_order_request"."quantity" IS 'Количество лотов.';
 COMMENT ON COLUMN "tin"."post_stop_order_request"."price_units" IS 'Цена за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента. / целая часть суммы, может быть отрицательным числом';
 COMMENT ON COLUMN "tin"."post_stop_order_request"."price_nano" IS 'Цена за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента. / дробная часть суммы, может быть отрицательным числом';

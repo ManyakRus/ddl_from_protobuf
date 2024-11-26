@@ -10,3 +10,5 @@ const DATEBASE_TYPES_FILENAME = "database_types.json"
 
 // COLUMNS_EVERY_TABLE_FILENAME - файл .sql для добавления в каждую таблицу .sql
 const COLUMNS_EVERY_TABLE_FILENAME = "columns_every_table.sql"
+
+const TEXT_DEPRECATED = "Deprecated"

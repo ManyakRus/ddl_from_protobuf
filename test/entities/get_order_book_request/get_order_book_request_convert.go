@@ -7,7 +7,6 @@ import (
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
 func (m *GetOrderBookRequest) ConvertFromProtobuf(i investapi.GetOrderBookRequest)  {
 	m.Depth = i.Depth
-	m.Figi = i.Figi
 	m.InstrumentID = i.InstrumentId
 
 	return

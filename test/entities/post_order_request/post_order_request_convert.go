@@ -8,7 +8,6 @@ import (
 func (m *PostOrderRequest) ConvertFromProtobuf(i investapi.PostOrderRequest)  {
 	m.AccountID = i.AccountId
 	m.DirectionID = int64(i.Direction.Number())
-	m.Figi = i.Figi
 	m.InstrumentID = i.InstrumentId
 	m.OrderID = i.OrderId
 	m.OrderTypeID = int64(i.OrderType.Number())

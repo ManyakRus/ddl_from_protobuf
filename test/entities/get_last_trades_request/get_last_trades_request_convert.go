@@ -6,7 +6,6 @@ import (
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
 func (m *GetLastTradesRequest) ConvertFromProtobuf(i investapi.GetLastTradesRequest)  {
-	m.Figi = i.Figi
 	m.From = i.From.AsTime()
 	m.InstrumentID = i.InstrumentId
 	m.To = i.To.AsTime()

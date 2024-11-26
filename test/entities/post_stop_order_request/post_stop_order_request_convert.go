@@ -10,7 +10,6 @@ func (m *PostStopOrderRequest) ConvertFromProtobuf(i investapi.PostStopOrderRequ
 	m.DirectionID = int64(i.Direction.Number())
 	m.ExpirationTypeID = int64(i.ExpirationType.Number())
 	m.ExpireDate = i.ExpireDate.AsTime()
-	m.Figi = i.Figi
 	m.InstrumentID = i.InstrumentId
 	m.PriceNano = i.Price.Nano
 	m.PriceUnits = i.Price.Units

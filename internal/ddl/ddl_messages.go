@@ -2,6 +2,7 @@ package ddl
 
 import (
 	"github.com/ManyakRus/ddl_from_protobuf/internal/config"
+	"github.com/ManyakRus/ddl_from_protobuf/internal/constants"
 	"github.com/ManyakRus/ddl_from_protobuf/internal/create_files"
 	"github.com/ManyakRus/ddl_from_protobuf/internal/types"
 	"github.com/ManyakRus/starter/log"
@@ -45,6 +46,12 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 	for _, field1 := range message1.Fields {
 		//массивы не перекачиваем
 		if field1.Repeated == true {
+			continue
+		}
+
+		//игнорируем текст deprecated
+		Documentation := field1.Documentation
+		if strings.HasPrefix(Documentation, constants.TEXT_DEPRECATED) == true {
 			continue
 		}
 

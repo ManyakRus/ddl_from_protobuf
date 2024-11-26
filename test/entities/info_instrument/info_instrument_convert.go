@@ -6,7 +6,6 @@ import (
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
 func (m *InfoInstrument) ConvertFromProtobuf(i investapi.InfoInstrument)  {
-	m.Figi = i.Figi
 	m.InstrumentID = i.InstrumentId
 
 	return
