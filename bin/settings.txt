@@ -28,6 +28,9 @@ FILTER_MESSAGE_NAME=""
 #FILTER_ENUM_NAME - regular expression, need only this messages
 FILTER_ENUM_NAME=""
 
+#EXCLUDE_MESSAGE_NAME - regular excpression, not need this messages
+EXCLUDE_MESSAGE_NAME="(Request$|Response$)"
+
 
 #---------------------------- convert files --------------------------------------------------------
 

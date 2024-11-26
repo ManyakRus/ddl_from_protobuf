@@ -17,6 +17,7 @@ func StartAll(Settings *config.SettingsINI) {
 	SettingsProto.Dir = dir + config.Settings.PROTOBUF_DIRECTORY
 	SettingsProto.FILTER_MESSAGE_NAME = config.Settings.FILTER_MESSAGE_NAME
 	SettingsProto.FILTER_ENUM_NAME = config.Settings.FILTER_ENUM_NAME
+	SettingsProto.EXCLUDE_MESSAGE_NAME = config.Settings.EXCLUDE_MESSAGE_NAME
 	Proto, err := protobuf.FindProtobufAll(SettingsProto)
 	if err != nil {
 		log.Errorln(err)

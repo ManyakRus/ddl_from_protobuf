@@ -36,6 +36,7 @@ type SettingsINI struct {
 	FILTER_MESSAGE_NAME        string
 	FILTER_ENUM_NAME           string
 	SUFFIX_CONVERT             string
+	EXCLUDE_MESSAGE_NAME       string
 }
 
 // CreateSettings - создает структуру типа SettingsINI
@@ -133,6 +134,11 @@ func FillSettings() {
 	Name = "SUFFIX_CONVERT"
 	s = Getenv(Name, false)
 	Settings.SUFFIX_CONVERT = s
+
+	//
+	Name = "EXCLUDE_MESSAGE_NAME"
+	s = Getenv(Name, false)
+	Settings.EXCLUDE_MESSAGE_NAME = s
 
 }
 

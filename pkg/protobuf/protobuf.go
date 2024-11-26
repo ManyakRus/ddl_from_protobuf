@@ -19,9 +19,10 @@ var mapMessages = make(map[string]*types.MessageElement)
 var mapEnums = make(map[string]*types.EnumElement)
 
 type SettingsProto struct {
-	Dir                 string
-	FILTER_MESSAGE_NAME string
-	FILTER_ENUM_NAME    string
+	Dir                  string
+	FILTER_MESSAGE_NAME  string
+	FILTER_ENUM_NAME     string
+	EXCLUDE_MESSAGE_NAME string
 }
 
 // Settings - структура для хранения всех нужных настроек
@@ -113,6 +114,15 @@ func handleMessage(m *proto.Message) {
 	if Filter != "" {
 		IsFound, _ := regexp.MatchString(Settings.FILTER_MESSAGE_NAME, MessageName)
 		if IsFound == false {
+			return
+		}
+	}
+
+	//фильтр кроме
+	FilterExclude := Settings.EXCLUDE_MESSAGE_NAME
+	if FilterExclude != "" {
+		IsFound, _ := regexp.MatchString(Settings.EXCLUDE_MESSAGE_NAME, MessageName)
+		if IsFound == true {
 			return
 		}
 	}

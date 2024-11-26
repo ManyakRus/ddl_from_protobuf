@@ -843,125 +843,12 @@ COMMENT ON COLUMN "tin"."broker_report"."separate_agreement_number" IS 'Номе
 COMMENT ON COLUMN "tin"."broker_report"."separate_agreement_date" IS 'Дата дог.';
 COMMENT ON COLUMN "tin"."broker_report"."delivery_type" IS 'Тип расчёта по сделке.';
 
-CREATE TABLE IF NOT EXISTS "tin"."get_accrued_interests_request" (
-	"figi" text NOT NULL,
-	"from" timestamptz NULL,
-	"to" timestamptz NULL,
-	CONSTRAINT "get_accrued_interests_request_pk" PRIMARY KEY ("figi")
-);
-COMMENT ON TABLE "tin"."get_accrued_interests_request" IS 'Запрос НКД по облигации';
-COMMENT ON COLUMN "tin"."get_accrued_interests_request"."figi" IS 'Figi-идентификатор инструмента.';
-COMMENT ON COLUMN "tin"."get_accrued_interests_request"."from" IS 'Начало запрашиваемого периода в часовом поясе UTC.';
-COMMENT ON COLUMN "tin"."get_accrued_interests_request"."to" IS 'Окончание запрашиваемого периода в часовом поясе UTC.';
-
-CREATE TABLE IF NOT EXISTS "tin"."get_bond_coupons_request" (
-	"figi" text NOT NULL,
-	"from" timestamptz NULL,
-	"to" timestamptz NULL,
-	CONSTRAINT "get_bond_coupons_request_pk" PRIMARY KEY ("figi")
-);
-COMMENT ON TABLE "tin"."get_bond_coupons_request" IS 'Запрос купонов по облигации.';
-COMMENT ON COLUMN "tin"."get_bond_coupons_request"."figi" IS 'Figi-идентификатор инструмента.';
-COMMENT ON COLUMN "tin"."get_bond_coupons_request"."from" IS 'Начало запрашиваемого периода в часовом поясе UTC. Фильтрация по coupon_date (дата выплаты купона)';
-COMMENT ON COLUMN "tin"."get_bond_coupons_request"."to" IS 'Окончание запрашиваемого периода в часовом поясе UTC. Фильтрация по coupon_date (дата выплаты купона)';
-
-CREATE TABLE IF NOT EXISTS "tin"."get_dividends_request" (
-	"figi" text NOT NULL,
-	"from" timestamptz NULL,
-	"to" timestamptz NULL,
-	CONSTRAINT "get_dividends_request_pk" PRIMARY KEY ("figi")
-);
-COMMENT ON TABLE "tin"."get_dividends_request" IS 'Запрос дивидендов.';
-COMMENT ON COLUMN "tin"."get_dividends_request"."figi" IS 'Figi-идентификатор инструмента.';
-COMMENT ON COLUMN "tin"."get_dividends_request"."from" IS 'Начало запрашиваемого периода в часовом поясе UTC. Фильтрация происходит по параметру *record_date* (дата фиксации реестра).';
-COMMENT ON COLUMN "tin"."get_dividends_request"."to" IS 'Окончание запрашиваемого периода в часовом поясе UTC. Фильтрация происходит по параметру *record_date* (дата фиксации реестра).';
-
-CREATE TABLE IF NOT EXISTS "tin"."get_last_prices_request" (
-	CONSTRAINT "get_last_prices_request_pk" PRIMARY KEY ("figi")
-);
-COMMENT ON TABLE "tin"."get_last_prices_request" IS 'Запрос получения цен последних сделок.';
-
-CREATE TABLE IF NOT EXISTS "tin"."get_last_trades_request" (
-	"from" timestamptz NULL,
-	"to" timestamptz NULL,
-	"instrument_id" text NOT NULL,
-	CONSTRAINT "get_last_trades_request_pk" PRIMARY KEY ("figi")
-);
-COMMENT ON TABLE "tin"."get_last_trades_request" IS 'Запрос обезличенных сделок за последний час.';
-COMMENT ON COLUMN "tin"."get_last_trades_request"."from" IS 'Начало запрашиваемого периода в часовом поясе UTC.';
-COMMENT ON COLUMN "tin"."get_last_trades_request"."to" IS 'Окончание запрашиваемого периода в часовом поясе UTC.';
-COMMENT ON COLUMN "tin"."get_last_trades_request"."instrument_id" IS 'Идентификатор инструмента, принимает значение figi или instrument_uid.';
-
-CREATE TABLE IF NOT EXISTS "tin"."get_order_book_request" (
-	"depth" integer NOT NULL,
-	"instrument_id" text NOT NULL,
-	CONSTRAINT "get_order_book_request_pk" PRIMARY KEY ("figi")
-);
-COMMENT ON TABLE "tin"."get_order_book_request" IS 'Запрос стакана.';
-COMMENT ON COLUMN "tin"."get_order_book_request"."depth" IS 'Глубина стакана.';
-COMMENT ON COLUMN "tin"."get_order_book_request"."instrument_id" IS 'Идентификатор инструмента, принимает значение figi или instrument_uid.';
-
-CREATE TABLE IF NOT EXISTS "tin"."get_order_book_response" (
-	"figi" text NOT NULL,
-	"depth" integer NOT NULL,
-	"last_price_units" bigint NULL,
-	"last_price_nano" integer NULL,
-	"close_price_units" bigint NULL,
-	"close_price_nano" integer NULL,
-	"limit_up_units" bigint NULL,
-	"limit_up_nano" integer NULL,
-	"limit_down_units" bigint NULL,
-	"limit_down_nano" integer NULL,
-	"last_price_ts" timestamptz NULL,
-	"close_price_ts" timestamptz NULL,
-	"orderbook_ts" timestamptz NULL,
-	"instrument_uid" text NOT NULL,
-	CONSTRAINT "get_order_book_response_pk" PRIMARY KEY ("figi")
-);
-COMMENT ON TABLE "tin"."get_order_book_response" IS 'Информация о стакане.';
-COMMENT ON COLUMN "tin"."get_order_book_response"."figi" IS 'Figi-идентификатор инструмента.';
-COMMENT ON COLUMN "tin"."get_order_book_response"."depth" IS 'Глубина стакана.';
-COMMENT ON COLUMN "tin"."get_order_book_response"."last_price_units" IS 'Цена последней сделки за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента. Для перевод цен в валюту рекомендуем использовать [информацию со страницы](https://tinkoff.github.io/investAPI/faq_marketdata/) / целая часть суммы, может быть отрицательным числом';
-COMMENT ON COLUMN "tin"."get_order_book_response"."last_price_nano" IS 'Цена последней сделки за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента. Для перевод цен в валюту рекомендуем использовать [информацию со страницы](https://tinkoff.github.io/investAPI/faq_marketdata/) / дробная часть суммы, может быть отрицательным числом';
-COMMENT ON COLUMN "tin"."get_order_book_response"."close_price_units" IS 'Цена закрытия за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента. Для перевод цен в валюту рекомендуем использовать [информацию со страницы](https://tinkoff.github.io/investAPI/faq_marketdata/) / целая часть суммы, может быть отрицательным числом';
-COMMENT ON COLUMN "tin"."get_order_book_response"."close_price_nano" IS 'Цена закрытия за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента. Для перевод цен в валюту рекомендуем использовать [информацию со страницы](https://tinkoff.github.io/investAPI/faq_marketdata/) / дробная часть суммы, может быть отрицательным числом';
-COMMENT ON COLUMN "tin"."get_order_book_response"."limit_up_units" IS 'Верхний лимит цены за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента. Для перевод цен в валюту рекомендуем использовать [информацию со страницы](https://tinkoff.github.io/investAPI/faq_marketdata/) / целая часть суммы, может быть отрицательным числом';
-COMMENT ON COLUMN "tin"."get_order_book_response"."limit_up_nano" IS 'Верхний лимит цены за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента. Для перевод цен в валюту рекомендуем использовать [информацию со страницы](https://tinkoff.github.io/investAPI/faq_marketdata/) / дробная часть суммы, может быть отрицательным числом';
-COMMENT ON COLUMN "tin"."get_order_book_response"."limit_down_units" IS 'Нижний лимит цены за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента. Для перевод цен в валюту рекомендуем использовать [информацию со страницы](https://tinkoff.github.io/investAPI/faq_marketdata/) / целая часть суммы, может быть отрицательным числом';
-COMMENT ON COLUMN "tin"."get_order_book_response"."limit_down_nano" IS 'Нижний лимит цены за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента. Для перевод цен в валюту рекомендуем использовать [информацию со страницы](https://tinkoff.github.io/investAPI/faq_marketdata/) / дробная часть суммы, может быть отрицательным числом';
-COMMENT ON COLUMN "tin"."get_order_book_response"."last_price_ts" IS 'Время получения цены последней сделки.';
-COMMENT ON COLUMN "tin"."get_order_book_response"."close_price_ts" IS 'Время получения цены закрытия.';
-COMMENT ON COLUMN "tin"."get_order_book_response"."orderbook_ts" IS 'Время формирования стакана на бирже.';
-COMMENT ON COLUMN "tin"."get_order_book_response"."instrument_uid" IS 'Uid инструмента.';
-
-CREATE TABLE IF NOT EXISTS "tin"."get_trading_status_request" (
-	"instrument_id" text NOT NULL,
-	CONSTRAINT "get_trading_status_request_pk" PRIMARY KEY ("figi")
-);
-COMMENT ON TABLE "tin"."get_trading_status_request" IS 'Запрос получения торгового статуса.';
-COMMENT ON COLUMN "tin"."get_trading_status_request"."instrument_id" IS 'Идентификатор инструмента, принимает значение figi или instrument_uid.';
-
 CREATE TABLE IF NOT EXISTS "tin"."info_instrument" (
 	"instrument_id" text NOT NULL,
 	CONSTRAINT "info_instrument_pk" PRIMARY KEY ("figi")
 );
 COMMENT ON TABLE "tin"."info_instrument" IS 'Запрос подписки на торговый статус.';
 COMMENT ON COLUMN "tin"."info_instrument"."instrument_id" IS 'Идентификатор инструмента, принимает значение figi или instrument_uid';
-
-CREATE TABLE IF NOT EXISTS "tin"."instrument_close_price_response" (
-	"figi" text NOT NULL,
-	"instrument_uid" text NOT NULL,
-	"price_units" bigint NULL,
-	"price_nano" integer NULL,
-	"time" timestamptz NULL,
-	CONSTRAINT "instrument_close_price_response_pk" PRIMARY KEY ("figi")
-);
-COMMENT ON TABLE "tin"."instrument_close_price_response" IS 'Цена закрытия торговой сессии по инструменту.';
-COMMENT ON COLUMN "tin"."instrument_close_price_response"."figi" IS 'Figi инструмента.';
-COMMENT ON COLUMN "tin"."instrument_close_price_response"."instrument_uid" IS 'Uid инструмента.';
-COMMENT ON COLUMN "tin"."instrument_close_price_response"."price_units" IS 'Цена закрытия торговой сессии. / целая часть суммы, может быть отрицательным числом';
-COMMENT ON COLUMN "tin"."instrument_close_price_response"."price_nano" IS 'Цена закрытия торговой сессии. / дробная часть суммы, может быть отрицательным числом';
-COMMENT ON COLUMN "tin"."instrument_close_price_response"."time" IS 'Дата совершения торгов.';
 
 CREATE TABLE IF NOT EXISTS "tin"."last_price" (
 	"figi" text NOT NULL,
@@ -1390,40 +1277,6 @@ COMMENT ON COLUMN "tin"."favorite_instrument"."otc_flag" IS 'Признак вн
 COMMENT ON COLUMN "tin"."favorite_instrument"."api_trade_available_flag" IS 'Параметр указывает на возможность торговать инструментом через API.';
 COMMENT ON COLUMN "tin"."favorite_instrument"."instrument_kind_id" IS 'Тип инструмента.';
 
-CREATE TABLE IF NOT EXISTS "tin"."get_candles_request" (
-	"from" timestamptz NULL,
-	"to" timestamptz NULL,
-	"interval_id" bigint NULL,
-	"instrument_id" text NOT NULL,
-	CONSTRAINT "get_candles_request_pk" PRIMARY KEY ("figi"),
-	CONSTRAINT "get_candles_request_interval_fk" FOREIGN KEY ("interval") REFERENCES "tin"."candle_interval" ("id")
-);
-CREATE INDEX IF NOT EXISTS "get_candles_request_interval_idx" ON "tin"."get_candles_request" USING btree ("interval");
-COMMENT ON TABLE "tin"."get_candles_request" IS 'Запрос исторических свечей.';
-COMMENT ON COLUMN "tin"."get_candles_request"."from" IS 'Начало запрашиваемого периода в часовом поясе UTC.';
-COMMENT ON COLUMN "tin"."get_candles_request"."to" IS 'Окончание запрашиваемого периода в часовом поясе UTC.';
-COMMENT ON COLUMN "tin"."get_candles_request"."interval_id" IS 'Интервал запрошенных свечей.';
-COMMENT ON COLUMN "tin"."get_candles_request"."instrument_id" IS 'Идентификатор инструмента, принимает значение figi или instrument_uid.';
-
-CREATE TABLE IF NOT EXISTS "tin"."get_trading_status_response" (
-	"figi" text NOT NULL,
-	"trading_status_id" bigint NULL,
-	"limit_order_available_flag" bool NOT NULL,
-	"market_order_available_flag" bool NOT NULL,
-	"api_trade_available_flag" bool NOT NULL,
-	"instrument_uid" text NOT NULL,
-	CONSTRAINT "get_trading_status_response_pk" PRIMARY KEY ("figi"),
-	CONSTRAINT "get_trading_status_response_trading_status_fk" FOREIGN KEY ("trading_status") REFERENCES "tin"."security_trading_status" ("id")
-);
-CREATE INDEX IF NOT EXISTS "get_trading_status_response_trading_status_idx" ON "tin"."get_trading_status_response" USING btree ("trading_status");
-COMMENT ON TABLE "tin"."get_trading_status_response" IS 'Информация о торговом статусе.';
-COMMENT ON COLUMN "tin"."get_trading_status_response"."figi" IS 'Figi-идентификатор инструмента.';
-COMMENT ON COLUMN "tin"."get_trading_status_response"."trading_status_id" IS 'Статус торговли инструментом.';
-COMMENT ON COLUMN "tin"."get_trading_status_response"."limit_order_available_flag" IS 'Признак доступности выставления лимитной заявки по инструменту.';
-COMMENT ON COLUMN "tin"."get_trading_status_response"."market_order_available_flag" IS 'Признак доступности выставления рыночной заявки по инструменту.';
-COMMENT ON COLUMN "tin"."get_trading_status_response"."api_trade_available_flag" IS 'Признак доступности торгов через API.';
-COMMENT ON COLUMN "tin"."get_trading_status_response"."instrument_uid" IS 'Uid инструмента.';
-
 CREATE TABLE IF NOT EXISTS "tin"."info_subscription" (
 	"figi" text NOT NULL,
 	"subscription_status_id" bigint NULL,
@@ -1436,19 +1289,6 @@ COMMENT ON TABLE "tin"."info_subscription" IS 'Статус подписки.';
 COMMENT ON COLUMN "tin"."info_subscription"."figi" IS 'Figi-идентификатор инструмента.';
 COMMENT ON COLUMN "tin"."info_subscription"."subscription_status_id" IS 'Статус подписки.';
 COMMENT ON COLUMN "tin"."info_subscription"."instrument_uid" IS 'Uid инструмента';
-
-CREATE TABLE IF NOT EXISTS "tin"."instrument_request" (
-	"id_type_id" bigint NULL,
-	"class_code" text NOT NULL,
-	"id" text NOT NULL,
-	CONSTRAINT "instrument_request_pk" PRIMARY KEY ("id"),
-	CONSTRAINT "instrument_request_id_type_fk" FOREIGN KEY ("id_type") REFERENCES "tin"."instrument_id_type" ("id")
-);
-CREATE INDEX IF NOT EXISTS "instrument_request_id_type_idx" ON "tin"."instrument_request" USING btree ("id_type");
-COMMENT ON TABLE "tin"."instrument_request" IS 'Запрос получения инструмента по идентификатору.';
-COMMENT ON COLUMN "tin"."instrument_request"."id_type_id" IS 'Тип идентификатора инструмента. Возможные значения: figi, ticker. Подробнее об идентификации инструментов: [Идентификация инструментов](https://tinkoff.github.io/investAPI/faq_identification/)';
-COMMENT ON COLUMN "tin"."instrument_request"."class_code" IS 'Идентификатор class_code. Обязателен при id_type = ticker.';
-COMMENT ON COLUMN "tin"."instrument_request"."id" IS 'Идентификатор запрашиваемого инструмента.';
 
 CREATE TABLE IF NOT EXISTS "tin"."instrument_short" (
 	"isin" text NOT NULL,
@@ -1501,23 +1341,6 @@ COMMENT ON TABLE "tin"."last_price_subscription" IS 'Статус подписк
 COMMENT ON COLUMN "tin"."last_price_subscription"."figi" IS 'Figi-идентификатор инструмента.';
 COMMENT ON COLUMN "tin"."last_price_subscription"."subscription_status_id" IS 'Статус подписки.';
 COMMENT ON COLUMN "tin"."last_price_subscription"."instrument_uid" IS 'Uid инструмента';
-
-CREATE TABLE IF NOT EXISTS "tin"."operations_request" (
-	"account_id" text NOT NULL,
-	"from" timestamptz NULL,
-	"to" timestamptz NULL,
-	"state_id" bigint NULL,
-	"figi" text NOT NULL,
-	CONSTRAINT "operations_request_pk" PRIMARY KEY ("figi"),
-	CONSTRAINT "operations_request_state_fk" FOREIGN KEY ("state") REFERENCES "tin"."operation_state" ("id")
-);
-CREATE INDEX IF NOT EXISTS "operations_request_state_idx" ON "tin"."operations_request" USING btree ("state");
-COMMENT ON TABLE "tin"."operations_request" IS 'Запрос получения списка операций по счёту.';
-COMMENT ON COLUMN "tin"."operations_request"."account_id" IS 'Идентификатор счёта клиента.';
-COMMENT ON COLUMN "tin"."operations_request"."from" IS 'Начало периода (по UTC).';
-COMMENT ON COLUMN "tin"."operations_request"."to" IS 'Окончание периода (по UTC).';
-COMMENT ON COLUMN "tin"."operations_request"."state_id" IS 'Статус запрашиваемых операций.';
-COMMENT ON COLUMN "tin"."operations_request"."figi" IS 'Figi-идентификатор инструмента для фильтрации.';
 
 CREATE TABLE IF NOT EXISTS "tin"."order_book_subscription" (
 	"figi" text NOT NULL,
@@ -2014,31 +1837,6 @@ COMMENT ON COLUMN "tin"."operation"."asset_uid" IS 'Идентификатор �
 COMMENT ON COLUMN "tin"."operation"."position_uid" IS 'position_uid-идентификатора инструмента.';
 COMMENT ON COLUMN "tin"."operation"."instrument_uid" IS 'Уникальный идентификатор инструмента.';
 
-CREATE TABLE IF NOT EXISTS "tin"."post_order_request" (
-	"quantity" bigint NOT NULL,
-	"price_units" bigint NULL,
-	"price_nano" integer NULL,
-	"direction_id" bigint NULL,
-	"account_id" text NOT NULL,
-	"order_type_id" bigint NULL,
-	"order_id" text NOT NULL,
-	"instrument_id" text NOT NULL,
-	CONSTRAINT "post_order_request_pk" PRIMARY KEY ("figi"),
-	CONSTRAINT "post_order_request_direction_fk" FOREIGN KEY ("direction") REFERENCES "tin"."order_direction" ("id"),
-	CONSTRAINT "post_order_request_order_type_fk" FOREIGN KEY ("order_type") REFERENCES "tin"."order_type" ("id")
-);
-CREATE INDEX IF NOT EXISTS "post_order_request_direction_idx" ON "tin"."post_order_request" USING btree ("direction");
-CREATE INDEX IF NOT EXISTS "post_order_request_order_type_idx" ON "tin"."post_order_request" USING btree ("order_type");
-COMMENT ON TABLE "tin"."post_order_request" IS 'Запрос выставления торгового поручения.';
-COMMENT ON COLUMN "tin"."post_order_request"."quantity" IS 'Количество лотов.';
-COMMENT ON COLUMN "tin"."post_order_request"."price_units" IS 'Цена за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента. Игнорируется для рыночных поручений. / целая часть суммы, может быть отрицательным числом';
-COMMENT ON COLUMN "tin"."post_order_request"."price_nano" IS 'Цена за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента. Игнорируется для рыночных поручений. / дробная часть суммы, может быть отрицательным числом';
-COMMENT ON COLUMN "tin"."post_order_request"."direction_id" IS 'Направление операции.';
-COMMENT ON COLUMN "tin"."post_order_request"."account_id" IS 'Номер счёта.';
-COMMENT ON COLUMN "tin"."post_order_request"."order_type_id" IS 'Тип заявки.';
-COMMENT ON COLUMN "tin"."post_order_request"."order_id" IS 'Идентификатор запроса выставления поручения для целей идемпотентности. Максимальная длина 36 символов.';
-COMMENT ON COLUMN "tin"."post_order_request"."instrument_id" IS 'Идентификатор инструмента, принимает значения Figi или Instrument_uid.';
-
 CREATE TABLE IF NOT EXISTS "tin"."stop_order" (
 	"stop_order_id" text NOT NULL,
 	"lots_requested" bigint NOT NULL,
@@ -2419,114 +2217,6 @@ COMMENT ON COLUMN "tin"."order_state"."order_type_id" IS 'Тип заявки.';
 COMMENT ON COLUMN "tin"."order_state"."order_date" IS 'Дата и время выставления заявки в часовом поясе UTC.';
 COMMENT ON COLUMN "tin"."order_state"."instrument_uid" IS 'UID идентификатор инструмента.';
 COMMENT ON COLUMN "tin"."order_state"."order_request_id" IS 'Идентификатор ключа идемпотентности, переданный клиентом.';
-
-CREATE TABLE IF NOT EXISTS "tin"."post_order_response" (
-	"order_id" text NOT NULL,
-	"execution_report_status_id" bigint NULL,
-	"lots_requested" bigint NOT NULL,
-	"lots_executed" bigint NOT NULL,
-	"initial_order_price_currency" text NULL,
-	"initial_order_price_units" bigint NULL,
-	"initial_order_price_nano" integer NULL,
-	"executed_order_price_currency" text NULL,
-	"executed_order_price_units" bigint NULL,
-	"executed_order_price_nano" integer NULL,
-	"total_order_amount_currency" text NULL,
-	"total_order_amount_units" bigint NULL,
-	"total_order_amount_nano" integer NULL,
-	"initial_commission_currency" text NULL,
-	"initial_commission_units" bigint NULL,
-	"initial_commission_nano" integer NULL,
-	"executed_commission_currency" text NULL,
-	"executed_commission_units" bigint NULL,
-	"executed_commission_nano" integer NULL,
-	"aci_value_currency" text NULL,
-	"aci_value_units" bigint NULL,
-	"aci_value_nano" integer NULL,
-	"figi" text NOT NULL,
-	"direction_id" bigint NULL,
-	"initial_security_price_currency" text NULL,
-	"initial_security_price_units" bigint NULL,
-	"initial_security_price_nano" integer NULL,
-	"order_type_id" bigint NULL,
-	"message" text NOT NULL,
-	"initial_order_price_pt_units" bigint NULL,
-	"initial_order_price_pt_nano" integer NULL,
-	"instrument_uid" text NOT NULL,
-	CONSTRAINT "post_order_response_pk" PRIMARY KEY ("figi"),
-	CONSTRAINT "post_order_response_execution_report_status_fk" FOREIGN KEY ("execution_report_status") REFERENCES "tin"."order_execution_report_status" ("id"),
-	CONSTRAINT "post_order_response_direction_fk" FOREIGN KEY ("direction") REFERENCES "tin"."order_direction" ("id"),
-	CONSTRAINT "post_order_response_order_type_fk" FOREIGN KEY ("order_type") REFERENCES "tin"."order_type" ("id")
-);
-CREATE INDEX IF NOT EXISTS "post_order_response_execution_report_status_idx" ON "tin"."post_order_response" USING btree ("execution_report_status");
-CREATE INDEX IF NOT EXISTS "post_order_response_direction_idx" ON "tin"."post_order_response" USING btree ("direction");
-CREATE INDEX IF NOT EXISTS "post_order_response_order_type_idx" ON "tin"."post_order_response" USING btree ("order_type");
-COMMENT ON TABLE "tin"."post_order_response" IS 'Информация о выставлении поручения.';
-COMMENT ON COLUMN "tin"."post_order_response"."order_id" IS 'Биржевой идентификатор заявки.';
-COMMENT ON COLUMN "tin"."post_order_response"."execution_report_status_id" IS 'Текущий статус заявки.';
-COMMENT ON COLUMN "tin"."post_order_response"."lots_requested" IS 'Запрошено лотов.';
-COMMENT ON COLUMN "tin"."post_order_response"."lots_executed" IS 'Исполнено лотов.';
-COMMENT ON COLUMN "tin"."post_order_response"."initial_order_price_currency" IS 'Начальная цена заявки. Произведение количества запрошенных лотов на цену. / строковый ISO-код валюты';
-COMMENT ON COLUMN "tin"."post_order_response"."initial_order_price_units" IS 'Начальная цена заявки. Произведение количества запрошенных лотов на цену. / целая часть суммы, может быть отрицательным числом';
-COMMENT ON COLUMN "tin"."post_order_response"."initial_order_price_nano" IS 'Начальная цена заявки. Произведение количества запрошенных лотов на цену. / дробная часть суммы, может быть отрицательным числом';
-COMMENT ON COLUMN "tin"."post_order_response"."executed_order_price_currency" IS 'Исполненная средняя цена 1 одного инструмента в заявки. / строковый ISO-код валюты';
-COMMENT ON COLUMN "tin"."post_order_response"."executed_order_price_units" IS 'Исполненная средняя цена 1 одного инструмента в заявки. / целая часть суммы, может быть отрицательным числом';
-COMMENT ON COLUMN "tin"."post_order_response"."executed_order_price_nano" IS 'Исполненная средняя цена 1 одного инструмента в заявки. / дробная часть суммы, может быть отрицательным числом';
-COMMENT ON COLUMN "tin"."post_order_response"."total_order_amount_currency" IS 'Итоговая стоимость заявки, включающая все комиссии. / строковый ISO-код валюты';
-COMMENT ON COLUMN "tin"."post_order_response"."total_order_amount_units" IS 'Итоговая стоимость заявки, включающая все комиссии. / целая часть суммы, может быть отрицательным числом';
-COMMENT ON COLUMN "tin"."post_order_response"."total_order_amount_nano" IS 'Итоговая стоимость заявки, включающая все комиссии. / дробная часть суммы, может быть отрицательным числом';
-COMMENT ON COLUMN "tin"."post_order_response"."initial_commission_currency" IS 'Начальная комиссия. Комиссия рассчитанная при выставлении заявки. / строковый ISO-код валюты';
-COMMENT ON COLUMN "tin"."post_order_response"."initial_commission_units" IS 'Начальная комиссия. Комиссия рассчитанная при выставлении заявки. / целая часть суммы, может быть отрицательным числом';
-COMMENT ON COLUMN "tin"."post_order_response"."initial_commission_nano" IS 'Начальная комиссия. Комиссия рассчитанная при выставлении заявки. / дробная часть суммы, может быть отрицательным числом';
-COMMENT ON COLUMN "tin"."post_order_response"."executed_commission_currency" IS 'Фактическая комиссия по итогам исполнения заявки. / строковый ISO-код валюты';
-COMMENT ON COLUMN "tin"."post_order_response"."executed_commission_units" IS 'Фактическая комиссия по итогам исполнения заявки. / целая часть суммы, может быть отрицательным числом';
-COMMENT ON COLUMN "tin"."post_order_response"."executed_commission_nano" IS 'Фактическая комиссия по итогам исполнения заявки. / дробная часть суммы, может быть отрицательным числом';
-COMMENT ON COLUMN "tin"."post_order_response"."aci_value_currency" IS 'Значение НКД (накопленного купонного дохода) на дату. Подробнее: [НКД при выставлении торговых поручений](https://tinkoff.github.io/investAPI/head-orders#coupon) / строковый ISO-код валюты';
-COMMENT ON COLUMN "tin"."post_order_response"."aci_value_units" IS 'Значение НКД (накопленного купонного дохода) на дату. Подробнее: [НКД при выставлении торговых поручений](https://tinkoff.github.io/investAPI/head-orders#coupon) / целая часть суммы, может быть отрицательным числом';
-COMMENT ON COLUMN "tin"."post_order_response"."aci_value_nano" IS 'Значение НКД (накопленного купонного дохода) на дату. Подробнее: [НКД при выставлении торговых поручений](https://tinkoff.github.io/investAPI/head-orders#coupon) / дробная часть суммы, может быть отрицательным числом';
-COMMENT ON COLUMN "tin"."post_order_response"."figi" IS 'Figi-идентификатор инструмента.';
-COMMENT ON COLUMN "tin"."post_order_response"."direction_id" IS 'Направление сделки.';
-COMMENT ON COLUMN "tin"."post_order_response"."initial_security_price_currency" IS 'Начальная цена за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента. / строковый ISO-код валюты';
-COMMENT ON COLUMN "tin"."post_order_response"."initial_security_price_units" IS 'Начальная цена за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента. / целая часть суммы, может быть отрицательным числом';
-COMMENT ON COLUMN "tin"."post_order_response"."initial_security_price_nano" IS 'Начальная цена за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента. / дробная часть суммы, может быть отрицательным числом';
-COMMENT ON COLUMN "tin"."post_order_response"."order_type_id" IS 'Тип заявки.';
-COMMENT ON COLUMN "tin"."post_order_response"."message" IS 'Дополнительные данные об исполнении заявки.';
-COMMENT ON COLUMN "tin"."post_order_response"."initial_order_price_pt_units" IS 'Начальная цена заявки в пунктах (для фьючерсов). / целая часть суммы, может быть отрицательным числом';
-COMMENT ON COLUMN "tin"."post_order_response"."initial_order_price_pt_nano" IS 'Начальная цена заявки в пунктах (для фьючерсов). / дробная часть суммы, может быть отрицательным числом';
-COMMENT ON COLUMN "tin"."post_order_response"."instrument_uid" IS 'UID идентификатор инструмента.';
-
-CREATE TABLE IF NOT EXISTS "tin"."post_stop_order_request" (
-	"quantity" bigint NOT NULL,
-	"price_units" bigint NULL,
-	"price_nano" integer NULL,
-	"stop_price_units" bigint NULL,
-	"stop_price_nano" integer NULL,
-	"direction_id" bigint NULL,
-	"account_id" text NOT NULL,
-	"expiration_type_id" bigint NULL,
-	"stop_order_type_id" bigint NULL,
-	"expire_date" timestamptz NULL,
-	"instrument_id" text NOT NULL,
-	CONSTRAINT "post_stop_order_request_pk" PRIMARY KEY ("figi"),
-	CONSTRAINT "post_stop_order_request_direction_fk" FOREIGN KEY ("direction") REFERENCES "tin"."stop_order_direction" ("id"),
-	CONSTRAINT "post_stop_order_request_expiration_type_fk" FOREIGN KEY ("expiration_type") REFERENCES "tin"."stop_order_expiration_type" ("id"),
-	CONSTRAINT "post_stop_order_request_stop_order_type_fk" FOREIGN KEY ("stop_order_type") REFERENCES "tin"."stop_order_type" ("id")
-);
-CREATE INDEX IF NOT EXISTS "post_stop_order_request_direction_idx" ON "tin"."post_stop_order_request" USING btree ("direction");
-CREATE INDEX IF NOT EXISTS "post_stop_order_request_expiration_type_idx" ON "tin"."post_stop_order_request" USING btree ("expiration_type");
-CREATE INDEX IF NOT EXISTS "post_stop_order_request_stop_order_type_idx" ON "tin"."post_stop_order_request" USING btree ("stop_order_type");
-COMMENT ON TABLE "tin"."post_stop_order_request" IS 'Запрос выставления стоп-заявки.';
-COMMENT ON COLUMN "tin"."post_stop_order_request"."quantity" IS 'Количество лотов.';
-COMMENT ON COLUMN "tin"."post_stop_order_request"."price_units" IS 'Цена за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента. / целая часть суммы, может быть отрицательным числом';
-COMMENT ON COLUMN "tin"."post_stop_order_request"."price_nano" IS 'Цена за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента. / дробная часть суммы, может быть отрицательным числом';
-COMMENT ON COLUMN "tin"."post_stop_order_request"."stop_price_units" IS 'Стоп-цена заявки за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента. / целая часть суммы, может быть отрицательным числом';
-COMMENT ON COLUMN "tin"."post_stop_order_request"."stop_price_nano" IS 'Стоп-цена заявки за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента. / дробная часть суммы, может быть отрицательным числом';
-COMMENT ON COLUMN "tin"."post_stop_order_request"."direction_id" IS 'Направление операции.';
-COMMENT ON COLUMN "tin"."post_stop_order_request"."account_id" IS 'Номер счёта.';
-COMMENT ON COLUMN "tin"."post_stop_order_request"."expiration_type_id" IS 'Тип экспирации заявки.';
-COMMENT ON COLUMN "tin"."post_stop_order_request"."stop_order_type_id" IS 'Тип заявки.';
-COMMENT ON COLUMN "tin"."post_stop_order_request"."expire_date" IS 'Дата и время окончания действия стоп-заявки в часовом поясе UTC. **Для ExpirationType = GoodTillDate заполнение обязательно**.';
-COMMENT ON COLUMN "tin"."post_stop_order_request"."instrument_id" IS 'Идентификатор инструмента, принимает значения Figi или instrument_uid.';
 
 CREATE TABLE IF NOT EXISTS "tin"."share" (
 	"figi" text NOT NULL,
