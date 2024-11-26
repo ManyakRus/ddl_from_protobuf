@@ -25,7 +25,7 @@ func (m *AssetShare) ConvertFromProtobuf(i investapi.AssetShare)  {
 	m.RepresIsin = i.RepresIsin
 	m.TotalFloatNano = i.TotalFloat.Nano
 	m.TotalFloatUnits = i.TotalFloat.Units
-	m.TypeID = int64(i.Type)
+	m.TypeID = int64(i.Type.Number())
 
 	return
 }

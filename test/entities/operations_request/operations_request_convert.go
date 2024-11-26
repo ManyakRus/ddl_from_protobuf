@@ -9,7 +9,7 @@ func (m *OperationsRequest) ConvertFromProtobuf(i investapi.OperationsRequest)  
 	m.AccountID = i.AccountId
 	m.Figi = i.Figi
 	m.From = i.From.AsTime()
-	m.StateID = int64(i.State)
+	m.StateID = int64(i.State.Number())
 	m.To = i.To.AsTime()
 
 	return

@@ -11,7 +11,7 @@ func (m *GetTradingStatusResponse) ConvertFromProtobuf(i investapi.GetTradingSta
 	m.InstrumentUid = i.InstrumentUid
 	m.LimitOrderAvailableFlag = i.LimitOrderAvailableFlag
 	m.MarketOrderAvailableFlag = i.MarketOrderAvailableFlag
-	m.TradingStatusID = int64(i.TradingStatus)
+	m.TradingStatusID = int64(i.TradingStatus.Number())
 
 	return
 }

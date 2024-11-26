@@ -14,7 +14,7 @@ func (m *InstrumentShort) ConvertFromProtobuf(i investapi.InstrumentShort)  {
 	m.First1MinCandleDate = i.First_1MinCandleDate.AsTime()
 	m.ForIisFlag = i.ForIisFlag
 	m.ForQualInvestorFlag = i.ForQualInvestorFlag
-	m.InstrumentKindID = int64(i.InstrumentKind)
+	m.InstrumentKindID = int64(i.InstrumentKind.Number())
 	m.InstrumentType = i.InstrumentType
 	m.Isin = i.Isin
 	m.Name = i.Name

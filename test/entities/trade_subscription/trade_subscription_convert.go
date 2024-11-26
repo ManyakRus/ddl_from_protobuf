@@ -8,7 +8,7 @@ import (
 func (m *TradeSubscription) ConvertFromProtobuf(i investapi.TradeSubscription)  {
 	m.Figi = i.Figi
 	m.InstrumentUid = i.InstrumentUid
-	m.SubscriptionStatusID = int64(i.SubscriptionStatus)
+	m.SubscriptionStatusID = int64(i.SubscriptionStatus.Number())
 
 	return
 }

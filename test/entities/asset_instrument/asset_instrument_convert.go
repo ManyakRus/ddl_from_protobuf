@@ -8,10 +8,8 @@ import (
 func (m *AssetInstrument) ConvertFromProtobuf(i investapi.AssetInstrument)  {
 	m.ClassCode = i.ClassCode
 	m.Figi = i.Figi
-	m.InstrumentKindID = int64(i.InstrumentKind)
+	m.InstrumentKindID = int64(i.InstrumentKind.Number())
 	m.InstrumentType = i.InstrumentType
-	m.LinksInstrumentUid = i.Links.InstrumentUid
-	m.LinksType = i.Links.Type
 	m.PositionUid = i.PositionUid
 	m.Ticker = i.Ticker
 	m.Uid = i.Uid

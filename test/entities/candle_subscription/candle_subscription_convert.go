@@ -8,8 +8,8 @@ import (
 func (m *CandleSubscription) ConvertFromProtobuf(i investapi.CandleSubscription)  {
 	m.Figi = i.Figi
 	m.InstrumentUid = i.InstrumentUid
-	m.IntervalID = int64(i.Interval)
-	m.SubscriptionStatusID = int64(i.SubscriptionStatus)
+	m.IntervalID = int64(i.Interval.Number())
+	m.SubscriptionStatusID = int64(i.SubscriptionStatus.Number())
 
 	return
 }

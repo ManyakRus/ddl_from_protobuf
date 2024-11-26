@@ -42,11 +42,11 @@ func (m *Currency) ConvertFromProtobuf(i investapi.Currency)  {
 	m.NominalUnits = i.Nominal.Units
 	m.OtcFlag = i.OtcFlag
 	m.PositionUid = i.PositionUid
-	m.RealExchangeID = int64(i.RealExchange)
+	m.RealExchangeID = int64(i.RealExchange.Number())
 	m.SellAvailableFlag = i.SellAvailableFlag
 	m.ShortEnabledFlag = i.ShortEnabledFlag
 	m.Ticker = i.Ticker
-	m.TradingStatusID = int64(i.TradingStatus)
+	m.TradingStatusID = int64(i.TradingStatus.Number())
 	m.Uid = i.Uid
 	m.WeekendFlag = i.WeekendFlag
 

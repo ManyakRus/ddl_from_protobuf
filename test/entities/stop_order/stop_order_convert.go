@@ -9,12 +9,12 @@ func (m *StopOrder) ConvertFromProtobuf(i investapi.StopOrder)  {
 	m.ActivationDateTime = i.ActivationDateTime.AsTime()
 	m.CreateDate = i.CreateDate.AsTime()
 	m.Currency = i.Currency
-	m.DirectionID = int64(i.Direction)
+	m.DirectionID = int64(i.Direction.Number())
 	m.ExpirationTime = i.ExpirationTime.AsTime()
 	m.Figi = i.Figi
 	m.InstrumentUid = i.InstrumentUid
 	m.LotsRequested = i.LotsRequested
-	m.OrderTypeID = int64(i.OrderType)
+	m.OrderTypeID = int64(i.OrderType.Number())
 	m.PriceCurrency = i.Price.Currency
 	m.PriceNano = i.Price.Nano
 	m.PriceUnits = i.Price.Units

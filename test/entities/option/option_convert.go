@@ -18,7 +18,7 @@ func (m *Option) ConvertFromProtobuf(i investapi.Option)  {
 	m.CountryOfRisk = i.CountryOfRisk
 	m.CountryOfRiskName = i.CountryOfRiskName
 	m.Currency = i.Currency
-	m.DirectionID = int64(i.Direction)
+	m.DirectionID = int64(i.Direction.Number())
 	m.DlongMinNano = i.DlongMin.Nano
 	m.DlongMinUnits = i.DlongMin.Units
 	m.DlongNano = i.Dlong.Nano
@@ -44,20 +44,20 @@ func (m *Option) ConvertFromProtobuf(i investapi.Option)  {
 	m.MinPriceIncrementUnits = i.MinPriceIncrement.Units
 	m.Name = i.Name
 	m.OtcFlag = i.OtcFlag
-	m.PaymentTypeID = int64(i.PaymentType)
+	m.PaymentTypeID = int64(i.PaymentType.Number())
 	m.PositionUid = i.PositionUid
-	m.RealExchangeID = int64(i.RealExchange)
+	m.RealExchangeID = int64(i.RealExchange.Number())
 	m.Sector = i.Sector
 	m.SellAvailableFlag = i.SellAvailableFlag
 	m.SettlementCurrency = i.SettlementCurrency
-	m.SettlementTypeID = int64(i.SettlementType)
+	m.SettlementTypeID = int64(i.SettlementType.Number())
 	m.ShortEnabledFlag = i.ShortEnabledFlag
 	m.StrikePriceCurrency = i.StrikePrice.Currency
 	m.StrikePriceNano = i.StrikePrice.Nano
 	m.StrikePriceUnits = i.StrikePrice.Units
-	m.StyleID = int64(i.Style)
+	m.StyleID = int64(i.Style.Number())
 	m.Ticker = i.Ticker
-	m.TradingStatusID = int64(i.TradingStatus)
+	m.TradingStatusID = int64(i.TradingStatus.Number())
 	m.Uid = i.Uid
 	m.WeekendFlag = i.WeekendFlag
 

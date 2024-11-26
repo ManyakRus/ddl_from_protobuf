@@ -43,6 +43,12 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 
 	//fields
 	for _, field1 := range message1.Fields {
+		//массивы не перекачиваем
+		if field1.Repeated == true {
+			continue
+		}
+
+		//
 		FieldType := field1.Type
 		SQLType := ""
 		MapMappings1, ok := Settings.MapSQLTypes[FieldType]
@@ -57,6 +63,7 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 		ProtoForeignTableName := ""
 		ProtoForeignColumnName := ""
 		TypeForeignProtobuf := ""
+		IsObject := false
 		//
 
 		//для тип=enum или message with table
@@ -66,13 +73,13 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 		if SQLType == "" {
 			IsEnum = IsEnumField(Settings, field1)
 			IsMessage = IsMessageField(Settings, field1)
-			ForeignTableName, ForeignTableColumnName := FindForeignTableNameAndColumnName(Settings, field1)
+			ProtoForeignTableName, ProtoForeignColumnName = FindForeignTableNameAndColumnName(Settings, field1)
 			if IsMessage == true {
-				if ForeignTableName != "" && ForeignTableColumnName != "" {
+				if ProtoForeignTableName != "" && ProtoForeignColumnName != "" {
 					IsMessageWithTable = true
 
 					FieldID := &types.FieldElement{}
-					ForeignMessage1, ok := Settings.MapMessages[ForeignTableName]
+					ForeignMessage1, ok := Settings.MapMessages[ProtoForeignTableName]
 					if ok == true {
 						//это message
 						FieldID = Find_ID_from_Fields(Settings, ForeignMessage1.Fields)
@@ -80,29 +87,33 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 						//тип
 						MapMappingsID1, ok := Settings.MapSQLTypes[FieldID.Type]
 						if ok == false {
-							log.Panic("message: ", FieldNameProto, ", field: ", FieldNameProto, ", not found message: "+ForeignTableName)
+							log.Panic("message: ", FieldNameProto, ", field: ", FieldNameProto, ", not found message: "+ProtoForeignTableName)
 						}
 						SQLType = MapMappingsID1.SQLType
 
 						//запомним MapTables
-						ForeignTableName = ForeignTableName
-						ProtoForeignColumnName = ForeignTableColumnName
+						//ProtoForeignTableName = ProtoForeignTableName
+						//ProtoForeignColumnName = ProtoForeignColumnName
 						TypeForeignProtobuf = FieldID.Type
+						FieldNameSQL = AddText_id(FieldNameSQL)
+						IsObject = true
 					}
 				}
 			} else {
 				//это enum
-				_, ok := Settings.MapEnums[ForeignTableName]
+				_, ok := Settings.MapEnums[ProtoForeignTableName]
 				if ok == false {
-					log.Panic("message: ", FieldNameProto, ", field: ", FieldNameProto, ", not found message: "+ForeignTableName)
+					log.Panic("message: ", FieldNameProto, ", field: ", FieldNameProto, ", not found message: "+ProtoForeignTableName)
 				}
 				SQLType = "bigint"
 
 				//запомним MapTables
-				ProtoForeignTableName = ForeignTableName
-				ProtoForeignColumnName = ForeignTableColumnName
-				TypeForeignProtobuf = ForeignTableName //"int64"
+				//ProtoForeignTableName = ProtoForeignTableName
+				//ProtoForeignColumnName = ProtoForeignColumnName
+				ProtoForeignColumnName = "Number()"
+				TypeForeignProtobuf = ProtoForeignTableName //"int64"
 				FieldNameSQL = AddText_id(FieldNameSQL)
+				IsObject = true
 			}
 		}
 
@@ -160,6 +171,8 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 		Column1.ProtoForeignTableName = ProtoForeignTableName
 		Column1.ProtoForeignColumnName = ProtoForeignColumnName
 		Column1.ProtoForeignColumnType = TypeForeignProtobuf
+		Column1.IsObject = IsObject
+		Column1.IsEnum = IsEnum
 		Table1.MapColumns[Column1.SQLName] = &Column1
 
 		//одна колонка
@@ -194,7 +207,10 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 
 		//
 		ColumnPK := create_files.FindColumn_from_NameProtobuf(Table1.MapColumns, IdentifierName)
-		ColumnPK.IsPrimaryKey = true
+		if ColumnPK != nil {
+			//log.Panic("message: ", message1.Name, ", field: ", IdentifierName, ", not found in table: ", TableNameSQL)
+			ColumnPK.IsPrimaryKey = true
+		}
 	} else {
 		//таблицы без идентификаторов не создаем
 		return "", ForeignCount, err

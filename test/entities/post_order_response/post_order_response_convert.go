@@ -9,14 +9,14 @@ func (m *PostOrderResponse) ConvertFromProtobuf(i investapi.PostOrderResponse)  
 	m.AciValueCurrency = i.AciValue.Currency
 	m.AciValueNano = i.AciValue.Nano
 	m.AciValueUnits = i.AciValue.Units
-	m.DirectionID = int64(i.Direction)
+	m.DirectionID = int64(i.Direction.Number())
 	m.ExecutedCommissionCurrency = i.ExecutedCommission.Currency
 	m.ExecutedCommissionNano = i.ExecutedCommission.Nano
 	m.ExecutedCommissionUnits = i.ExecutedCommission.Units
 	m.ExecutedOrderPriceCurrency = i.ExecutedOrderPrice.Currency
 	m.ExecutedOrderPriceNano = i.ExecutedOrderPrice.Nano
 	m.ExecutedOrderPriceUnits = i.ExecutedOrderPrice.Units
-	m.ExecutionReportStatusID = int64(i.ExecutionReportStatus)
+	m.ExecutionReportStatusID = int64(i.ExecutionReportStatus.Number())
 	m.Figi = i.Figi
 	m.InitialCommissionCurrency = i.InitialCommission.Currency
 	m.InitialCommissionNano = i.InitialCommission.Nano
@@ -34,7 +34,7 @@ func (m *PostOrderResponse) ConvertFromProtobuf(i investapi.PostOrderResponse)  
 	m.LotsRequested = i.LotsRequested
 	m.Message = i.Message
 	m.OrderID = i.OrderId
-	m.OrderTypeID = int64(i.OrderType)
+	m.OrderTypeID = int64(i.OrderType.Number())
 	m.TotalOrderAmountCurrency = i.TotalOrderAmount.Currency
 	m.TotalOrderAmountNano = i.TotalOrderAmount.Nano
 	m.TotalOrderAmountUnits = i.TotalOrderAmount.Units

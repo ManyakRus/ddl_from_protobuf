@@ -8,7 +8,7 @@ import (
 func (m *CandleInstrument) ConvertFromProtobuf(i investapi.CandleInstrument)  {
 	m.Figi = i.Figi
 	m.InstrumentID = i.InstrumentId
-	m.IntervalID = int64(i.Interval)
+	m.IntervalID = int64(i.Interval.Number())
 
 	return
 }

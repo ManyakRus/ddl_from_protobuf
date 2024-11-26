@@ -13,7 +13,7 @@ func (m *Operation) ConvertFromProtobuf(i investapi.Operation)  {
 	m.ID = i.Id
 	m.InstrumentType = i.InstrumentType
 	m.InstrumentUid = i.InstrumentUid
-	m.OperationTypeID = int64(i.OperationType)
+	m.OperationTypeID = int64(i.OperationType.Number())
 	m.ParentOperationID = i.ParentOperationId
 	m.PaymentCurrency = i.Payment.Currency
 	m.PaymentNano = i.Payment.Nano
@@ -24,8 +24,7 @@ func (m *Operation) ConvertFromProtobuf(i investapi.Operation)  {
 	m.PriceUnits = i.Price.Units
 	m.Quantity = i.Quantity
 	m.QuantityRest = i.QuantityRest
-	m.StateID = int64(i.State)
-	m.Trades = i.Trades
+	m.StateID = int64(i.State.Number())
 	m.Type = i.Type
 
 	return

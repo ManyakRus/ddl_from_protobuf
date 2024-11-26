@@ -8,7 +8,7 @@ import (
 func (m *InstrumentRequest) ConvertFromProtobuf(i investapi.InstrumentRequest)  {
 	m.ClassCode = i.ClassCode
 	m.ID = i.Id
-	m.IdTypeID = int64(i.IdType)
+	m.IdTypeID = int64(i.IdType.Number())
 
 	return
 }

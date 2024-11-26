@@ -27,7 +27,7 @@ func (m *Instrument) ConvertFromProtobuf(i investapi.Instrument)  {
 	m.First1MinCandleDate = i.First_1MinCandleDate.AsTime()
 	m.ForIisFlag = i.ForIisFlag
 	m.ForQualInvestorFlag = i.ForQualInvestorFlag
-	m.InstrumentKindID = int64(i.InstrumentKind)
+	m.InstrumentKindID = int64(i.InstrumentKind.Number())
 	m.InstrumentType = i.InstrumentType
 	m.Isin = i.Isin
 	m.KlongNano = i.Klong.Nano
@@ -40,11 +40,11 @@ func (m *Instrument) ConvertFromProtobuf(i investapi.Instrument)  {
 	m.Name = i.Name
 	m.OtcFlag = i.OtcFlag
 	m.PositionUid = i.PositionUid
-	m.RealExchangeID = int64(i.RealExchange)
+	m.RealExchangeID = int64(i.RealExchange.Number())
 	m.SellAvailableFlag = i.SellAvailableFlag
 	m.ShortEnabledFlag = i.ShortEnabledFlag
 	m.Ticker = i.Ticker
-	m.TradingStatusID = int64(i.TradingStatus)
+	m.TradingStatusID = int64(i.TradingStatus.Number())
 	m.Uid = i.Uid
 	m.WeekendFlag = i.WeekendFlag
 

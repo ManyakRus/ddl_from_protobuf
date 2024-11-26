@@ -36,7 +36,6 @@ func (m *AssetEtf) ConvertFromProtobuf(i investapi.AssetEtf)  {
 	m.PrimaryIndexDescription = i.PrimaryIndexDescription
 	m.PrimaryIndexTrackingErrorNano = i.PrimaryIndexTrackingError.Nano
 	m.PrimaryIndexTrackingErrorUnits = i.PrimaryIndexTrackingError.Units
-	m.RebalancingDates = i.RebalancingDates.AsTime()
 	m.RebalancingFlag = i.RebalancingFlag
 	m.RebalancingFreq = i.RebalancingFreq
 	m.RebalancingPlan = i.RebalancingPlan

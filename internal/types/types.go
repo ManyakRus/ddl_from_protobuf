@@ -28,6 +28,7 @@ type Column struct {
 	//TypeGo              string
 	IsObject     bool
 	IsPrimaryKey bool
+	IsEnum       bool
 }
 
 // NewTable - создает новую структуру Table

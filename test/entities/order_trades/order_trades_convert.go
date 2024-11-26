@@ -8,11 +8,10 @@ import (
 func (m *OrderTrades) ConvertFromProtobuf(i investapi.OrderTrades)  {
 	m.AccountID = i.AccountId
 	m.CreatedAt = i.CreatedAt.AsTime()
-	m.DirectionID = int64(i.Direction)
+	m.DirectionID = int64(i.Direction.Number())
 	m.Figi = i.Figi
 	m.InstrumentUid = i.InstrumentUid
 	m.OrderID = i.OrderId
-	m.Trades = i.Trades
 
 	return
 }

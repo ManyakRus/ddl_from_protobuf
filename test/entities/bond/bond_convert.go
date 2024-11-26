@@ -60,15 +60,15 @@ func (m *Bond) ConvertFromProtobuf(i investapi.Bond)  {
 	m.PlacementPriceNano = i.PlacementPrice.Nano
 	m.PlacementPriceUnits = i.PlacementPrice.Units
 	m.PositionUid = i.PositionUid
-	m.RealExchangeID = int64(i.RealExchange)
-	m.RiskLevelID = int64(i.RiskLevel)
+	m.RealExchangeID = int64(i.RealExchange.Number())
+	m.RiskLevelID = int64(i.RiskLevel.Number())
 	m.Sector = i.Sector
 	m.SellAvailableFlag = i.SellAvailableFlag
 	m.ShortEnabledFlag = i.ShortEnabledFlag
 	m.StateRegDate = i.StateRegDate.AsTime()
 	m.SubordinatedFlag = i.SubordinatedFlag
 	m.Ticker = i.Ticker
-	m.TradingStatusID = int64(i.TradingStatus)
+	m.TradingStatusID = int64(i.TradingStatus.Number())
 	m.Uid = i.Uid
 	m.WeekendFlag = i.WeekendFlag
 

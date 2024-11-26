@@ -6,7 +6,7 @@ import (
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
 func (m *Trade) ConvertFromProtobuf(i investapi.Trade)  {
-	m.DirectionID = int64(i.Direction)
+	m.DirectionID = int64(i.Direction.Number())
 	m.Figi = i.Figi
 	m.InstrumentUid = i.InstrumentUid
 	m.PriceNano = i.Price.Nano

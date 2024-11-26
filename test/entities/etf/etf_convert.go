@@ -44,14 +44,14 @@ func (m *Etf) ConvertFromProtobuf(i investapi.Etf)  {
 	m.NumSharesUnits = i.NumShares.Units
 	m.OtcFlag = i.OtcFlag
 	m.PositionUid = i.PositionUid
-	m.RealExchangeID = int64(i.RealExchange)
+	m.RealExchangeID = int64(i.RealExchange.Number())
 	m.RebalancingFreq = i.RebalancingFreq
 	m.ReleasedDate = i.ReleasedDate.AsTime()
 	m.Sector = i.Sector
 	m.SellAvailableFlag = i.SellAvailableFlag
 	m.ShortEnabledFlag = i.ShortEnabledFlag
 	m.Ticker = i.Ticker
-	m.TradingStatusID = int64(i.TradingStatus)
+	m.TradingStatusID = int64(i.TradingStatus.Number())
 	m.Uid = i.Uid
 	m.WeekendFlag = i.WeekendFlag
 

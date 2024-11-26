@@ -6,9 +6,8 @@ import (
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
 func (m *Asset) ConvertFromProtobuf(i investapi.Asset)  {
-	m.Instruments = i.Instruments
 	m.Name = i.Name
-	m.TypeID = int64(i.Type)
+	m.TypeID = int64(i.Type.Number())
 	m.Uid = i.Uid
 
 	return

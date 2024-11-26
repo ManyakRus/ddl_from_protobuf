@@ -9,7 +9,7 @@ func (m *FavoriteInstrument) ConvertFromProtobuf(i investapi.FavoriteInstrument)
 	m.ApiTradeAvailableFlag = i.ApiTradeAvailableFlag
 	m.ClassCode = i.ClassCode
 	m.Figi = i.Figi
-	m.InstrumentKindID = int64(i.InstrumentKind)
+	m.InstrumentKindID = int64(i.InstrumentKind.Number())
 	m.InstrumentType = i.InstrumentType
 	m.Isin = i.Isin
 	m.OtcFlag = i.OtcFlag

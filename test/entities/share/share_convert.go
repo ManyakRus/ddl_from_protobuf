@@ -46,13 +46,13 @@ func (m *Share) ConvertFromProtobuf(i investapi.Share)  {
 	m.NominalUnits = i.Nominal.Units
 	m.OtcFlag = i.OtcFlag
 	m.PositionUid = i.PositionUid
-	m.RealExchangeID = int64(i.RealExchange)
+	m.RealExchangeID = int64(i.RealExchange.Number())
 	m.Sector = i.Sector
 	m.SellAvailableFlag = i.SellAvailableFlag
-	m.ShareTypeID = int64(i.ShareType)
+	m.ShareTypeID = int64(i.ShareType.Number())
 	m.ShortEnabledFlag = i.ShortEnabledFlag
 	m.Ticker = i.Ticker
-	m.TradingStatusID = int64(i.TradingStatus)
+	m.TradingStatusID = int64(i.TradingStatus.Number())
 	m.Uid = i.Uid
 	m.WeekendFlag = i.WeekendFlag
 

@@ -132,6 +132,12 @@ func TextConvertFromProtobufField1(Settings *config.SettingsINI, MapTables map[s
 		return Otvet
 	}
 
+	//enum
+	if Column1.IsEnum == true {
+		Otvet = Otvet + "\tm." + NameGoFromSQL + " = int64(i." + ProtoName + "." + ProtoForeignColumnName + ")\n"
+		return Otvet
+	}
+
 	//случай с объектами, структурами
 	if IsProtobufType == false && Column1.IsObject == true {
 		Otvet = Otvet + "\tm." + NameGoFromSQL + " = i." + ProtoName + "." + ProtoForeignColumnName + "\n"
