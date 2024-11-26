@@ -1,11 +1,11 @@
 package trade_instrument
 
 import (
-	"github.com/ManyakRus/tinkoff_invest/api/invest_api/investapi"
+	"github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *TradeInstrument) ConvertFromProtobuf(i investapi.TradeInstrument)  {
+func (m *TradeInstrument) ConvertFromProtobuf(i proto.TradeInstrument)  {
 	m.InstrumentID = i.InstrumentId
 
 	return

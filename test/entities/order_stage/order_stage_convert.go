@@ -1,11 +1,11 @@
 package order_stage
 
 import (
-	"github.com/ManyakRus/tinkoff_invest/api/invest_api/investapi"
+	"github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *OrderStage) ConvertFromProtobuf(i investapi.OrderStage)  {
+func (m *OrderStage) ConvertFromProtobuf(i proto.OrderStage)  {
 	m.PriceCurrency = i.Price.Currency
 	m.PriceNano = i.Price.Nano
 	m.PriceUnits = i.Price.Units

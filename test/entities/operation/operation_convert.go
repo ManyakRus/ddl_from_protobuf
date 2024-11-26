@@ -1,11 +1,11 @@
 package operation
 
 import (
-	"github.com/ManyakRus/tinkoff_invest/api/invest_api/investapi"
+	"github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *Operation) ConvertFromProtobuf(i investapi.Operation)  {
+func (m *Operation) ConvertFromProtobuf(i proto.Operation)  {
 	m.AssetUid = i.AssetUid
 	m.Currency = i.Currency
 	m.Date = i.Date.AsTime()

@@ -1,11 +1,11 @@
 package stop_order
 
 import (
-	"github.com/ManyakRus/tinkoff_invest/api/invest_api/investapi"
+	"github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *StopOrder) ConvertFromProtobuf(i investapi.StopOrder)  {
+func (m *StopOrder) ConvertFromProtobuf(i proto.StopOrder)  {
 	m.ActivationDateTime = i.ActivationDateTime.AsTime()
 	m.CreateDate = i.CreateDate.AsTime()
 	m.Currency = i.Currency

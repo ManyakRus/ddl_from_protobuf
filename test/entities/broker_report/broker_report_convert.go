@@ -1,11 +1,11 @@
 package broker_report
 
 import (
-	"github.com/ManyakRus/tinkoff_invest/api/invest_api/investapi"
+	"github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *BrokerReport) ConvertFromProtobuf(i investapi.BrokerReport)  {
+func (m *BrokerReport) ConvertFromProtobuf(i proto.BrokerReport)  {
 	m.AciValueNano = i.AciValue.Nano
 	m.AciValueUnits = i.AciValue.Units
 	m.BrokerCommissionCurrency = i.BrokerCommission.Currency

@@ -1,11 +1,11 @@
 package asset_instrument
 
 import (
-	"github.com/ManyakRus/tinkoff_invest/api/invest_api/investapi"
+	"github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *AssetInstrument) ConvertFromProtobuf(i investapi.AssetInstrument)  {
+func (m *AssetInstrument) ConvertFromProtobuf(i proto.AssetInstrument)  {
 	m.ClassCode = i.ClassCode
 	m.Figi = i.Figi
 	m.InstrumentKindID = int64(i.InstrumentKind.Number())

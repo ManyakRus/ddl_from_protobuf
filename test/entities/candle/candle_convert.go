@@ -1,11 +1,11 @@
 package candle
 
 import (
-	"github.com/ManyakRus/tinkoff_invest/api/invest_api/investapi"
+	"github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *Candle) ConvertFromProtobuf(i investapi.Candle)  {
+func (m *Candle) ConvertFromProtobuf(i proto.Candle)  {
 	m.CloseNano = i.Close.Nano
 	m.CloseUnits = i.Close.Units
 	m.Figi = i.Figi

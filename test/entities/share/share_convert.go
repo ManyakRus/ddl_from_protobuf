@@ -1,11 +1,11 @@
 package share
 
 import (
-	"github.com/ManyakRus/tinkoff_invest/api/invest_api/investapi"
+	"github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *Share) ConvertFromProtobuf(i investapi.Share)  {
+func (m *Share) ConvertFromProtobuf(i proto.Share)  {
 	m.ApiTradeAvailableFlag = i.ApiTradeAvailableFlag
 	m.BlockedTcaFlag = i.BlockedTcaFlag
 	m.BuyAvailableFlag = i.BuyAvailableFlag

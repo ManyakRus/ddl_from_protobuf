@@ -1,11 +1,11 @@
 package favorite_instrument
 
 import (
-	"github.com/ManyakRus/tinkoff_invest/api/invest_api/investapi"
+	"github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *FavoriteInstrument) ConvertFromProtobuf(i investapi.FavoriteInstrument)  {
+func (m *FavoriteInstrument) ConvertFromProtobuf(i proto.FavoriteInstrument)  {
 	m.ApiTradeAvailableFlag = i.ApiTradeAvailableFlag
 	m.ClassCode = i.ClassCode
 	m.Figi = i.Figi

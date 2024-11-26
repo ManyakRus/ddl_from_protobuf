@@ -1,11 +1,11 @@
 package positions_securities
 
 import (
-	"github.com/ManyakRus/tinkoff_invest/api/invest_api/investapi"
+	"github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *PositionsSecurities) ConvertFromProtobuf(i investapi.PositionsSecurities)  {
+func (m *PositionsSecurities) ConvertFromProtobuf(i proto.PositionsSecurities)  {
 	m.Balance = i.Balance
 	m.Blocked = i.Blocked
 	m.ExchangeBlocked = i.ExchangeBlocked

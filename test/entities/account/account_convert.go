@@ -1,11 +1,11 @@
 package account
 
 import (
-	"github.com/ManyakRus/tinkoff_invest/api/invest_api/investapi"
+	"github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *Account) ConvertFromProtobuf(i investapi.Account)  {
+func (m *Account) ConvertFromProtobuf(i proto.Account)  {
 	m.AccessLevelID = int64(i.AccessLevel.Number())
 	m.ClosedDate = i.ClosedDate.AsTime()
 	m.ID = i.Id

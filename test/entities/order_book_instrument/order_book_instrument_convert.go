@@ -1,11 +1,11 @@
 package order_book_instrument
 
 import (
-	"github.com/ManyakRus/tinkoff_invest/api/invest_api/investapi"
+	"github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *OrderBookInstrument) ConvertFromProtobuf(i investapi.OrderBookInstrument)  {
+func (m *OrderBookInstrument) ConvertFromProtobuf(i proto.OrderBookInstrument)  {
 	m.Depth = i.Depth
 	m.InstrumentID = i.InstrumentId
 

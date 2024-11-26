@@ -1,11 +1,11 @@
 package order_trade
 
 import (
-	"github.com/ManyakRus/tinkoff_invest/api/invest_api/investapi"
+	"github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *OrderTrade) ConvertFromProtobuf(i investapi.OrderTrade)  {
+func (m *OrderTrade) ConvertFromProtobuf(i proto.OrderTrade)  {
 	m.DateTime = i.DateTime.AsTime()
 	m.PriceNano = i.Price.Nano
 	m.PriceUnits = i.Price.Units

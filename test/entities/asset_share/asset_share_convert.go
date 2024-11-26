@@ -1,11 +1,11 @@
 package asset_share
 
 import (
-	"github.com/ManyakRus/tinkoff_invest/api/invest_api/investapi"
+	"github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *AssetShare) ConvertFromProtobuf(i investapi.AssetShare)  {
+func (m *AssetShare) ConvertFromProtobuf(i proto.AssetShare)  {
 	m.DivYieldFlag = i.DivYieldFlag
 	m.DividendRateNano = i.DividendRate.Nano
 	m.DividendRateUnits = i.DividendRate.Units

@@ -1,11 +1,11 @@
 package instrument_short
 
 import (
-	"github.com/ManyakRus/tinkoff_invest/api/invest_api/investapi"
+	"github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *InstrumentShort) ConvertFromProtobuf(i investapi.InstrumentShort)  {
+func (m *InstrumentShort) ConvertFromProtobuf(i proto.InstrumentShort)  {
 	m.ApiTradeAvailableFlag = i.ApiTradeAvailableFlag
 	m.BlockedTcaFlag = i.BlockedTcaFlag
 	m.ClassCode = i.ClassCode

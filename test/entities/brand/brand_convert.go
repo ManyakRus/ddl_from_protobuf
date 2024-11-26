@@ -1,11 +1,11 @@
 package brand
 
 import (
-	"github.com/ManyakRus/tinkoff_invest/api/invest_api/investapi"
+	"github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *Brand) ConvertFromProtobuf(i investapi.Brand)  {
+func (m *Brand) ConvertFromProtobuf(i proto.Brand)  {
 	m.Company = i.Company
 	m.CountryOfRisk = i.CountryOfRisk
 	m.CountryOfRiskName = i.CountryOfRiskName

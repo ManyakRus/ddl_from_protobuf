@@ -1,11 +1,11 @@
 package option
 
 import (
-	"github.com/ManyakRus/tinkoff_invest/api/invest_api/investapi"
+	"github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *Option) ConvertFromProtobuf(i investapi.Option)  {
+func (m *Option) ConvertFromProtobuf(i proto.Option)  {
 	m.ApiTradeAvailableFlag = i.ApiTradeAvailableFlag
 	m.AssetType = i.AssetType
 	m.BasicAsset = i.BasicAsset

@@ -1,11 +1,11 @@
 package bond
 
 import (
-	"github.com/ManyakRus/tinkoff_invest/api/invest_api/investapi"
+	"github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *Bond) ConvertFromProtobuf(i investapi.Bond)  {
+func (m *Bond) ConvertFromProtobuf(i proto.Bond)  {
 	m.AciValueCurrency = i.AciValue.Currency
 	m.AciValueNano = i.AciValue.Nano
 	m.AciValueUnits = i.AciValue.Units

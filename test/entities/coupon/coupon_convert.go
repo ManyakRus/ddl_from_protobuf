@@ -1,11 +1,11 @@
 package coupon
 
 import (
-	"github.com/ManyakRus/tinkoff_invest/api/invest_api/investapi"
+	"github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *Coupon) ConvertFromProtobuf(i investapi.Coupon)  {
+func (m *Coupon) ConvertFromProtobuf(i proto.Coupon)  {
 	m.CouponDate = i.CouponDate.AsTime()
 	m.CouponEndDate = i.CouponEndDate.AsTime()
 	m.CouponNumber = i.CouponNumber

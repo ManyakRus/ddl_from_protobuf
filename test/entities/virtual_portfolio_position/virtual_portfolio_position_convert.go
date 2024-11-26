@@ -1,11 +1,11 @@
 package virtual_portfolio_position
 
 import (
-	"github.com/ManyakRus/tinkoff_invest/api/invest_api/investapi"
+	"github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *VirtualPortfolioPosition) ConvertFromProtobuf(i investapi.VirtualPortfolioPosition)  {
+func (m *VirtualPortfolioPosition) ConvertFromProtobuf(i proto.VirtualPortfolioPosition)  {
 	m.AveragePositionPriceCurrency = i.AveragePositionPrice.Currency
 	m.AveragePositionPriceFifoCurrency = i.AveragePositionPriceFifo.Currency
 	m.AveragePositionPriceFifoNano = i.AveragePositionPriceFifo.Nano

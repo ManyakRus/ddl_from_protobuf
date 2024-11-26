@@ -1,11 +1,11 @@
 package order_trades
 
 import (
-	"github.com/ManyakRus/tinkoff_invest/api/invest_api/investapi"
+	"github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *OrderTrades) ConvertFromProtobuf(i investapi.OrderTrades)  {
+func (m *OrderTrades) ConvertFromProtobuf(i proto.OrderTrades)  {
 	m.AccountID = i.AccountId
 	m.CreatedAt = i.CreatedAt.AsTime()
 	m.DirectionID = int64(i.Direction.Number())

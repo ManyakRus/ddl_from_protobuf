@@ -1,11 +1,11 @@
 package future
 
 import (
-	"github.com/ManyakRus/tinkoff_invest/api/invest_api/investapi"
+	"github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *Future) ConvertFromProtobuf(i investapi.Future)  {
+func (m *Future) ConvertFromProtobuf(i proto.Future)  {
 	m.ApiTradeAvailableFlag = i.ApiTradeAvailableFlag
 	m.AssetType = i.AssetType
 	m.BasicAsset = i.BasicAsset

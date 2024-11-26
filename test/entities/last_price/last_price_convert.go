@@ -1,11 +1,11 @@
 package last_price
 
 import (
-	"github.com/ManyakRus/tinkoff_invest/api/invest_api/investapi"
+	"github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *LastPrice) ConvertFromProtobuf(i investapi.LastPrice)  {
+func (m *LastPrice) ConvertFromProtobuf(i proto.LastPrice)  {
 	m.Figi = i.Figi
 	m.InstrumentUid = i.InstrumentUid
 	m.PriceNano = i.Price.Nano

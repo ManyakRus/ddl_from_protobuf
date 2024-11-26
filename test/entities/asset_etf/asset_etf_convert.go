@@ -1,11 +1,11 @@
 package asset_etf
 
 import (
-	"github.com/ManyakRus/tinkoff_invest/api/invest_api/investapi"
+	"github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *AssetEtf) ConvertFromProtobuf(i investapi.AssetEtf)  {
+func (m *AssetEtf) ConvertFromProtobuf(i proto.AssetEtf)  {
 	m.BuyPremiumNano = i.BuyPremium.Nano
 	m.BuyPremiumUnits = i.BuyPremium.Units
 	m.Description = i.Description

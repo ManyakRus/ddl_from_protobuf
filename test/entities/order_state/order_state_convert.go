@@ -1,11 +1,11 @@
 package order_state
 
 import (
-	"github.com/ManyakRus/tinkoff_invest/api/invest_api/investapi"
+	"github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *OrderState) ConvertFromProtobuf(i investapi.OrderState)  {
+func (m *OrderState) ConvertFromProtobuf(i proto.OrderState)  {
 	m.AveragePositionPriceCurrency = i.AveragePositionPrice.Currency
 	m.AveragePositionPriceNano = i.AveragePositionPrice.Nano
 	m.AveragePositionPriceUnits = i.AveragePositionPrice.Units
