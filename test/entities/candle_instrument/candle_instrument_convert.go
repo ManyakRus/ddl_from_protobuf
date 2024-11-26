@@ -1,7 +1,7 @@
 package candle_instrument
 
 import (
-	"github.com/tinkoff/invest-api-go-sdk/proto"
+	proto "github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud

@@ -50,7 +50,7 @@ func CreateFiles_Message1(Settings *config.SettingsINI, MapTables map[string]*ty
 	Text := `package ` + TableNameSQL + `
 
 import (
-	"` + ProtoURL + `"
+	proto "` + ProtoURL + `"
 )
 `
 
