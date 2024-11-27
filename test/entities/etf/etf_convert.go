@@ -13,35 +13,143 @@ func (m *Etf) ConvertFromProtobuf(i proto.Etf)  {
 	m.CountryOfRisk = i.CountryOfRisk
 	m.CountryOfRiskName = i.CountryOfRiskName
 	m.Currency = i.Currency
-	m.DlongMinNano = i.DlongMin.Nano
-	m.DlongMinUnits = i.DlongMin.Units
-	m.DlongNano = i.Dlong.Nano
-	m.DlongUnits = i.Dlong.Units
-	m.DshortMinNano = i.DshortMin.Nano
-	m.DshortMinUnits = i.DshortMin.Units
-	m.DshortNano = i.Dshort.Nano
-	m.DshortUnits = i.Dshort.Units
+
+	if i.DlongMin != nil {
+		m.DlongMinNano = i.DlongMin.Nano
+	} else {
+		m.DlongMinNano = 0
+	}
+
+
+	if i.DlongMin != nil {
+		m.DlongMinUnits = i.DlongMin.Units
+	} else {
+		m.DlongMinUnits = 0
+	}
+
+
+	if i.Dlong != nil {
+		m.DlongNano = i.Dlong.Nano
+	} else {
+		m.DlongNano = 0
+	}
+
+
+	if i.Dlong != nil {
+		m.DlongUnits = i.Dlong.Units
+	} else {
+		m.DlongUnits = 0
+	}
+
+
+	if i.DshortMin != nil {
+		m.DshortMinNano = i.DshortMin.Nano
+	} else {
+		m.DshortMinNano = 0
+	}
+
+
+	if i.DshortMin != nil {
+		m.DshortMinUnits = i.DshortMin.Units
+	} else {
+		m.DshortMinUnits = 0
+	}
+
+
+	if i.Dshort != nil {
+		m.DshortNano = i.Dshort.Nano
+	} else {
+		m.DshortNano = 0
+	}
+
+
+	if i.Dshort != nil {
+		m.DshortUnits = i.Dshort.Units
+	} else {
+		m.DshortUnits = 0
+	}
+
 	m.Exchange = i.Exchange
 	m.Figi = i.Figi
 	m.First1DayCandleDate = i.First_1DayCandleDate.AsTime()
 	m.First1MinCandleDate = i.First_1MinCandleDate.AsTime()
-	m.FixedCommissionNano = i.FixedCommission.Nano
-	m.FixedCommissionUnits = i.FixedCommission.Units
+
+	if i.FixedCommission != nil {
+		m.FixedCommissionNano = i.FixedCommission.Nano
+	} else {
+		m.FixedCommissionNano = 0
+	}
+
+
+	if i.FixedCommission != nil {
+		m.FixedCommissionUnits = i.FixedCommission.Units
+	} else {
+		m.FixedCommissionUnits = 0
+	}
+
 	m.FocusType = i.FocusType
 	m.ForIisFlag = i.ForIisFlag
 	m.ForQualInvestorFlag = i.ForQualInvestorFlag
 	m.Isin = i.Isin
-	m.KlongNano = i.Klong.Nano
-	m.KlongUnits = i.Klong.Units
-	m.KshortNano = i.Kshort.Nano
-	m.KshortUnits = i.Kshort.Units
+
+	if i.Klong != nil {
+		m.KlongNano = i.Klong.Nano
+	} else {
+		m.KlongNano = 0
+	}
+
+
+	if i.Klong != nil {
+		m.KlongUnits = i.Klong.Units
+	} else {
+		m.KlongUnits = 0
+	}
+
+
+	if i.Kshort != nil {
+		m.KshortNano = i.Kshort.Nano
+	} else {
+		m.KshortNano = 0
+	}
+
+
+	if i.Kshort != nil {
+		m.KshortUnits = i.Kshort.Units
+	} else {
+		m.KshortUnits = 0
+	}
+
 	m.LiquidityFlag = i.LiquidityFlag
 	m.Lot = i.Lot
-	m.MinPriceIncrementNano = i.MinPriceIncrement.Nano
-	m.MinPriceIncrementUnits = i.MinPriceIncrement.Units
+
+	if i.MinPriceIncrement != nil {
+		m.MinPriceIncrementNano = i.MinPriceIncrement.Nano
+	} else {
+		m.MinPriceIncrementNano = 0
+	}
+
+
+	if i.MinPriceIncrement != nil {
+		m.MinPriceIncrementUnits = i.MinPriceIncrement.Units
+	} else {
+		m.MinPriceIncrementUnits = 0
+	}
+
 	m.Name = i.Name
-	m.NumSharesNano = i.NumShares.Nano
-	m.NumSharesUnits = i.NumShares.Units
+
+	if i.NumShares != nil {
+		m.NumSharesNano = i.NumShares.Nano
+	} else {
+		m.NumSharesNano = 0
+	}
+
+
+	if i.NumShares != nil {
+		m.NumSharesUnits = i.NumShares.Units
+	} else {
+		m.NumSharesUnits = 0
+	}
+
 	m.OtcFlag = i.OtcFlag
 	m.PositionUid = i.PositionUid
 	m.RealExchangeID = int64(i.RealExchange.Number())

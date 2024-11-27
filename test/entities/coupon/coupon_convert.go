@@ -14,9 +14,27 @@ func (m *Coupon) ConvertFromProtobuf(i proto.Coupon)  {
 	m.CouponTypeID = int64(i.CouponType.Number())
 	m.Figi = i.Figi
 	m.FixDate = i.FixDate.AsTime()
-	m.PayOneBondCurrency = i.PayOneBond.Currency
-	m.PayOneBondNano = i.PayOneBond.Nano
-	m.PayOneBondUnits = i.PayOneBond.Units
+
+	if i.PayOneBond != nil {
+		m.PayOneBondCurrency = i.PayOneBond.Currency
+	} else {
+		m.PayOneBondCurrency = ""
+	}
+
+
+	if i.PayOneBond != nil {
+		m.PayOneBondNano = i.PayOneBond.Nano
+	} else {
+		m.PayOneBondNano = 0
+	}
+
+
+	if i.PayOneBond != nil {
+		m.PayOneBondUnits = i.PayOneBond.Units
+	} else {
+		m.PayOneBondUnits = 0
+	}
+
 
 	return
 }

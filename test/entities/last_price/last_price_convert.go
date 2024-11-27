@@ -8,8 +8,20 @@ import (
 func (m *LastPrice) ConvertFromProtobuf(i proto.LastPrice)  {
 	m.Figi = i.Figi
 	m.InstrumentUid = i.InstrumentUid
-	m.PriceNano = i.Price.Nano
-	m.PriceUnits = i.Price.Units
+
+	if i.Price != nil {
+		m.PriceNano = i.Price.Nano
+	} else {
+		m.PriceNano = 0
+	}
+
+
+	if i.Price != nil {
+		m.PriceUnits = i.Price.Units
+	} else {
+		m.PriceUnits = 0
+	}
+
 	m.Time = i.Time.AsTime()
 
 	return

@@ -140,7 +140,13 @@ func TextConvertFromProtobufField1(Settings *config.SettingsINI, MapTables map[s
 
 	//случай с объектами, структурами
 	if IsProtobufType == false && Column1.IsObject == true {
-		Otvet = Otvet + "\tm." + NameGoFromSQL + " = i." + ProtoName + "." + ProtoForeignColumnName + "\n"
+		TypeGo := create_files.Convert_TypeSQL_to_TypeGo(Settings, Column1.SQLType)
+		DefaultValue := create_files.FindText_DefaultValue(TypeGo)
+		Otvet = Otvet + "\n\tif i." + ProtoName + " != nil {\n"
+		Otvet = Otvet + "\t\tm." + NameGoFromSQL + " = i." + ProtoName + "." + ProtoForeignColumnName + "\n"
+		Otvet = Otvet + "\t} else {\n"
+		Otvet = Otvet + "\t\tm." + NameGoFromSQL + " = " + DefaultValue + "\n"
+		Otvet = Otvet + "\t}\n\n"
 	}
 
 	return Otvet

@@ -507,3 +507,43 @@ func IsDeprecatedField(field1 *types.FieldElement) bool {
 
 	return Otvet
 }
+
+// FindText_DefaultValue - возвращает golang значение по умолчанию для типа
+func FindText_DefaultValue(Type_go string) string {
+	var Otvet string
+
+	switch Type_go {
+	case "string":
+		Otvet = `""`
+	case "int", "int32", "int64", "float32", "float64", "uint", "uint32", "uint64":
+		Otvet = "0"
+	case "time.Time":
+		Otvet = "time.Time{}"
+	case "bool":
+		Otvet = "false"
+	case "uuid.UUID", "uuid.NullUUID":
+		Otvet = "uuid.Nil"
+	}
+
+	return Otvet
+}
+
+// FindText_DefaultValueSQL - возвращает значение по умолчанию для типа
+func FindText_DefaultValueSQL(Type_go string) string {
+	var Otvet string
+
+	switch Type_go {
+	case "string":
+		Otvet = `''`
+	case "int", "int32", "int64", "float32", "float64", "uint", "uint32", "uint64":
+		Otvet = "0"
+	case "time.Time":
+		Otvet = "null"
+	case "bool":
+		Otvet = "false"
+	case "uuid.UUID", "uuid.NullUUID":
+		Otvet = "null"
+	}
+
+	return Otvet
+}

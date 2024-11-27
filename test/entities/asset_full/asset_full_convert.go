@@ -8,7 +8,13 @@ import (
 func (m *AssetFull) ConvertFromProtobuf(i proto.AssetFull)  {
 	m.BrCode = i.BrCode
 	m.BrCodeName = i.BrCodeName
-	m.BrandID = i.Brand.Uid
+
+	if i.Brand != nil {
+		m.BrandID = i.Brand.Uid
+	} else {
+		m.BrandID = ""
+	}
+
 	m.Cfi = i.Cfi
 	m.CodeNsd = i.CodeNsd
 	m.DeletedAt = i.DeletedAt.AsTime()

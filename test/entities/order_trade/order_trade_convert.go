@@ -7,8 +7,20 @@ import (
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
 func (m *OrderTrade) ConvertFromProtobuf(i proto.OrderTrade)  {
 	m.DateTime = i.DateTime.AsTime()
-	m.PriceNano = i.Price.Nano
-	m.PriceUnits = i.Price.Units
+
+	if i.Price != nil {
+		m.PriceNano = i.Price.Nano
+	} else {
+		m.PriceNano = 0
+	}
+
+
+	if i.Price != nil {
+		m.PriceUnits = i.Price.Units
+	} else {
+		m.PriceUnits = 0
+	}
+
 	m.Quantity = i.Quantity
 	m.TradeID = i.TradeId
 
