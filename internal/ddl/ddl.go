@@ -204,6 +204,13 @@ func Find_ID_from_Fields(Settings *config.SettingsINI, Fields []*types.FieldElem
 	MassIndexNames := Settings.MassIndexNames
 	for _, IndexName1 := range MassIndexNames {
 		for _, Field1 := range Fields {
+			//
+			IsDeprecated := create_files.IsDeprecatedField(Field1)
+			if IsDeprecated == true {
+				continue
+			}
+
+			//
 			if Field1.Name == IndexName1 {
 				Otvet = Field1
 				return Otvet

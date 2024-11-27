@@ -35,7 +35,7 @@ EXCLUDE_MESSAGE_NAME="(Request$|Response$)"
 #---------------------------- convert files --------------------------------------------------------
 
 #REPOSITORY_PROTO_URL - another repository URL for protoc *.pb.go files
-REPOSITORY_PROTO_URL=
+REPOSITORY_PROTO_URL="github.com/tinkoff/invest-api-go-sdk/proto"
 
 #CONVERT_FOLDER_NAME - folder name for create convert .go files
 CONVERT_FOLDER_NAME="entities"

@@ -2,7 +2,6 @@ package ddl
 
 import (
 	"github.com/ManyakRus/ddl_from_protobuf/internal/config"
-	"github.com/ManyakRus/ddl_from_protobuf/internal/constants"
 	"github.com/ManyakRus/ddl_from_protobuf/internal/create_files"
 	"github.com/ManyakRus/ddl_from_protobuf/internal/types"
 	"github.com/ManyakRus/starter/log"
@@ -50,8 +49,9 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 		}
 
 		//игнорируем текст deprecated
-		Documentation := field1.Documentation
-		if strings.HasPrefix(Documentation, constants.TEXT_DEPRECATED) == true {
+		//Documentation := field1.Documentation
+		IsDeprecated := create_files.IsDeprecatedField(field1)
+		if IsDeprecated == true {
 			continue
 		}
 
@@ -187,14 +187,14 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 		Otvet = Otvet + "\t" + `"` + FieldNameSQL + `"` + " " + SQLType + " " + TextNullable + ",\n"
 
 		//CONSTRAINT
-		TextConstraint1 := FillTextConstraint1(Settings, message1, field1)
+		TextConstraint1 := FillTextConstraint1(Settings, message1, field1, FieldNameSQL)
 		TextConstraint = TextConstraint + TextConstraint1
 		if TextConstraint1 != "" {
 			ForeignCount = ForeignCount + 1
 		}
 
 		//INDEX
-		TextIndex1 := FillTextIndex1(Settings, message1, field1)
+		TextIndex1 := FillTextIndex1(Settings, message1, field1, FieldNameSQL)
 		TextIndex = TextIndex + TextIndex1
 
 		//COLUMN COMMENTS
@@ -247,13 +247,13 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 }
 
 // FillTextConstraint1 - возвращает текст SQL ограничений
-func FillTextConstraint1(Settings *config.SettingsINI, message1 *types.MessageElement, field1 *types.FieldElement) string {
+func FillTextConstraint1(Settings *config.SettingsINI, message1 *types.MessageElement, field1 *types.FieldElement, FieldNameSQL string) string {
 	Otvet := ""
 
 	TableName := message1.Name
 	TableNameSQL := FormatNameSQL(TableName)
-	FieldName := FindFieldName(Settings, field1)
-	FieldNameSQL := FormatNameSQL(FieldName)
+	//FieldName := FindFieldName(Settings, field1)
+	//FieldNameSQL := FormatNameSQL(FieldName)
 	IsIdentifier := IsIdentifierField(Settings, field1)
 	if IsIdentifier == false {
 		return Otvet
@@ -286,13 +286,13 @@ func FillTextConstraint1(Settings *config.SettingsINI, message1 *types.MessageEl
 }
 
 // FillTextIndex1 - возвращает текст SQL ограничений
-func FillTextIndex1(Settings *config.SettingsINI, message1 *types.MessageElement, field1 *types.FieldElement) string {
+func FillTextIndex1(Settings *config.SettingsINI, message1 *types.MessageElement, field1 *types.FieldElement, FieldNameSQL string) string {
 	Otvet := ""
 
 	TableName := message1.Name
 	TableNameSQL := FormatNameSQL(TableName)
-	FieldName := FindFieldName(Settings, field1)
-	FieldNameSQL := FormatNameSQL(FieldName)
+	//FieldName := FindFieldName(Settings, field1)
+	//FieldNameSQL := FormatNameSQL(FieldName)
 	IsIdentifier := IsIdentifierField(Settings, field1)
 	if IsIdentifier == false {
 		return Otvet

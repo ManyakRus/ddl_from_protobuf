@@ -2,6 +2,7 @@ package create_files
 
 import (
 	"github.com/ManyakRus/ddl_from_protobuf/internal/config"
+	"github.com/ManyakRus/ddl_from_protobuf/internal/constants"
 	"github.com/ManyakRus/ddl_from_protobuf/internal/types"
 	"github.com/ManyakRus/starter/log"
 	"github.com/ManyakRus/starter/micro"
@@ -486,6 +487,23 @@ func Convert_ProtoName_to_GRPCName(NameProtobuf string) string {
 
 	Otvet = str.PascalCase(MassConvert...).Get()
 	Otvet = pascalCaseReformatNumbers(Otvet)
+
+	return Otvet
+}
+
+// IsDeprecatedField - возвращает true если в комментарии написано Deprecated
+func IsDeprecatedField(field1 *types.FieldElement) bool {
+	Otvet := false
+
+	if field1 == nil {
+		return Otvet
+	}
+
+	//игнорируем текст deprecated
+	Documentation := field1.Documentation
+	if strings.HasPrefix(Documentation, constants.TEXT_DEPRECATED) == true {
+		Otvet = true
+	}
 
 	return Otvet
 }

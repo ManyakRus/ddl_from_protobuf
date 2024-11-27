@@ -843,13 +843,6 @@ COMMENT ON COLUMN "tin"."broker_report"."separate_agreement_number" IS 'Номе
 COMMENT ON COLUMN "tin"."broker_report"."separate_agreement_date" IS 'Дата дог.';
 COMMENT ON COLUMN "tin"."broker_report"."delivery_type" IS 'Тип расчёта по сделке.';
 
-CREATE TABLE IF NOT EXISTS "tin"."info_instrument" (
-	"instrument_id" text NOT NULL,
-	CONSTRAINT "info_instrument_pk" PRIMARY KEY ("figi")
-);
-COMMENT ON TABLE "tin"."info_instrument" IS 'Запрос подписки на торговый статус.';
-COMMENT ON COLUMN "tin"."info_instrument"."instrument_id" IS 'Идентификатор инструмента, принимает значение figi или instrument_uid';
-
 CREATE TABLE IF NOT EXISTS "tin"."last_price" (
 	"figi" text NOT NULL,
 	"price_units" bigint NULL,
@@ -864,13 +857,6 @@ COMMENT ON COLUMN "tin"."last_price"."price_units" IS 'Цена последне
 COMMENT ON COLUMN "tin"."last_price"."price_nano" IS 'Цена последней сделки за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента. Для перевод цен в валюту рекомендуем использовать [информацию со страницы](https://tinkoff.github.io/investAPI/faq_marketdata/) / дробная часть суммы, может быть отрицательным числом';
 COMMENT ON COLUMN "tin"."last_price"."time" IS 'Время получения последней цены в часовом поясе UTC по времени биржи.';
 COMMENT ON COLUMN "tin"."last_price"."instrument_uid" IS 'Uid инструмента';
-
-CREATE TABLE IF NOT EXISTS "tin"."last_price_instrument" (
-	"instrument_id" text NOT NULL,
-	CONSTRAINT "last_price_instrument_pk" PRIMARY KEY ("figi")
-);
-COMMENT ON TABLE "tin"."last_price_instrument" IS 'Запрос подписки на последнюю цену.';
-COMMENT ON COLUMN "tin"."last_price_instrument"."instrument_id" IS 'Идентификатор инструмента, принимает значение figi или instrument_uid';
 
 CREATE TABLE IF NOT EXISTS "tin"."operation_trade" (
 	"trade_id" text NOT NULL,
@@ -911,15 +897,6 @@ COMMENT ON COLUMN "tin"."order_book"."limit_up_nano" IS 'Верхний лими
 COMMENT ON COLUMN "tin"."order_book"."limit_down_units" IS 'Нижний лимит цены за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента. Для перевод цен в валюту рекомендуем использовать [информацию со страницы](https://tinkoff.github.io/investAPI/faq_marketdata/) / целая часть суммы, может быть отрицательным числом';
 COMMENT ON COLUMN "tin"."order_book"."limit_down_nano" IS 'Нижний лимит цены за 1 инструмент. Для получения стоимости лота требуется умножить на лотность инструмента. Для перевод цен в валюту рекомендуем использовать [информацию со страницы](https://tinkoff.github.io/investAPI/faq_marketdata/) / дробная часть суммы, может быть отрицательным числом';
 COMMENT ON COLUMN "tin"."order_book"."instrument_uid" IS 'Uid инструмента';
-
-CREATE TABLE IF NOT EXISTS "tin"."order_book_instrument" (
-	"depth" integer NOT NULL,
-	"instrument_id" text NOT NULL,
-	CONSTRAINT "order_book_instrument_pk" PRIMARY KEY ("figi")
-);
-COMMENT ON TABLE "tin"."order_book_instrument" IS 'Запрос подписки на стаканы.';
-COMMENT ON COLUMN "tin"."order_book_instrument"."depth" IS 'Глубина стакана.';
-COMMENT ON COLUMN "tin"."order_book_instrument"."instrument_id" IS 'Идентификатор инструмента, принимает значение figi или instrument_uid';
 
 CREATE TABLE IF NOT EXISTS "tin"."order_stage" (
 	"price_currency" text NULL,
@@ -1046,13 +1023,6 @@ COMMENT ON COLUMN "tin"."positions_securities"."instrument_uid" IS 'Уникал
 COMMENT ON COLUMN "tin"."positions_securities"."exchange_blocked" IS 'Заблокировано на бирже.';
 COMMENT ON COLUMN "tin"."positions_securities"."instrument_type" IS 'Тип инструмента.';
 
-CREATE TABLE IF NOT EXISTS "tin"."trade_instrument" (
-	"instrument_id" text NOT NULL,
-	CONSTRAINT "trade_instrument_pk" PRIMARY KEY ("figi")
-);
-COMMENT ON TABLE "tin"."trade_instrument" IS 'Запрос подписки на поток обезличенных сделок.';
-COMMENT ON COLUMN "tin"."trade_instrument"."instrument_id" IS 'Идентификатор инструмента, принимает значение figi или instrument_uid';
-
 CREATE TABLE IF NOT EXISTS "tin"."virtual_portfolio_position" (
 	"position_uid" text NOT NULL,
 	"instrument_uid" text NOT NULL,
@@ -1103,9 +1073,9 @@ CREATE TABLE IF NOT EXISTS "tin"."asset" (
 	"type_id" bigint NULL,
 	"name" text NOT NULL,
 	CONSTRAINT "asset_pk" PRIMARY KEY ("uid"),
-	CONSTRAINT "asset_type_fk" FOREIGN KEY ("type") REFERENCES "tin"."asset_type" ("id")
+	CONSTRAINT "asset_type_id_fk" FOREIGN KEY ("type_id") REFERENCES "tin"."asset_type" ("id")
 );
-CREATE INDEX IF NOT EXISTS "asset_type_idx" ON "tin"."asset" USING btree ("type");
+CREATE INDEX IF NOT EXISTS "asset_type_id_idx" ON "tin"."asset" USING btree ("type_id");
 COMMENT ON TABLE "tin"."asset" IS 'Информация об активе.';
 COMMENT ON COLUMN "tin"."asset"."uid" IS 'Уникальный идентификатор актива.';
 COMMENT ON COLUMN "tin"."asset"."type_id" IS 'Тип актива.';
@@ -1120,9 +1090,9 @@ CREATE TABLE IF NOT EXISTS "tin"."asset_instrument" (
 	"instrument_kind_id" bigint NULL,
 	"position_uid" text NOT NULL,
 	CONSTRAINT "asset_instrument_pk" PRIMARY KEY ("uid"),
-	CONSTRAINT "asset_instrument_instrument_kind_fk" FOREIGN KEY ("instrument_kind") REFERENCES "tin"."instrument_type" ("id")
+	CONSTRAINT "asset_instrument_instrument_kind_id_fk" FOREIGN KEY ("instrument_kind_id") REFERENCES "tin"."instrument_type" ("id")
 );
-CREATE INDEX IF NOT EXISTS "asset_instrument_instrument_kind_idx" ON "tin"."asset_instrument" USING btree ("instrument_kind");
+CREATE INDEX IF NOT EXISTS "asset_instrument_instrument_kind_id_idx" ON "tin"."asset_instrument" USING btree ("instrument_kind_id");
 COMMENT ON TABLE "tin"."asset_instrument" IS 'Идентификаторы инструмента.';
 COMMENT ON COLUMN "tin"."asset_instrument"."uid" IS 'uid идентификатор инструмента.';
 COMMENT ON COLUMN "tin"."asset_instrument"."figi" IS 'figi идентификатор инструмента.';
@@ -1154,9 +1124,9 @@ CREATE TABLE IF NOT EXISTS "tin"."asset_share" (
 	"total_float_units" bigint NULL,
 	"total_float_nano" integer NULL,
 	CONSTRAINT "asset_share_pk" PRIMARY KEY ("primary_index"),
-	CONSTRAINT "asset_share_type_fk" FOREIGN KEY ("type") REFERENCES "tin"."share_type" ("id")
+	CONSTRAINT "asset_share_type_id_fk" FOREIGN KEY ("type_id") REFERENCES "tin"."share_type" ("id")
 );
-CREATE INDEX IF NOT EXISTS "asset_share_type_idx" ON "tin"."asset_share" USING btree ("type");
+CREATE INDEX IF NOT EXISTS "asset_share_type_id_idx" ON "tin"."asset_share" USING btree ("type_id");
 COMMENT ON TABLE "tin"."asset_share" IS 'Акция.';
 COMMENT ON COLUMN "tin"."asset_share"."type_id" IS 'Тип акции.';
 COMMENT ON COLUMN "tin"."asset_share"."issue_size_units" IS 'Объем выпуска (шт.). / целая часть суммы, может быть отрицательным числом';
@@ -1195,9 +1165,9 @@ CREATE TABLE IF NOT EXISTS "tin"."candle" (
 	"last_trade_ts" timestamptz NULL,
 	"instrument_uid" text NOT NULL,
 	CONSTRAINT "candle_pk" PRIMARY KEY ("figi"),
-	CONSTRAINT "candle_interval_fk" FOREIGN KEY ("interval") REFERENCES "tin"."subscription_interval" ("id")
+	CONSTRAINT "candle_interval_id_fk" FOREIGN KEY ("interval_id") REFERENCES "tin"."subscription_interval" ("id")
 );
-CREATE INDEX IF NOT EXISTS "candle_interval_idx" ON "tin"."candle" USING btree ("interval");
+CREATE INDEX IF NOT EXISTS "candle_interval_id_idx" ON "tin"."candle" USING btree ("interval_id");
 COMMENT ON TABLE "tin"."candle" IS 'Пакет свечей в рамках стрима.';
 COMMENT ON COLUMN "tin"."candle"."figi" IS 'Figi-идентификатор инструмента.';
 COMMENT ON COLUMN "tin"."candle"."interval_id" IS 'Интервал свечи.';
@@ -1214,17 +1184,6 @@ COMMENT ON COLUMN "tin"."candle"."time" IS 'Время начала интерв
 COMMENT ON COLUMN "tin"."candle"."last_trade_ts" IS 'Время последней сделки, вошедшей в свечу в часовом поясе UTC.';
 COMMENT ON COLUMN "tin"."candle"."instrument_uid" IS 'Uid инструмента';
 
-CREATE TABLE IF NOT EXISTS "tin"."candle_instrument" (
-	"interval_id" bigint NULL,
-	"instrument_id" text NOT NULL,
-	CONSTRAINT "candle_instrument_pk" PRIMARY KEY ("figi"),
-	CONSTRAINT "candle_instrument_interval_fk" FOREIGN KEY ("interval") REFERENCES "tin"."subscription_interval" ("id")
-);
-CREATE INDEX IF NOT EXISTS "candle_instrument_interval_idx" ON "tin"."candle_instrument" USING btree ("interval");
-COMMENT ON TABLE "tin"."candle_instrument" IS 'Запрос изменения статус подписки на свечи.';
-COMMENT ON COLUMN "tin"."candle_instrument"."interval_id" IS 'Интервал свечей.';
-COMMENT ON COLUMN "tin"."candle_instrument"."instrument_id" IS 'Идентификатор инструмента, принимает значение figi или instrument_uid';
-
 CREATE TABLE IF NOT EXISTS "tin"."coupon" (
 	"figi" text NOT NULL,
 	"coupon_date" timestamptz NULL,
@@ -1238,9 +1197,9 @@ CREATE TABLE IF NOT EXISTS "tin"."coupon" (
 	"coupon_end_date" timestamptz NULL,
 	"coupon_period" integer NOT NULL,
 	CONSTRAINT "coupon_pk" PRIMARY KEY ("figi"),
-	CONSTRAINT "coupon_coupon_type_fk" FOREIGN KEY ("coupon_type") REFERENCES "tin"."coupon_type" ("id")
+	CONSTRAINT "coupon_coupon_type_id_fk" FOREIGN KEY ("coupon_type_id") REFERENCES "tin"."coupon_type" ("id")
 );
-CREATE INDEX IF NOT EXISTS "coupon_coupon_type_idx" ON "tin"."coupon" USING btree ("coupon_type");
+CREATE INDEX IF NOT EXISTS "coupon_coupon_type_id_idx" ON "tin"."coupon" USING btree ("coupon_type_id");
 COMMENT ON TABLE "tin"."coupon" IS 'Объект передачи информации о купоне облигации.';
 COMMENT ON COLUMN "tin"."coupon"."figi" IS 'Figi-идентификатор инструмента.';
 COMMENT ON COLUMN "tin"."coupon"."coupon_date" IS 'Дата выплаты купона.';
@@ -1264,9 +1223,9 @@ CREATE TABLE IF NOT EXISTS "tin"."favorite_instrument" (
 	"api_trade_available_flag" bool NOT NULL,
 	"instrument_kind_id" bigint NULL,
 	CONSTRAINT "favorite_instrument_pk" PRIMARY KEY ("figi"),
-	CONSTRAINT "favorite_instrument_instrument_kind_fk" FOREIGN KEY ("instrument_kind") REFERENCES "tin"."instrument_type" ("id")
+	CONSTRAINT "favorite_instrument_instrument_kind_id_fk" FOREIGN KEY ("instrument_kind_id") REFERENCES "tin"."instrument_type" ("id")
 );
-CREATE INDEX IF NOT EXISTS "favorite_instrument_instrument_kind_idx" ON "tin"."favorite_instrument" USING btree ("instrument_kind");
+CREATE INDEX IF NOT EXISTS "favorite_instrument_instrument_kind_id_idx" ON "tin"."favorite_instrument" USING btree ("instrument_kind_id");
 COMMENT ON TABLE "tin"."favorite_instrument" IS 'Массив избранных инструментов.';
 COMMENT ON COLUMN "tin"."favorite_instrument"."figi" IS 'Figi-идентификатор инструмента.';
 COMMENT ON COLUMN "tin"."favorite_instrument"."ticker" IS 'Тикер инструмента.';
@@ -1282,9 +1241,9 @@ CREATE TABLE IF NOT EXISTS "tin"."info_subscription" (
 	"subscription_status_id" bigint NULL,
 	"instrument_uid" text NOT NULL,
 	CONSTRAINT "info_subscription_pk" PRIMARY KEY ("figi"),
-	CONSTRAINT "info_subscription_subscription_status_fk" FOREIGN KEY ("subscription_status") REFERENCES "tin"."subscription_status" ("id")
+	CONSTRAINT "info_subscription_subscription_status_id_fk" FOREIGN KEY ("subscription_status_id") REFERENCES "tin"."subscription_status" ("id")
 );
-CREATE INDEX IF NOT EXISTS "info_subscription_subscription_status_idx" ON "tin"."info_subscription" USING btree ("subscription_status");
+CREATE INDEX IF NOT EXISTS "info_subscription_subscription_status_id_idx" ON "tin"."info_subscription" USING btree ("subscription_status_id");
 COMMENT ON TABLE "tin"."info_subscription" IS 'Статус подписки.';
 COMMENT ON COLUMN "tin"."info_subscription"."figi" IS 'Figi-идентификатор инструмента.';
 COMMENT ON COLUMN "tin"."info_subscription"."subscription_status_id" IS 'Статус подписки.';
@@ -1308,9 +1267,9 @@ CREATE TABLE IF NOT EXISTS "tin"."instrument_short" (
 	"weekend_flag" bool NOT NULL,
 	"blocked_tca_flag" bool NOT NULL,
 	CONSTRAINT "instrument_short_pk" PRIMARY KEY ("uid"),
-	CONSTRAINT "instrument_short_instrument_kind_fk" FOREIGN KEY ("instrument_kind") REFERENCES "tin"."instrument_type" ("id")
+	CONSTRAINT "instrument_short_instrument_kind_id_fk" FOREIGN KEY ("instrument_kind_id") REFERENCES "tin"."instrument_type" ("id")
 );
-CREATE INDEX IF NOT EXISTS "instrument_short_instrument_kind_idx" ON "tin"."instrument_short" USING btree ("instrument_kind");
+CREATE INDEX IF NOT EXISTS "instrument_short_instrument_kind_id_idx" ON "tin"."instrument_short" USING btree ("instrument_kind_id");
 COMMENT ON TABLE "tin"."instrument_short" IS 'Краткая информация об инструменте.';
 COMMENT ON COLUMN "tin"."instrument_short"."isin" IS 'Isin инструмента.';
 COMMENT ON COLUMN "tin"."instrument_short"."figi" IS 'Figi инструмента.';
@@ -1334,9 +1293,9 @@ CREATE TABLE IF NOT EXISTS "tin"."last_price_subscription" (
 	"subscription_status_id" bigint NULL,
 	"instrument_uid" text NOT NULL,
 	CONSTRAINT "last_price_subscription_pk" PRIMARY KEY ("figi"),
-	CONSTRAINT "last_price_subscription_subscription_status_fk" FOREIGN KEY ("subscription_status") REFERENCES "tin"."subscription_status" ("id")
+	CONSTRAINT "last_price_subscription_subscription_status_id_fk" FOREIGN KEY ("subscription_status_id") REFERENCES "tin"."subscription_status" ("id")
 );
-CREATE INDEX IF NOT EXISTS "last_price_subscription_subscription_status_idx" ON "tin"."last_price_subscription" USING btree ("subscription_status");
+CREATE INDEX IF NOT EXISTS "last_price_subscription_subscription_status_id_idx" ON "tin"."last_price_subscription" USING btree ("subscription_status_id");
 COMMENT ON TABLE "tin"."last_price_subscription" IS 'Статус подписки на цену последней сделки.';
 COMMENT ON COLUMN "tin"."last_price_subscription"."figi" IS 'Figi-идентификатор инструмента.';
 COMMENT ON COLUMN "tin"."last_price_subscription"."subscription_status_id" IS 'Статус подписки.';
@@ -1348,9 +1307,9 @@ CREATE TABLE IF NOT EXISTS "tin"."order_book_subscription" (
 	"subscription_status_id" bigint NULL,
 	"instrument_uid" text NOT NULL,
 	CONSTRAINT "order_book_subscription_pk" PRIMARY KEY ("figi"),
-	CONSTRAINT "order_book_subscription_subscription_status_fk" FOREIGN KEY ("subscription_status") REFERENCES "tin"."subscription_status" ("id")
+	CONSTRAINT "order_book_subscription_subscription_status_id_fk" FOREIGN KEY ("subscription_status_id") REFERENCES "tin"."subscription_status" ("id")
 );
-CREATE INDEX IF NOT EXISTS "order_book_subscription_subscription_status_idx" ON "tin"."order_book_subscription" USING btree ("subscription_status");
+CREATE INDEX IF NOT EXISTS "order_book_subscription_subscription_status_id_idx" ON "tin"."order_book_subscription" USING btree ("subscription_status_id");
 COMMENT ON TABLE "tin"."order_book_subscription" IS 'Статус подписки.';
 COMMENT ON COLUMN "tin"."order_book_subscription"."figi" IS 'Figi-идентификатор инструмента.';
 COMMENT ON COLUMN "tin"."order_book_subscription"."depth" IS 'Глубина стакана.';
@@ -1365,9 +1324,9 @@ CREATE TABLE IF NOT EXISTS "tin"."order_trades" (
 	"account_id" text NOT NULL,
 	"instrument_uid" text NOT NULL,
 	CONSTRAINT "order_trades_pk" PRIMARY KEY ("figi"),
-	CONSTRAINT "order_trades_direction_fk" FOREIGN KEY ("direction") REFERENCES "tin"."order_direction" ("id")
+	CONSTRAINT "order_trades_direction_id_fk" FOREIGN KEY ("direction_id") REFERENCES "tin"."order_direction" ("id")
 );
-CREATE INDEX IF NOT EXISTS "order_trades_direction_idx" ON "tin"."order_trades" USING btree ("direction");
+CREATE INDEX IF NOT EXISTS "order_trades_direction_id_idx" ON "tin"."order_trades" USING btree ("direction_id");
 COMMENT ON TABLE "tin"."order_trades" IS 'Информация об исполнении торгового поручения.';
 COMMENT ON COLUMN "tin"."order_trades"."order_id" IS 'Идентификатор торгового поручения.';
 COMMENT ON COLUMN "tin"."order_trades"."created_at" IS 'Дата и время создания сообщения в часовом поясе UTC.';
@@ -1385,9 +1344,9 @@ CREATE TABLE IF NOT EXISTS "tin"."trade" (
 	"time" timestamptz NULL,
 	"instrument_uid" text NOT NULL,
 	CONSTRAINT "trade_pk" PRIMARY KEY ("figi"),
-	CONSTRAINT "trade_direction_fk" FOREIGN KEY ("direction") REFERENCES "tin"."trade_direction" ("id")
+	CONSTRAINT "trade_direction_id_fk" FOREIGN KEY ("direction_id") REFERENCES "tin"."trade_direction" ("id")
 );
-CREATE INDEX IF NOT EXISTS "trade_direction_idx" ON "tin"."trade" USING btree ("direction");
+CREATE INDEX IF NOT EXISTS "trade_direction_id_idx" ON "tin"."trade" USING btree ("direction_id");
 COMMENT ON TABLE "tin"."trade" IS 'Информация о сделке.';
 COMMENT ON COLUMN "tin"."trade"."figi" IS 'Figi-идентификатор инструмента.';
 COMMENT ON COLUMN "tin"."trade"."direction_id" IS 'Направление сделки.';
@@ -1402,9 +1361,9 @@ CREATE TABLE IF NOT EXISTS "tin"."trade_subscription" (
 	"subscription_status_id" bigint NULL,
 	"instrument_uid" text NOT NULL,
 	CONSTRAINT "trade_subscription_pk" PRIMARY KEY ("figi"),
-	CONSTRAINT "trade_subscription_subscription_status_fk" FOREIGN KEY ("subscription_status") REFERENCES "tin"."subscription_status" ("id")
+	CONSTRAINT "trade_subscription_subscription_status_id_fk" FOREIGN KEY ("subscription_status_id") REFERENCES "tin"."subscription_status" ("id")
 );
-CREATE INDEX IF NOT EXISTS "trade_subscription_subscription_status_idx" ON "tin"."trade_subscription" USING btree ("subscription_status");
+CREATE INDEX IF NOT EXISTS "trade_subscription_subscription_status_id_idx" ON "tin"."trade_subscription" USING btree ("subscription_status_id");
 COMMENT ON TABLE "tin"."trade_subscription" IS 'Статус подписки.';
 COMMENT ON COLUMN "tin"."trade_subscription"."figi" IS 'Figi-идентификатор инструмента.';
 COMMENT ON COLUMN "tin"."trade_subscription"."subscription_status_id" IS 'Статус подписки.';
@@ -1418,9 +1377,9 @@ CREATE TABLE IF NOT EXISTS "tin"."trading_status" (
 	"market_order_available_flag" bool NOT NULL,
 	"instrument_uid" text NOT NULL,
 	CONSTRAINT "trading_status_pk" PRIMARY KEY ("figi"),
-	CONSTRAINT "trading_status_trading_status_fk" FOREIGN KEY ("trading_status") REFERENCES "tin"."security_trading_status" ("id")
+	CONSTRAINT "trading_status_trading_status_id_fk" FOREIGN KEY ("trading_status_id") REFERENCES "tin"."security_trading_status" ("id")
 );
-CREATE INDEX IF NOT EXISTS "trading_status_trading_status_idx" ON "tin"."trading_status" USING btree ("trading_status");
+CREATE INDEX IF NOT EXISTS "trading_status_trading_status_id_idx" ON "tin"."trading_status" USING btree ("trading_status_id");
 COMMENT ON TABLE "tin"."trading_status" IS 'Пакет изменения торгового статуса.';
 COMMENT ON COLUMN "tin"."trading_status"."figi" IS 'Figi-идентификатор инструмента.';
 COMMENT ON COLUMN "tin"."trading_status"."trading_status_id" IS 'Статус торговли инструментом.';
@@ -1445,11 +1404,11 @@ CREATE TABLE IF NOT EXISTS "tin"."asset_full" (
 	"br_code" text NOT NULL,
 	"br_code_name" text NOT NULL,
 	CONSTRAINT "asset_full_pk" PRIMARY KEY ("uid"),
-	CONSTRAINT "asset_full_type_fk" FOREIGN KEY ("type") REFERENCES "tin"."asset_type" ("id"),
-	CONSTRAINT "asset_full_brand_fk" FOREIGN KEY ("brand") REFERENCES "tin"."brand" ("uid")
+	CONSTRAINT "asset_full_type_id_fk" FOREIGN KEY ("type_id") REFERENCES "tin"."asset_type" ("id"),
+	CONSTRAINT "asset_full_brand_id_fk" FOREIGN KEY ("brand_id") REFERENCES "tin"."brand" ("uid")
 );
-CREATE INDEX IF NOT EXISTS "asset_full_type_idx" ON "tin"."asset_full" USING btree ("type");
-CREATE INDEX IF NOT EXISTS "asset_full_brand_idx" ON "tin"."asset_full" USING btree ("brand");
+CREATE INDEX IF NOT EXISTS "asset_full_type_id_idx" ON "tin"."asset_full" USING btree ("type_id");
+CREATE INDEX IF NOT EXISTS "asset_full_brand_id_idx" ON "tin"."asset_full" USING btree ("brand_id");
 COMMENT ON TABLE "tin"."asset_full" IS '';
 COMMENT ON COLUMN "tin"."asset_full"."uid" IS 'Уникальный идентификатор актива.';
 COMMENT ON COLUMN "tin"."asset_full"."type_id" IS 'Тип актива.';
@@ -1472,11 +1431,11 @@ CREATE TABLE IF NOT EXISTS "tin"."candle_subscription" (
 	"subscription_status_id" bigint NULL,
 	"instrument_uid" text NOT NULL,
 	CONSTRAINT "candle_subscription_pk" PRIMARY KEY ("figi"),
-	CONSTRAINT "candle_subscription_interval_fk" FOREIGN KEY ("interval") REFERENCES "tin"."subscription_interval" ("id"),
-	CONSTRAINT "candle_subscription_subscription_status_fk" FOREIGN KEY ("subscription_status") REFERENCES "tin"."subscription_status" ("id")
+	CONSTRAINT "candle_subscription_interval_id_fk" FOREIGN KEY ("interval_id") REFERENCES "tin"."subscription_interval" ("id"),
+	CONSTRAINT "candle_subscription_subscription_status_id_fk" FOREIGN KEY ("subscription_status_id") REFERENCES "tin"."subscription_status" ("id")
 );
-CREATE INDEX IF NOT EXISTS "candle_subscription_interval_idx" ON "tin"."candle_subscription" USING btree ("interval");
-CREATE INDEX IF NOT EXISTS "candle_subscription_subscription_status_idx" ON "tin"."candle_subscription" USING btree ("subscription_status");
+CREATE INDEX IF NOT EXISTS "candle_subscription_interval_id_idx" ON "tin"."candle_subscription" USING btree ("interval_id");
+CREATE INDEX IF NOT EXISTS "candle_subscription_subscription_status_id_idx" ON "tin"."candle_subscription" USING btree ("subscription_status_id");
 COMMENT ON TABLE "tin"."candle_subscription" IS 'Статус подписки на свечи.';
 COMMENT ON COLUMN "tin"."candle_subscription"."figi" IS 'Figi-идентификатор инструмента.';
 COMMENT ON COLUMN "tin"."candle_subscription"."interval_id" IS 'Интервал свечей.';
@@ -1528,11 +1487,11 @@ CREATE TABLE IF NOT EXISTS "tin"."currency" (
 	"first_1min_candle_date" timestamptz NULL,
 	"first_1day_candle_date" timestamptz NULL,
 	CONSTRAINT "currency_pk" PRIMARY KEY ("uid"),
-	CONSTRAINT "currency_trading_status_fk" FOREIGN KEY ("trading_status") REFERENCES "tin"."security_trading_status" ("id"),
-	CONSTRAINT "currency_real_exchange_fk" FOREIGN KEY ("real_exchange") REFERENCES "tin"."real_exchange" ("id")
+	CONSTRAINT "currency_trading_status_id_fk" FOREIGN KEY ("trading_status_id") REFERENCES "tin"."security_trading_status" ("id"),
+	CONSTRAINT "currency_real_exchange_id_fk" FOREIGN KEY ("real_exchange_id") REFERENCES "tin"."real_exchange" ("id")
 );
-CREATE INDEX IF NOT EXISTS "currency_trading_status_idx" ON "tin"."currency" USING btree ("trading_status");
-CREATE INDEX IF NOT EXISTS "currency_real_exchange_idx" ON "tin"."currency" USING btree ("real_exchange");
+CREATE INDEX IF NOT EXISTS "currency_trading_status_id_idx" ON "tin"."currency" USING btree ("trading_status_id");
+CREATE INDEX IF NOT EXISTS "currency_real_exchange_id_idx" ON "tin"."currency" USING btree ("real_exchange_id");
 COMMENT ON TABLE "tin"."currency" IS 'Объект передачи информации о валюте.';
 COMMENT ON COLUMN "tin"."currency"."figi" IS 'Figi-идентификатор инструмента.';
 COMMENT ON COLUMN "tin"."currency"."ticker" IS 'Тикер инструмента.';
@@ -1628,11 +1587,11 @@ CREATE TABLE IF NOT EXISTS "tin"."etf" (
 	"first_1min_candle_date" timestamptz NULL,
 	"first_1day_candle_date" timestamptz NULL,
 	CONSTRAINT "etf_pk" PRIMARY KEY ("uid"),
-	CONSTRAINT "etf_trading_status_fk" FOREIGN KEY ("trading_status") REFERENCES "tin"."security_trading_status" ("id"),
-	CONSTRAINT "etf_real_exchange_fk" FOREIGN KEY ("real_exchange") REFERENCES "tin"."real_exchange" ("id")
+	CONSTRAINT "etf_trading_status_id_fk" FOREIGN KEY ("trading_status_id") REFERENCES "tin"."security_trading_status" ("id"),
+	CONSTRAINT "etf_real_exchange_id_fk" FOREIGN KEY ("real_exchange_id") REFERENCES "tin"."real_exchange" ("id")
 );
-CREATE INDEX IF NOT EXISTS "etf_trading_status_idx" ON "tin"."etf" USING btree ("trading_status");
-CREATE INDEX IF NOT EXISTS "etf_real_exchange_idx" ON "tin"."etf" USING btree ("real_exchange");
+CREATE INDEX IF NOT EXISTS "etf_trading_status_id_idx" ON "tin"."etf" USING btree ("trading_status_id");
+CREATE INDEX IF NOT EXISTS "etf_real_exchange_id_idx" ON "tin"."etf" USING btree ("real_exchange_id");
 COMMENT ON TABLE "tin"."etf" IS 'Объект передачи информации об инвестиционном фонде.';
 COMMENT ON COLUMN "tin"."etf"."figi" IS 'Figi-идентификатор инструмента.';
 COMMENT ON COLUMN "tin"."etf"."ticker" IS 'Тикер инструмента.';
@@ -1733,11 +1692,11 @@ CREATE TABLE IF NOT EXISTS "tin"."future" (
 	"first_1min_candle_date" timestamptz NULL,
 	"first_1day_candle_date" timestamptz NULL,
 	CONSTRAINT "future_pk" PRIMARY KEY ("uid"),
-	CONSTRAINT "future_trading_status_fk" FOREIGN KEY ("trading_status") REFERENCES "tin"."security_trading_status" ("id"),
-	CONSTRAINT "future_real_exchange_fk" FOREIGN KEY ("real_exchange") REFERENCES "tin"."real_exchange" ("id")
+	CONSTRAINT "future_trading_status_id_fk" FOREIGN KEY ("trading_status_id") REFERENCES "tin"."security_trading_status" ("id"),
+	CONSTRAINT "future_real_exchange_id_fk" FOREIGN KEY ("real_exchange_id") REFERENCES "tin"."real_exchange" ("id")
 );
-CREATE INDEX IF NOT EXISTS "future_trading_status_idx" ON "tin"."future" USING btree ("trading_status");
-CREATE INDEX IF NOT EXISTS "future_real_exchange_idx" ON "tin"."future" USING btree ("real_exchange");
+CREATE INDEX IF NOT EXISTS "future_trading_status_id_idx" ON "tin"."future" USING btree ("trading_status_id");
+CREATE INDEX IF NOT EXISTS "future_real_exchange_id_idx" ON "tin"."future" USING btree ("real_exchange_id");
 COMMENT ON TABLE "tin"."future" IS 'Объект передачи информации о фьючерсе.';
 COMMENT ON COLUMN "tin"."future"."figi" IS 'Figi-идентификатор инструмента.';
 COMMENT ON COLUMN "tin"."future"."ticker" IS 'Тикер инструмента.';
@@ -1810,11 +1769,11 @@ CREATE TABLE IF NOT EXISTS "tin"."operation" (
 	"position_uid" text NOT NULL,
 	"instrument_uid" text NOT NULL,
 	CONSTRAINT "operation_pk" PRIMARY KEY ("id"),
-	CONSTRAINT "operation_state_fk" FOREIGN KEY ("state") REFERENCES "tin"."operation_state" ("id"),
-	CONSTRAINT "operation_operation_type_fk" FOREIGN KEY ("operation_type") REFERENCES "tin"."operation_type" ("id")
+	CONSTRAINT "operation_state_id_fk" FOREIGN KEY ("state_id") REFERENCES "tin"."operation_state" ("id"),
+	CONSTRAINT "operation_operation_type_id_fk" FOREIGN KEY ("operation_type_id") REFERENCES "tin"."operation_type" ("id")
 );
-CREATE INDEX IF NOT EXISTS "operation_state_idx" ON "tin"."operation" USING btree ("state");
-CREATE INDEX IF NOT EXISTS "operation_operation_type_idx" ON "tin"."operation" USING btree ("operation_type");
+CREATE INDEX IF NOT EXISTS "operation_state_id_idx" ON "tin"."operation" USING btree ("state_id");
+CREATE INDEX IF NOT EXISTS "operation_operation_type_id_idx" ON "tin"."operation" USING btree ("operation_type_id");
 COMMENT ON TABLE "tin"."operation" IS 'Данные по операции.';
 COMMENT ON COLUMN "tin"."operation"."id" IS 'Идентификатор операции.';
 COMMENT ON COLUMN "tin"."operation"."parent_operation_id" IS 'Идентификатор родительской операции.';
@@ -1855,11 +1814,11 @@ CREATE TABLE IF NOT EXISTS "tin"."stop_order" (
 	"stop_price_nano" integer NULL,
 	"instrument_uid" text NOT NULL,
 	CONSTRAINT "stop_order_pk" PRIMARY KEY ("figi"),
-	CONSTRAINT "stop_order_direction_fk" FOREIGN KEY ("direction") REFERENCES "tin"."stop_order_direction" ("id"),
-	CONSTRAINT "stop_order_order_type_fk" FOREIGN KEY ("order_type") REFERENCES "tin"."stop_order_type" ("id")
+	CONSTRAINT "stop_order_direction_id_fk" FOREIGN KEY ("direction_id") REFERENCES "tin"."stop_order_direction" ("id"),
+	CONSTRAINT "stop_order_order_type_id_fk" FOREIGN KEY ("order_type_id") REFERENCES "tin"."stop_order_type" ("id")
 );
-CREATE INDEX IF NOT EXISTS "stop_order_direction_idx" ON "tin"."stop_order" USING btree ("direction");
-CREATE INDEX IF NOT EXISTS "stop_order_order_type_idx" ON "tin"."stop_order" USING btree ("order_type");
+CREATE INDEX IF NOT EXISTS "stop_order_direction_id_idx" ON "tin"."stop_order" USING btree ("direction_id");
+CREATE INDEX IF NOT EXISTS "stop_order_order_type_id_idx" ON "tin"."stop_order" USING btree ("order_type_id");
 COMMENT ON TABLE "tin"."stop_order" IS 'Информация о стоп-заявке.';
 COMMENT ON COLUMN "tin"."stop_order"."stop_order_id" IS 'Идентификатор-идентификатор стоп-заявки.';
 COMMENT ON COLUMN "tin"."stop_order"."lots_requested" IS 'Запрошено лотов.';
@@ -1887,13 +1846,13 @@ CREATE TABLE IF NOT EXISTS "tin"."account" (
 	"closed_date" timestamptz NULL,
 	"access_level_id" bigint NULL,
 	CONSTRAINT "account_pk" PRIMARY KEY ("id"),
-	CONSTRAINT "account_type_fk" FOREIGN KEY ("type") REFERENCES "tin"."account_type" ("id"),
-	CONSTRAINT "account_status_fk" FOREIGN KEY ("status") REFERENCES "tin"."account_status" ("id"),
-	CONSTRAINT "account_access_level_fk" FOREIGN KEY ("access_level") REFERENCES "tin"."access_level" ("id")
+	CONSTRAINT "account_type_id_fk" FOREIGN KEY ("type_id") REFERENCES "tin"."account_type" ("id"),
+	CONSTRAINT "account_status_id_fk" FOREIGN KEY ("status_id") REFERENCES "tin"."account_status" ("id"),
+	CONSTRAINT "account_access_level_id_fk" FOREIGN KEY ("access_level_id") REFERENCES "tin"."access_level" ("id")
 );
-CREATE INDEX IF NOT EXISTS "account_type_idx" ON "tin"."account" USING btree ("type");
-CREATE INDEX IF NOT EXISTS "account_status_idx" ON "tin"."account" USING btree ("status");
-CREATE INDEX IF NOT EXISTS "account_access_level_idx" ON "tin"."account" USING btree ("access_level");
+CREATE INDEX IF NOT EXISTS "account_type_id_idx" ON "tin"."account" USING btree ("type_id");
+CREATE INDEX IF NOT EXISTS "account_status_id_idx" ON "tin"."account" USING btree ("status_id");
+CREATE INDEX IF NOT EXISTS "account_access_level_id_idx" ON "tin"."account" USING btree ("access_level_id");
 COMMENT ON TABLE "tin"."account" IS 'Информация о счёте.';
 COMMENT ON COLUMN "tin"."account"."id" IS 'Идентификатор счёта.';
 COMMENT ON COLUMN "tin"."account"."type_id" IS 'Тип счёта.';
@@ -1970,13 +1929,13 @@ CREATE TABLE IF NOT EXISTS "tin"."bond" (
 	"first_1day_candle_date" timestamptz NULL,
 	"risk_level_id" bigint NULL,
 	CONSTRAINT "bond_pk" PRIMARY KEY ("uid"),
-	CONSTRAINT "bond_trading_status_fk" FOREIGN KEY ("trading_status") REFERENCES "tin"."security_trading_status" ("id"),
-	CONSTRAINT "bond_real_exchange_fk" FOREIGN KEY ("real_exchange") REFERENCES "tin"."real_exchange" ("id"),
-	CONSTRAINT "bond_risk_level_fk" FOREIGN KEY ("risk_level") REFERENCES "tin"."risk_level" ("id")
+	CONSTRAINT "bond_trading_status_id_fk" FOREIGN KEY ("trading_status_id") REFERENCES "tin"."security_trading_status" ("id"),
+	CONSTRAINT "bond_real_exchange_id_fk" FOREIGN KEY ("real_exchange_id") REFERENCES "tin"."real_exchange" ("id"),
+	CONSTRAINT "bond_risk_level_id_fk" FOREIGN KEY ("risk_level_id") REFERENCES "tin"."risk_level" ("id")
 );
-CREATE INDEX IF NOT EXISTS "bond_trading_status_idx" ON "tin"."bond" USING btree ("trading_status");
-CREATE INDEX IF NOT EXISTS "bond_real_exchange_idx" ON "tin"."bond" USING btree ("real_exchange");
-CREATE INDEX IF NOT EXISTS "bond_risk_level_idx" ON "tin"."bond" USING btree ("risk_level");
+CREATE INDEX IF NOT EXISTS "bond_trading_status_id_idx" ON "tin"."bond" USING btree ("trading_status_id");
+CREATE INDEX IF NOT EXISTS "bond_real_exchange_id_idx" ON "tin"."bond" USING btree ("real_exchange_id");
+CREATE INDEX IF NOT EXISTS "bond_risk_level_id_idx" ON "tin"."bond" USING btree ("risk_level_id");
 COMMENT ON TABLE "tin"."bond" IS 'Объект передачи информации об облигации.';
 COMMENT ON COLUMN "tin"."bond"."figi" IS 'Figi-идентификатор инструмента.';
 COMMENT ON COLUMN "tin"."bond"."ticker" IS 'Тикер инструмента.';
@@ -2087,13 +2046,13 @@ CREATE TABLE IF NOT EXISTS "tin"."instrument" (
 	"first_1min_candle_date" timestamptz NULL,
 	"first_1day_candle_date" timestamptz NULL,
 	CONSTRAINT "instrument_pk" PRIMARY KEY ("uid"),
-	CONSTRAINT "instrument_trading_status_fk" FOREIGN KEY ("trading_status") REFERENCES "tin"."security_trading_status" ("id"),
-	CONSTRAINT "instrument_real_exchange_fk" FOREIGN KEY ("real_exchange") REFERENCES "tin"."real_exchange" ("id"),
-	CONSTRAINT "instrument_instrument_kind_fk" FOREIGN KEY ("instrument_kind") REFERENCES "tin"."instrument_type" ("id")
+	CONSTRAINT "instrument_trading_status_id_fk" FOREIGN KEY ("trading_status_id") REFERENCES "tin"."security_trading_status" ("id"),
+	CONSTRAINT "instrument_real_exchange_id_fk" FOREIGN KEY ("real_exchange_id") REFERENCES "tin"."real_exchange" ("id"),
+	CONSTRAINT "instrument_instrument_kind_id_fk" FOREIGN KEY ("instrument_kind_id") REFERENCES "tin"."instrument_type" ("id")
 );
-CREATE INDEX IF NOT EXISTS "instrument_trading_status_idx" ON "tin"."instrument" USING btree ("trading_status");
-CREATE INDEX IF NOT EXISTS "instrument_real_exchange_idx" ON "tin"."instrument" USING btree ("real_exchange");
-CREATE INDEX IF NOT EXISTS "instrument_instrument_kind_idx" ON "tin"."instrument" USING btree ("instrument_kind");
+CREATE INDEX IF NOT EXISTS "instrument_trading_status_id_idx" ON "tin"."instrument" USING btree ("trading_status_id");
+CREATE INDEX IF NOT EXISTS "instrument_real_exchange_id_idx" ON "tin"."instrument" USING btree ("real_exchange_id");
+CREATE INDEX IF NOT EXISTS "instrument_instrument_kind_id_idx" ON "tin"."instrument" USING btree ("instrument_kind_id");
 COMMENT ON TABLE "tin"."instrument" IS 'Объект передачи основной информации об инструменте.';
 COMMENT ON COLUMN "tin"."instrument"."figi" IS 'Figi-идентификатор инструмента.';
 COMMENT ON COLUMN "tin"."instrument"."ticker" IS 'Тикер инструмента.';
@@ -2174,13 +2133,13 @@ CREATE TABLE IF NOT EXISTS "tin"."order_state" (
 	"instrument_uid" text NOT NULL,
 	"order_request_id" text NOT NULL,
 	CONSTRAINT "order_state_pk" PRIMARY KEY ("figi"),
-	CONSTRAINT "order_state_execution_report_status_fk" FOREIGN KEY ("execution_report_status") REFERENCES "tin"."order_execution_report_status" ("id"),
-	CONSTRAINT "order_state_direction_fk" FOREIGN KEY ("direction") REFERENCES "tin"."order_direction" ("id"),
-	CONSTRAINT "order_state_order_type_fk" FOREIGN KEY ("order_type") REFERENCES "tin"."order_type" ("id")
+	CONSTRAINT "order_state_execution_report_status_id_fk" FOREIGN KEY ("execution_report_status_id") REFERENCES "tin"."order_execution_report_status" ("id"),
+	CONSTRAINT "order_state_direction_id_fk" FOREIGN KEY ("direction_id") REFERENCES "tin"."order_direction" ("id"),
+	CONSTRAINT "order_state_order_type_id_fk" FOREIGN KEY ("order_type_id") REFERENCES "tin"."order_type" ("id")
 );
-CREATE INDEX IF NOT EXISTS "order_state_execution_report_status_idx" ON "tin"."order_state" USING btree ("execution_report_status");
-CREATE INDEX IF NOT EXISTS "order_state_direction_idx" ON "tin"."order_state" USING btree ("direction");
-CREATE INDEX IF NOT EXISTS "order_state_order_type_idx" ON "tin"."order_state" USING btree ("order_type");
+CREATE INDEX IF NOT EXISTS "order_state_execution_report_status_id_idx" ON "tin"."order_state" USING btree ("execution_report_status_id");
+CREATE INDEX IF NOT EXISTS "order_state_direction_id_idx" ON "tin"."order_state" USING btree ("direction_id");
+CREATE INDEX IF NOT EXISTS "order_state_order_type_id_idx" ON "tin"."order_state" USING btree ("order_type_id");
 COMMENT ON TABLE "tin"."order_state" IS 'Информация о торговом поручении.';
 COMMENT ON COLUMN "tin"."order_state"."order_id" IS 'Биржевой идентификатор заявки.';
 COMMENT ON COLUMN "tin"."order_state"."execution_report_status_id" IS 'Текущий статус заявки.';
@@ -2269,13 +2228,13 @@ CREATE TABLE IF NOT EXISTS "tin"."share" (
 	"first_1min_candle_date" timestamptz NULL,
 	"first_1day_candle_date" timestamptz NULL,
 	CONSTRAINT "share_pk" PRIMARY KEY ("uid"),
-	CONSTRAINT "share_trading_status_fk" FOREIGN KEY ("trading_status") REFERENCES "tin"."security_trading_status" ("id"),
-	CONSTRAINT "share_share_type_fk" FOREIGN KEY ("share_type") REFERENCES "tin"."share_type" ("id"),
-	CONSTRAINT "share_real_exchange_fk" FOREIGN KEY ("real_exchange") REFERENCES "tin"."real_exchange" ("id")
+	CONSTRAINT "share_trading_status_id_fk" FOREIGN KEY ("trading_status_id") REFERENCES "tin"."security_trading_status" ("id"),
+	CONSTRAINT "share_share_type_id_fk" FOREIGN KEY ("share_type_id") REFERENCES "tin"."share_type" ("id"),
+	CONSTRAINT "share_real_exchange_id_fk" FOREIGN KEY ("real_exchange_id") REFERENCES "tin"."real_exchange" ("id")
 );
-CREATE INDEX IF NOT EXISTS "share_trading_status_idx" ON "tin"."share" USING btree ("trading_status");
-CREATE INDEX IF NOT EXISTS "share_share_type_idx" ON "tin"."share" USING btree ("share_type");
-CREATE INDEX IF NOT EXISTS "share_real_exchange_idx" ON "tin"."share" USING btree ("real_exchange");
+CREATE INDEX IF NOT EXISTS "share_trading_status_id_idx" ON "tin"."share" USING btree ("trading_status_id");
+CREATE INDEX IF NOT EXISTS "share_share_type_id_idx" ON "tin"."share" USING btree ("share_type_id");
+CREATE INDEX IF NOT EXISTS "share_real_exchange_id_idx" ON "tin"."share" USING btree ("real_exchange_id");
 COMMENT ON TABLE "tin"."share" IS 'Объект передачи информации об акции.';
 COMMENT ON COLUMN "tin"."share"."figi" IS 'Figi-идентификатор инструмента.';
 COMMENT ON COLUMN "tin"."share"."ticker" IS 'Тикер инструмента.';
@@ -2383,19 +2342,19 @@ CREATE TABLE IF NOT EXISTS "tin"."option" (
 	"blocked_tca_flag" bool NOT NULL,
 	"api_trade_available_flag" bool NOT NULL,
 	CONSTRAINT "option_pk" PRIMARY KEY ("uid"),
-	CONSTRAINT "option_trading_status_fk" FOREIGN KEY ("trading_status") REFERENCES "tin"."security_trading_status" ("id"),
-	CONSTRAINT "option_real_exchange_fk" FOREIGN KEY ("real_exchange") REFERENCES "tin"."real_exchange" ("id"),
-	CONSTRAINT "option_direction_fk" FOREIGN KEY ("direction") REFERENCES "tin"."option_direction" ("id"),
-	CONSTRAINT "option_payment_type_fk" FOREIGN KEY ("payment_type") REFERENCES "tin"."option_payment_type" ("id"),
-	CONSTRAINT "option_style_fk" FOREIGN KEY ("style") REFERENCES "tin"."option_style" ("id"),
-	CONSTRAINT "option_settlement_type_fk" FOREIGN KEY ("settlement_type") REFERENCES "tin"."option_settlement_type" ("id")
+	CONSTRAINT "option_trading_status_id_fk" FOREIGN KEY ("trading_status_id") REFERENCES "tin"."security_trading_status" ("id"),
+	CONSTRAINT "option_real_exchange_id_fk" FOREIGN KEY ("real_exchange_id") REFERENCES "tin"."real_exchange" ("id"),
+	CONSTRAINT "option_direction_id_fk" FOREIGN KEY ("direction_id") REFERENCES "tin"."option_direction" ("id"),
+	CONSTRAINT "option_payment_type_id_fk" FOREIGN KEY ("payment_type_id") REFERENCES "tin"."option_payment_type" ("id"),
+	CONSTRAINT "option_style_id_fk" FOREIGN KEY ("style_id") REFERENCES "tin"."option_style" ("id"),
+	CONSTRAINT "option_settlement_type_id_fk" FOREIGN KEY ("settlement_type_id") REFERENCES "tin"."option_settlement_type" ("id")
 );
-CREATE INDEX IF NOT EXISTS "option_trading_status_idx" ON "tin"."option" USING btree ("trading_status");
-CREATE INDEX IF NOT EXISTS "option_real_exchange_idx" ON "tin"."option" USING btree ("real_exchange");
-CREATE INDEX IF NOT EXISTS "option_direction_idx" ON "tin"."option" USING btree ("direction");
-CREATE INDEX IF NOT EXISTS "option_payment_type_idx" ON "tin"."option" USING btree ("payment_type");
-CREATE INDEX IF NOT EXISTS "option_style_idx" ON "tin"."option" USING btree ("style");
-CREATE INDEX IF NOT EXISTS "option_settlement_type_idx" ON "tin"."option" USING btree ("settlement_type");
+CREATE INDEX IF NOT EXISTS "option_trading_status_id_idx" ON "tin"."option" USING btree ("trading_status_id");
+CREATE INDEX IF NOT EXISTS "option_real_exchange_id_idx" ON "tin"."option" USING btree ("real_exchange_id");
+CREATE INDEX IF NOT EXISTS "option_direction_id_idx" ON "tin"."option" USING btree ("direction_id");
+CREATE INDEX IF NOT EXISTS "option_payment_type_id_idx" ON "tin"."option" USING btree ("payment_type_id");
+CREATE INDEX IF NOT EXISTS "option_style_id_idx" ON "tin"."option" USING btree ("style_id");
+CREATE INDEX IF NOT EXISTS "option_settlement_type_id_idx" ON "tin"."option" USING btree ("settlement_type_id");
 COMMENT ON TABLE "tin"."option" IS 'Опцион.';
 COMMENT ON COLUMN "tin"."option"."uid" IS 'Уникальный идентификатор инструмента.';
 COMMENT ON COLUMN "tin"."option"."position_uid" IS 'Уникальный идентификатор позиции.';
