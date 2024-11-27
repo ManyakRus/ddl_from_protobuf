@@ -137,8 +137,8 @@ func IsIdentifierField(Settings *config.SettingsINI, Field *types.FieldElement) 
 	return Otvet
 }
 
-// TextNullable - возвращает текст NULL для nullable
-func TextNullable(IsNullable bool) string {
+// Find_TextNullable - возвращает текст NULL для nullable
+func Find_TextNullable(IsNullable bool) string {
 	Otvet := ""
 
 	Otvet = "NOT NULL"

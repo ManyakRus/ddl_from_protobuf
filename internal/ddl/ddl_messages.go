@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 		}
 
 		isNullabe := IsNullableField(Settings, field1)
-		TextNullable := TextNullable(isNullabe)
+		TextNullable := Find_TextNullable(isNullabe)
 		FieldNameProto := FindFieldName(Settings, field1)
 		FieldNameSQL := FormatNameSQL(FieldNameProto)
 		ProtoForeignTableName := ""
@@ -141,8 +141,9 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 				SQLTypeForeign := ""
 				MapSQLTypes1F, ok := Settings.MapSQLTypes[FieldTypeF]
 				if ok == false {
-					log.Error("message: ", message1.Name, ", field: ", FieldNameProto, ", foreign message: ", MessageF.Name, " foreign field:", FieldNameF, ", not found type: "+FieldTypeF)
-					return "", ForeignCount, nil
+					log.Warn("message: ", message1.Name, ", field: ", FieldNameProto, ", foreign message: ", MessageF.Name, " foreign field:", FieldNameF, ", not found type: "+FieldTypeF)
+					continue
+					//return "", ForeignCount, nil
 				}
 				SQLTypeForeign = MapSQLTypes1F.SQLType
 
@@ -159,7 +160,11 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 				Table1.MapColumns[Column1.SQLName] = &Column1
 
 				//
-				Otvet = Otvet + "\t" + `"` + FieldNameSQL1 + `"` + " " + SQLTypeForeign + " " + TextNullable + ",\n"
+				isNullabe1 := IsNullableField(Settings, FieldForeign)
+				TextNullable1 := Find_TextNullable(isNullabe1)
+
+				//
+				Otvet = Otvet + "\t" + `"` + FieldNameSQL1 + `"` + " " + SQLTypeForeign + " " + TextNullable1 + ",\n"
 
 				//COLUMN COMMENTS
 				Comments := field1.Documentation + " / " + FieldForeign.Documentation
