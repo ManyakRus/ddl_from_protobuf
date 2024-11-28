@@ -1,6 +1,7 @@
 package asset_etf
 
 import (
+	"github.com/ManyakRus/starter/micro"
 	proto "github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
@@ -147,7 +148,7 @@ func (m *AssetEtf) ConvertFromProtobuf(i proto.AssetEtf)  {
 	m.RebalancingFlag = i.RebalancingFlag
 	m.RebalancingFreq = i.RebalancingFreq
 	m.RebalancingPlan = i.RebalancingPlan
-	m.ReleasedDate = i.ReleasedDate.AsTime()
+	m.ReleasedDate = micro.Date_from_TimestampReference(i.ReleasedDate)
 
 	if i.SellDiscount != nil {
 		m.SellDiscountNano = i.SellDiscount.Nano

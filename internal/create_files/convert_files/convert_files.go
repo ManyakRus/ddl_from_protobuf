@@ -85,6 +85,7 @@ func (m *` + TableName + `) ConvertFromProtobuf(i ` + ProtoNameMessageName + `) 
 	Text = Text + "\n\treturn\n}\n"
 
 	Text = create_files.CheckAndAdd_ImportTimestamp_FromText(Text)
+	Text = create_files.CheckAndAdd_ImportMicro(Text)
 
 	//запись файла
 	err = os.WriteFile(FilenameReady, []byte(Text), config.Settings.FILE_PERMISSIONS)

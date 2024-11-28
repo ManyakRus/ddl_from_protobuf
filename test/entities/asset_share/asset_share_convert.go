@@ -1,6 +1,7 @@
 package asset_share
 
 import (
+	"github.com/ManyakRus/starter/micro"
 	proto "github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
@@ -21,7 +22,7 @@ func (m *AssetShare) ConvertFromProtobuf(i proto.AssetShare)  {
 		m.DividendRateUnits = 0
 	}
 
-	m.IpoDate = i.IpoDate.AsTime()
+	m.IpoDate = micro.Date_from_TimestampReference(i.IpoDate)
 	m.IssueKind = i.IssueKind
 
 	if i.IssueSize != nil {
@@ -66,10 +67,10 @@ func (m *AssetShare) ConvertFromProtobuf(i proto.AssetShare)  {
 		m.NominalUnits = 0
 	}
 
-	m.PlacementDate = i.PlacementDate.AsTime()
+	m.PlacementDate = micro.Date_from_TimestampReference(i.PlacementDate)
 	m.PreferredShareType = i.PreferredShareType
 	m.PrimaryIndex = i.PrimaryIndex
-	m.RegistryDate = i.RegistryDate.AsTime()
+	m.RegistryDate = micro.Date_from_TimestampReference(i.RegistryDate)
 	m.RepresIsin = i.RepresIsin
 
 	if i.TotalFloat != nil {

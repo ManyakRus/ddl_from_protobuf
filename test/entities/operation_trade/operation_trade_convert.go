@@ -1,12 +1,13 @@
 package operation_trade
 
 import (
+	"github.com/ManyakRus/starter/micro"
 	proto "github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
 func (m *OperationTrade) ConvertFromProtobuf(i proto.OperationTrade)  {
-	m.DateTime = i.DateTime.AsTime()
+	m.DateTime = micro.Date_from_TimestampReference(i.DateTime)
 
 	if i.Price != nil {
 		m.PriceCurrency = i.Price.Currency

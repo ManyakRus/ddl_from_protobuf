@@ -1,6 +1,7 @@
 package operation_item
 
 import (
+	"github.com/ManyakRus/starter/micro"
 	proto "github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
@@ -29,7 +30,7 @@ func (m *OperationItem) ConvertFromProtobuf(i proto.OperationItem)  {
 
 	m.AssetUid = i.AssetUid
 	m.BrokerAccountID = i.BrokerAccountId
-	m.CancelDateTime = i.CancelDateTime.AsTime()
+	m.CancelDateTime = micro.Date_from_TimestampReference(i.CancelDateTime)
 	m.CancelReason = i.CancelReason
 
 	if i.Commission != nil {
@@ -53,7 +54,7 @@ func (m *OperationItem) ConvertFromProtobuf(i proto.OperationItem)  {
 	}
 
 	m.Cursor = i.Cursor
-	m.Date = i.Date.AsTime()
+	m.Date = micro.Date_from_TimestampReference(i.Date)
 	m.Description = i.Description
 	m.Figi = i.Figi
 	m.ID = i.Id

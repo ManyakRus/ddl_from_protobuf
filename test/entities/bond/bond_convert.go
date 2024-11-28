@@ -1,6 +1,7 @@
 package bond
 
 import (
+	"github.com/ManyakRus/starter/micro"
 	proto "github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
@@ -94,8 +95,8 @@ func (m *Bond) ConvertFromProtobuf(i proto.Bond)  {
 
 	m.Exchange = i.Exchange
 	m.Figi = i.Figi
-	m.First1DayCandleDate = i.First_1DayCandleDate.AsTime()
-	m.First1MinCandleDate = i.First_1MinCandleDate.AsTime()
+	m.First1DayCandleDate = micro.Date_from_TimestampReference(i.First_1DayCandleDate)
+	m.First1MinCandleDate = micro.Date_from_TimestampReference(i.First_1MinCandleDate)
 	m.FloatingCouponFlag = i.FloatingCouponFlag
 	m.ForIisFlag = i.ForIisFlag
 	m.ForQualInvestorFlag = i.ForQualInvestorFlag
@@ -154,7 +155,7 @@ func (m *Bond) ConvertFromProtobuf(i proto.Bond)  {
 
 	m.LiquidityFlag = i.LiquidityFlag
 	m.Lot = i.Lot
-	m.MaturityDate = i.MaturityDate.AsTime()
+	m.MaturityDate = micro.Date_from_TimestampReference(i.MaturityDate)
 
 	if i.MinPriceIncrement != nil {
 		m.MinPriceIncrementNano = i.MinPriceIncrement.Nano
@@ -193,7 +194,7 @@ func (m *Bond) ConvertFromProtobuf(i proto.Bond)  {
 
 	m.OtcFlag = i.OtcFlag
 	m.PerpetualFlag = i.PerpetualFlag
-	m.PlacementDate = i.PlacementDate.AsTime()
+	m.PlacementDate = micro.Date_from_TimestampReference(i.PlacementDate)
 
 	if i.PlacementPrice != nil {
 		m.PlacementPriceCurrency = i.PlacementPrice.Currency
@@ -221,7 +222,7 @@ func (m *Bond) ConvertFromProtobuf(i proto.Bond)  {
 	m.Sector = i.Sector
 	m.SellAvailableFlag = i.SellAvailableFlag
 	m.ShortEnabledFlag = i.ShortEnabledFlag
-	m.StateRegDate = i.StateRegDate.AsTime()
+	m.StateRegDate = micro.Date_from_TimestampReference(i.StateRegDate)
 	m.SubordinatedFlag = i.SubordinatedFlag
 	m.Ticker = i.Ticker
 	m.TradingStatusID = int64(i.TradingStatus.Number())

@@ -1,6 +1,7 @@
 package share
 
 import (
+	"github.com/ManyakRus/starter/micro"
 	proto "github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
@@ -72,11 +73,11 @@ func (m *Share) ConvertFromProtobuf(i proto.Share)  {
 
 	m.Exchange = i.Exchange
 	m.Figi = i.Figi
-	m.First1DayCandleDate = i.First_1DayCandleDate.AsTime()
-	m.First1MinCandleDate = i.First_1MinCandleDate.AsTime()
+	m.First1DayCandleDate = micro.Date_from_TimestampReference(i.First_1DayCandleDate)
+	m.First1MinCandleDate = micro.Date_from_TimestampReference(i.First_1MinCandleDate)
 	m.ForIisFlag = i.ForIisFlag
 	m.ForQualInvestorFlag = i.ForQualInvestorFlag
-	m.IpoDate = i.IpoDate.AsTime()
+	m.IpoDate = micro.Date_from_TimestampReference(i.IpoDate)
 	m.Isin = i.Isin
 	m.IssueSize = i.IssueSize
 	m.IssueSizePlan = i.IssueSizePlan

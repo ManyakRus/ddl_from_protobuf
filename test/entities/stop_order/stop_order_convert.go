@@ -1,16 +1,17 @@
 package stop_order
 
 import (
+	"github.com/ManyakRus/starter/micro"
 	proto "github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
 func (m *StopOrder) ConvertFromProtobuf(i proto.StopOrder)  {
-	m.ActivationDateTime = i.ActivationDateTime.AsTime()
-	m.CreateDate = i.CreateDate.AsTime()
+	m.ActivationDateTime = micro.Date_from_TimestampReference(i.ActivationDateTime)
+	m.CreateDate = micro.Date_from_TimestampReference(i.CreateDate)
 	m.Currency = i.Currency
 	m.DirectionID = int64(i.Direction.Number())
-	m.ExpirationTime = i.ExpirationTime.AsTime()
+	m.ExpirationTime = micro.Date_from_TimestampReference(i.ExpirationTime)
 	m.Figi = i.Figi
 	m.InstrumentUid = i.InstrumentUid
 	m.LotsRequested = i.LotsRequested

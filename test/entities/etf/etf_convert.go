@@ -1,6 +1,7 @@
 package etf
 
 import (
+	"github.com/ManyakRus/starter/micro"
 	proto "github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
@@ -71,8 +72,8 @@ func (m *Etf) ConvertFromProtobuf(i proto.Etf)  {
 
 	m.Exchange = i.Exchange
 	m.Figi = i.Figi
-	m.First1DayCandleDate = i.First_1DayCandleDate.AsTime()
-	m.First1MinCandleDate = i.First_1MinCandleDate.AsTime()
+	m.First1DayCandleDate = micro.Date_from_TimestampReference(i.First_1DayCandleDate)
+	m.First1MinCandleDate = micro.Date_from_TimestampReference(i.First_1MinCandleDate)
 
 	if i.FixedCommission != nil {
 		m.FixedCommissionNano = i.FixedCommission.Nano
@@ -154,7 +155,7 @@ func (m *Etf) ConvertFromProtobuf(i proto.Etf)  {
 	m.PositionUid = i.PositionUid
 	m.RealExchangeID = int64(i.RealExchange.Number())
 	m.RebalancingFreq = i.RebalancingFreq
-	m.ReleasedDate = i.ReleasedDate.AsTime()
+	m.ReleasedDate = micro.Date_from_TimestampReference(i.ReleasedDate)
 	m.Sector = i.Sector
 	m.SellAvailableFlag = i.SellAvailableFlag
 	m.ShortEnabledFlag = i.ShortEnabledFlag

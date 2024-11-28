@@ -1,6 +1,7 @@
 package last_price
 
 import (
+	"github.com/ManyakRus/starter/micro"
 	proto "github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
@@ -22,7 +23,7 @@ func (m *LastPrice) ConvertFromProtobuf(i proto.LastPrice)  {
 		m.PriceUnits = 0
 	}
 
-	m.Time = i.Time.AsTime()
+	m.Time = micro.Date_from_TimestampReference(i.Time)
 
 	return
 }

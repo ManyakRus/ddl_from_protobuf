@@ -1,6 +1,7 @@
 package option
 
 import (
+	"github.com/ManyakRus/starter/micro"
 	proto "github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
@@ -88,10 +89,10 @@ func (m *Option) ConvertFromProtobuf(i proto.Option)  {
 	}
 
 	m.Exchange = i.Exchange
-	m.ExpirationDate = i.ExpirationDate.AsTime()
-	m.First1DayCandleDate = i.First_1DayCandleDate.AsTime()
-	m.First1MinCandleDate = i.First_1MinCandleDate.AsTime()
-	m.FirstTradeDate = i.FirstTradeDate.AsTime()
+	m.ExpirationDate = micro.Date_from_TimestampReference(i.ExpirationDate)
+	m.First1DayCandleDate = micro.Date_from_TimestampReference(i.First_1DayCandleDate)
+	m.First1MinCandleDate = micro.Date_from_TimestampReference(i.First_1MinCandleDate)
+	m.FirstTradeDate = micro.Date_from_TimestampReference(i.FirstTradeDate)
 	m.ForIisFlag = i.ForIisFlag
 	m.ForQualInvestorFlag = i.ForQualInvestorFlag
 
@@ -122,7 +123,7 @@ func (m *Option) ConvertFromProtobuf(i proto.Option)  {
 		m.KshortUnits = 0
 	}
 
-	m.LastTradeDate = i.LastTradeDate.AsTime()
+	m.LastTradeDate = micro.Date_from_TimestampReference(i.LastTradeDate)
 	m.Lot = i.Lot
 
 	if i.MinPriceIncrement != nil {

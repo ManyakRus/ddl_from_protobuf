@@ -1,6 +1,7 @@
 package order_state
 
 import (
+	"github.com/ManyakRus/starter/micro"
 	proto "github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
@@ -139,7 +140,7 @@ func (m *OrderState) ConvertFromProtobuf(i proto.OrderState)  {
 	m.InstrumentUid = i.InstrumentUid
 	m.LotsExecuted = i.LotsExecuted
 	m.LotsRequested = i.LotsRequested
-	m.OrderDate = i.OrderDate.AsTime()
+	m.OrderDate = micro.Date_from_TimestampReference(i.OrderDate)
 	m.OrderID = i.OrderId
 	m.OrderRequestID = i.OrderRequestId
 	m.OrderTypeID = int64(i.OrderType.Number())

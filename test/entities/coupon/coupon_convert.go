@@ -1,19 +1,20 @@
 package coupon
 
 import (
+	"github.com/ManyakRus/starter/micro"
 	proto "github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
 func (m *Coupon) ConvertFromProtobuf(i proto.Coupon)  {
-	m.CouponDate = i.CouponDate.AsTime()
-	m.CouponEndDate = i.CouponEndDate.AsTime()
+	m.CouponDate = micro.Date_from_TimestampReference(i.CouponDate)
+	m.CouponEndDate = micro.Date_from_TimestampReference(i.CouponEndDate)
 	m.CouponNumber = i.CouponNumber
 	m.CouponPeriod = i.CouponPeriod
-	m.CouponStartDate = i.CouponStartDate.AsTime()
+	m.CouponStartDate = micro.Date_from_TimestampReference(i.CouponStartDate)
 	m.CouponTypeID = int64(i.CouponType.Number())
 	m.Figi = i.Figi
-	m.FixDate = i.FixDate.AsTime()
+	m.FixDate = micro.Date_from_TimestampReference(i.FixDate)
 
 	if i.PayOneBond != nil {
 		m.PayOneBondCurrency = i.PayOneBond.Currency

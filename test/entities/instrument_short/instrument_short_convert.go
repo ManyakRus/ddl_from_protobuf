@@ -1,6 +1,7 @@
 package instrument_short
 
 import (
+	"github.com/ManyakRus/starter/micro"
 	proto "github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
@@ -10,8 +11,8 @@ func (m *InstrumentShort) ConvertFromProtobuf(i proto.InstrumentShort)  {
 	m.BlockedTcaFlag = i.BlockedTcaFlag
 	m.ClassCode = i.ClassCode
 	m.Figi = i.Figi
-	m.First1DayCandleDate = i.First_1DayCandleDate.AsTime()
-	m.First1MinCandleDate = i.First_1MinCandleDate.AsTime()
+	m.First1DayCandleDate = micro.Date_from_TimestampReference(i.First_1DayCandleDate)
+	m.First1MinCandleDate = micro.Date_from_TimestampReference(i.First_1MinCandleDate)
 	m.ForIisFlag = i.ForIisFlag
 	m.ForQualInvestorFlag = i.ForQualInvestorFlag
 	m.InstrumentKindID = int64(i.InstrumentKind.Number())

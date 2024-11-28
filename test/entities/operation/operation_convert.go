@@ -1,6 +1,7 @@
 package operation
 
 import (
+	"github.com/ManyakRus/starter/micro"
 	proto "github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
@@ -8,7 +9,7 @@ import (
 func (m *Operation) ConvertFromProtobuf(i proto.Operation)  {
 	m.AssetUid = i.AssetUid
 	m.Currency = i.Currency
-	m.Date = i.Date.AsTime()
+	m.Date = micro.Date_from_TimestampReference(i.Date)
 	m.Figi = i.Figi
 	m.ID = i.Id
 	m.InstrumentType = i.InstrumentType

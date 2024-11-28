@@ -1,6 +1,7 @@
 package asset_full
 
 import (
+	"github.com/ManyakRus/starter/micro"
 	proto "github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
@@ -17,7 +18,7 @@ func (m *AssetFull) ConvertFromProtobuf(i proto.AssetFull)  {
 
 	m.Cfi = i.Cfi
 	m.CodeNsd = i.CodeNsd
-	m.DeletedAt = i.DeletedAt.AsTime()
+	m.DeletedAt = micro.Date_from_TimestampReference(i.DeletedAt)
 	m.Description = i.Description
 	m.GosRegCode = i.GosRegCode
 	m.Name = i.Name
@@ -25,7 +26,7 @@ func (m *AssetFull) ConvertFromProtobuf(i proto.AssetFull)  {
 	m.Status = i.Status
 	m.TypeID = int64(i.Type.Number())
 	m.Uid = i.Uid
-	m.UpdatedAt = i.UpdatedAt.AsTime()
+	m.UpdatedAt = micro.Date_from_TimestampReference(i.UpdatedAt)
 
 	return
 }

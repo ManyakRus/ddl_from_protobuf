@@ -1,6 +1,7 @@
 package virtual_portfolio_position
 
 import (
+	"github.com/ManyakRus/starter/micro"
 	proto "github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
@@ -97,7 +98,7 @@ func (m *VirtualPortfolioPosition) ConvertFromProtobuf(i proto.VirtualPortfolioP
 		m.ExpectedYieldUnits = 0
 	}
 
-	m.ExpireDate = i.ExpireDate.AsTime()
+	m.ExpireDate = micro.Date_from_TimestampReference(i.ExpireDate)
 	m.Figi = i.Figi
 	m.InstrumentType = i.InstrumentType
 	m.InstrumentUid = i.InstrumentUid

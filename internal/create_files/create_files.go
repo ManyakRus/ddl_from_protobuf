@@ -206,7 +206,7 @@ func Convert_ProtobufVariableToGolangVariable(Settings *config.SettingsINI, Colu
 	switch TypeGo {
 	case "time.Time":
 		{
-			VariableColumn = VariablePrefix + VariableName + ".AsTime()"
+			VariableColumn = "micro.Date_from_TimestampReference(" + VariablePrefix + VariableName + ")"
 			return VariableColumn, GolangCode
 		}
 	case "uuid.UUID":
@@ -364,20 +364,15 @@ func AddImport_Timestamp(Text string) string {
 	RepositoryURL := `google.golang.org/protobuf/types/known/timestamppb`
 	Otvet = AddImport(Text, RepositoryURL)
 
-	////если уже есть импорт
-	//pos1 := strings.Index(Otvet, `"google.golang.org/protobuf/types/known/timestamppb"`)
-	//if pos1 >= 0 {
-	//	return Otvet
-	//}
-	//
-	////
-	//pos1 = strings.Index(Otvet, "import (")
-	//if pos1 < 0 {
-	//	log.Error("not found word: import (")
-	//	return TextModel
-	//}
-	//
-	//Otvet = Otvet[:pos1+8] + "\n\t" + `"google.golang.org/protobuf/types/known/timestamppb"` + Otvet[pos1+8:]
+	return Otvet
+}
+
+// AddImport_Micro - добавляет покет в секцию Import, если его там нет
+func AddImport_Micro(Text string) string {
+	Otvet := Text
+
+	RepositoryURL := "github.com/ManyakRus/starter/micro"
+	Otvet = AddImport(Text, RepositoryURL)
 
 	return Otvet
 }
@@ -434,6 +429,20 @@ func CheckAndAdd_ImportTimestamp_FromText(Text string) string {
 	}
 
 	Otvet = AddImport_Timestamp(Otvet)
+
+	return Otvet
+}
+
+// CheckAndAdd_ImportMicro - добавляет пакет "micro" в секцию Import, если его там нет
+func CheckAndAdd_ImportMicro(Text string) string {
+	Otvet := Text
+
+	pos1 := strings.Index(Text, " micro.")
+	if pos1 < 0 {
+		return Otvet
+	}
+
+	Otvet = AddImport_Micro(Otvet)
 
 	return Otvet
 }

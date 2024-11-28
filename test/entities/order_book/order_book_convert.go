@@ -1,6 +1,7 @@
 package order_book
 
 import (
+	"github.com/ManyakRus/starter/micro"
 	proto "github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
@@ -38,7 +39,7 @@ func (m *OrderBook) ConvertFromProtobuf(i proto.OrderBook)  {
 		m.LimitUpUnits = 0
 	}
 
-	m.Time = i.Time.AsTime()
+	m.Time = micro.Date_from_TimestampReference(i.Time)
 
 	return
 }

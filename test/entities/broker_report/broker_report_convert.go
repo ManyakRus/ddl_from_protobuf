@@ -1,6 +1,7 @@
 package broker_report
 
 import (
+	"github.com/ManyakRus/starter/micro"
 	proto "github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
@@ -43,7 +44,7 @@ func (m *BrokerReport) ConvertFromProtobuf(i proto.BrokerReport)  {
 
 	m.BrokerStatus = i.BrokerStatus
 	m.ClassCode = i.ClassCode
-	m.ClearValueDate = i.ClearValueDate.AsTime()
+	m.ClearValueDate = micro.Date_from_TimestampReference(i.ClearValueDate)
 	m.DeliveryType = i.DeliveryType
 	m.Direction = i.Direction
 	m.Exchange = i.Exchange
@@ -151,7 +152,7 @@ func (m *BrokerReport) ConvertFromProtobuf(i proto.BrokerReport)  {
 		m.RepoRateUnits = 0
 	}
 
-	m.SecValueDate = i.SecValueDate.AsTime()
+	m.SecValueDate = micro.Date_from_TimestampReference(i.SecValueDate)
 	m.SeparateAgreementDate = i.SeparateAgreementDate
 	m.SeparateAgreementNumber = i.SeparateAgreementNumber
 	m.SeparateAgreementType = i.SeparateAgreementType
@@ -177,7 +178,7 @@ func (m *BrokerReport) ConvertFromProtobuf(i proto.BrokerReport)  {
 		m.TotalOrderAmountUnits = 0
 	}
 
-	m.TradeDatetime = i.TradeDatetime.AsTime()
+	m.TradeDatetime = micro.Date_from_TimestampReference(i.TradeDatetime)
 	m.TradeID = i.TradeId
 
 	return

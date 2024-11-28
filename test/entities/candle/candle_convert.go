@@ -1,6 +1,7 @@
 package candle
 
 import (
+	"github.com/ManyakRus/starter/micro"
 	proto "github.com/tinkoff/invest-api-go-sdk/proto"
 )
 
@@ -37,7 +38,7 @@ func (m *Candle) ConvertFromProtobuf(i proto.Candle)  {
 
 	m.InstrumentUid = i.InstrumentUid
 	m.IntervalID = int64(i.Interval.Number())
-	m.LastTradeTs = i.LastTradeTs.AsTime()
+	m.LastTradeTs = micro.Date_from_TimestampReference(i.LastTradeTs)
 
 	if i.Low != nil {
 		m.LowNano = i.Low.Nano
@@ -66,7 +67,7 @@ func (m *Candle) ConvertFromProtobuf(i proto.Candle)  {
 		m.OpenUnits = 0
 	}
 
-	m.Time = i.Time.AsTime()
+	m.Time = micro.Date_from_TimestampReference(i.Time)
 	m.Volume = i.Volume
 
 	return
