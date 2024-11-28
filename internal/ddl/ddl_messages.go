@@ -5,10 +5,15 @@ import (
 	"github.com/ManyakRus/ddl_from_protobuf/internal/create_files"
 	"github.com/ManyakRus/ddl_from_protobuf/internal/types"
 	"github.com/ManyakRus/starter/log"
+	"regexp"
 	"strings"
 )
 
 // CreateFile_Message - создание одного файла ddl .sql, для message
+// возвращает:
+// - текст SQL для одного .proto
+// - количество созданных внешних таблиц, для: сортируем по кол-ву внешних ключей
+// - error
 func CreateFile_Message(Settings *config.SettingsINI, MapTables map[string]*types.Table, message1 *types.MessageElement) (string, int, error) {
 	Otvet := ""
 	ForeignCount := 0
@@ -23,6 +28,24 @@ func CreateFile_Message(Settings *config.SettingsINI, MapTables map[string]*type
 	TableComments := message1.Documentation
 	TextColumnComment := ""
 	TableNameSQL := FormatNameSQL(TableName)
+
+	//фильтр
+	Filter := Settings.FILTER_MESSAGE_NAME
+	if Filter != "" {
+		IsFound, _ := regexp.MatchString(Settings.FILTER_MESSAGE_NAME, TableName)
+		if IsFound == false {
+			return Otvet, ForeignCount, err
+		}
+	}
+
+	//фильтр кроме
+	FilterExclude := Settings.EXCLUDE_MESSAGE_NAME
+	if FilterExclude != "" {
+		IsFound, _ := regexp.MatchString(Settings.EXCLUDE_MESSAGE_NAME, TableName)
+		if IsFound == true {
+			return Otvet, ForeignCount, err
+		}
+	}
 
 	//
 	Table1 := types.NewTable()
@@ -225,7 +248,9 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 		}
 	} else {
 		//таблицы без идентификаторов не создаем
-		return "", ForeignCount, err
+		if config.Settings.NEED_IGNORE_MESSAGES_WITHOUT_PRIMARY_KEY == true {
+			return "", ForeignCount, err
+		}
 	}
 
 	//добавим CONSTRAINT

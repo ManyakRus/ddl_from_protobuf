@@ -107,25 +107,25 @@ func handleMessage(m *proto.Message) {
 	//var err error
 
 	//
-	MessageName := m.Name
+	//MessageName := m.Name
 
-	//фильтр
-	Filter := Settings.FILTER_MESSAGE_NAME
-	if Filter != "" {
-		IsFound, _ := regexp.MatchString(Settings.FILTER_MESSAGE_NAME, MessageName)
-		if IsFound == false {
-			return
-		}
-	}
-
-	//фильтр кроме
-	FilterExclude := Settings.EXCLUDE_MESSAGE_NAME
-	if FilterExclude != "" {
-		IsFound, _ := regexp.MatchString(Settings.EXCLUDE_MESSAGE_NAME, MessageName)
-		if IsFound == true {
-			return
-		}
-	}
+	////фильтр
+	//Filter := Settings.FILTER_MESSAGE_NAME
+	//if Filter != "" {
+	//	IsFound, _ := regexp.MatchString(Settings.FILTER_MESSAGE_NAME, MessageName)
+	//	if IsFound == false {
+	//		return
+	//	}
+	//}
+	//
+	////фильтр кроме
+	//FilterExclude := Settings.EXCLUDE_MESSAGE_NAME
+	//if FilterExclude != "" {
+	//	IsFound, _ := regexp.MatchString(Settings.EXCLUDE_MESSAGE_NAME, MessageName)
+	//	if IsFound == true {
+	//		return
+	//	}
+	//}
 
 	//
 	documentation := ""

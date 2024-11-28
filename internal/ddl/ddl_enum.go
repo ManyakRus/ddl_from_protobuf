@@ -4,6 +4,7 @@ import (
 	"github.com/ManyakRus/ddl_from_protobuf/internal/config"
 	"github.com/ManyakRus/ddl_from_protobuf/internal/create_files"
 	"github.com/ManyakRus/ddl_from_protobuf/internal/types"
+	"regexp"
 	"strconv"
 )
 
@@ -21,6 +22,24 @@ func CreateFiles_Enum(Settings *config.SettingsINI, MapTables map[string]*types.
 	TableName := enum1.Name
 	TableNameSQL := FormatNameSQL(TableName)
 	TableComments := enum1.Documentation
+
+	//фильтр
+	Filter := Settings.FILTER_MESSAGE_NAME
+	if Filter != "" {
+		IsFound, _ := regexp.MatchString(Settings.FILTER_MESSAGE_NAME, TableName)
+		if IsFound == false {
+			return Otvet, err
+		}
+	}
+
+	//фильтр кроме
+	FilterExclude := Settings.EXCLUDE_MESSAGE_NAME
+	if FilterExclude != "" {
+		IsFound, _ := regexp.MatchString(Settings.EXCLUDE_MESSAGE_NAME, TableName)
+		if IsFound == true {
+			return Otvet, err
+		}
+	}
 
 	//
 	Otvet = `

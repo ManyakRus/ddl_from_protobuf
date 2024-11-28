@@ -31,6 +31,9 @@ FILTER_ENUM_NAME=""
 #EXCLUDE_MESSAGE_NAME - regular excpression, not need this messages
 EXCLUDE_MESSAGE_NAME="(Request$|Response$)"
 
+#NEED_IGNORE_MESSAGES_WITHOUT_PRIMARY_KEY - need ignore messages without primary key field ("id", "uid", etc.)
+NEED_IGNORE_MESSAGES_WITHOUT_PRIMARY_KEY=true
+
 
 #---------------------------- convert files --------------------------------------------------------
 
