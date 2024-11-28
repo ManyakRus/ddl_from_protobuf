@@ -235,6 +235,12 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 	//PRIMARY KEY
 	IdentifierName = Find_ID_Name_from_Fields(Settings, message1.Fields)
 	if IdentifierName != "" {
+		//таблицы с идентификатором не создаем, если не нужны
+		if config.Settings.NEED_CREATE_MESSAGE_TABLES_WITH_PRIMARY_KEY == false {
+			return "", ForeignCount, err
+		}
+
+		//
 		ConstraintName := TableNameSQL + "_pk"
 		TextPrimaryKey := "\t" + `CONSTRAINT "` + ConstraintName + `" PRIMARY KEY ("` + IdentifierName + `"),` + "\n"
 		Otvet = Otvet + TextPrimaryKey
@@ -249,6 +255,11 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 	} else {
 		//таблицы без идентификаторов не создаем
 		if config.Settings.NEED_IGNORE_MESSAGES_WITHOUT_PRIMARY_KEY == true {
+			return "", ForeignCount, err
+		}
+
+		//таблицы без идентификаторов не создаем, если не нужны
+		if config.Settings.NEED_CREATE_MESSAGE_TABLES_WITHOUT_PRIMARY_KEY == false {
 			return "", ForeignCount, err
 		}
 	}

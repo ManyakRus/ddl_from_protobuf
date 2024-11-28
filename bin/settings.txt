@@ -34,6 +34,18 @@ EXCLUDE_MESSAGE_NAME="(Request$|Response$)"
 #NEED_IGNORE_MESSAGES_WITHOUT_PRIMARY_KEY - need ignore messages without primary key field ("id", "uid", etc.)
 NEED_IGNORE_MESSAGES_WITHOUT_PRIMARY_KEY=true
 
+#NEED_CREATE_ENUM_TABLES - need create ddl .sql tables from protobuf enums
+NEED_CREATE_ENUM_TABLES=true
+
+#NEED_CREATE_MESSAGE_TABLES - need create ddl .sql tables from protobuf messages
+NEED_CREATE_MESSAGE_TABLES=true
+
+#NEED_CREATE_MESSAGE_TABLES_WITH_PRIMARY_KEY - need create ddl .sql tables from protobuf messages with primary key
+NEED_CREATE_MESSAGE_TABLES_WITH_PRIMARY_KEY=true
+
+#NEED_CREATE_MESSAGE_TABLES_WITHOUT_PRIMARY_KEY - need create ddl .sql tables from protobuf messages without primary key
+NEED_CREATE_MESSAGE_TABLES_WITHOUT_PRIMARY_KEY=false
+
 
 #---------------------------- convert files --------------------------------------------------------
 

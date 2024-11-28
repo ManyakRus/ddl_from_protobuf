@@ -52,30 +52,35 @@ func Start1(Settings *config.SettingsINI) (string, map[string]*types.Table, erro
 	var err error
 
 	//enums отсортированно
-	MassEnums := micro.MassFrom_Map(Settings.MapEnums)
-	for _, enum1 := range MassEnums {
-		Otvet1, err := CreateFiles_Enum(Settings, MapTables, enum1)
-		if err != nil {
-			err = fmt.Errorf("CreateFiles_Enum(%s) error: %w", enum1.Name, err)
-			return Otvet, MapTables, err
+	if config.Settings.NEED_CREATE_ENUM_TABLES == true {
+		MassEnums := micro.MassFrom_Map(Settings.MapEnums)
+		for _, enum1 := range MassEnums {
+			Otvet1, err := CreateFiles_Enum(Settings, MapTables, enum1)
+			if err != nil {
+				err = fmt.Errorf("CreateFiles_Enum(%s) error: %w", enum1.Name, err)
+				return Otvet, MapTables, err
+			}
+			Otvet = Otvet + Otvet1 + "\n"
 		}
-		Otvet = Otvet + Otvet1 + "\n"
 	}
 
-	//messages отсортированно
 	//сначала делаем map для сортировки
 	MapSQL := make(map[string]string, len(Settings.MapMessages))
-	MassMessages := micro.MassFrom_Map(Settings.MapMessages)
-	for i, message1 := range MassMessages {
-		Otvet1, ForeignCount, err := CreateFile_Message(Settings, MapTables, message1)
-		if err != nil {
-			err = fmt.Errorf("CreateFile_Message(%s) error: %w", message1.Name, err)
-			return Otvet, MapTables, err
-		}
-		//Otvet = Otvet + Otvet1
-		sCount := fmt.Sprintf("%09d_%09d", ForeignCount, i)
-		if Otvet1 != "" {
-			MapSQL[sCount] = Otvet1
+
+	//messages отсортированно
+	if config.Settings.NEED_CREATE_MESSAGE_TABLES == true {
+		MassMessages := micro.MassFrom_Map(Settings.MapMessages)
+		for i, message1 := range MassMessages {
+			Otvet1, ForeignCount, err := CreateFile_Message(Settings, MapTables, message1)
+			if err != nil {
+				err = fmt.Errorf("CreateFile_Message(%s) error: %w", message1.Name, err)
+				return Otvet, MapTables, err
+			}
+			//Otvet = Otvet + Otvet1
+			sCount := fmt.Sprintf("%09d_%09d", ForeignCount, i)
+			if Otvet1 != "" {
+				MapSQL[sCount] = Otvet1
+			}
 		}
 	}
 

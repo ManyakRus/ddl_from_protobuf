@@ -17,27 +17,31 @@ var Settings SettingsINI
 
 // SettingsINI - структура для хранения всех нужных переменных окружения
 type SettingsINI struct {
-	PROTOBUF_DIRECTORY                       string
-	DDL_FILENAME                             string
-	CONFIG_DIRECTORY_NAME                    string
-	MapSQLTypes                              map[string]load_configs_mapping.SQLMapping //map[ProtoType]SQLMapping
-	TextEveryTableColumns                    string
-	DB_SCHEMA_NAME                           string
-	MapMessages                              map[string]*types.MessageElement
-	MapEnums                                 map[string]*types.EnumElement
-	MassIndexNames                           []string
-	PRIMARY_KEY_NAMES_FILENAME               string
-	FILE_PERMISSIONS                         fs.FileMode //= 0666
-	ENUMS_ID_COLUMN_NAME                     string
-	ENUMS_NAME_COLUMN_NAME                   string
-	REPOSITORY_PROTO_URL                     string
-	CONVERT_FOLDER_NAME                      string
-	NEED_CREATE_CONVERT_FILES                bool
-	FILTER_MESSAGE_NAME                      string
-	FILTER_ENUM_NAME                         string
-	SUFFIX_CONVERT                           string
-	EXCLUDE_MESSAGE_NAME                     string
-	NEED_IGNORE_MESSAGES_WITHOUT_PRIMARY_KEY bool
+	PROTOBUF_DIRECTORY                             string
+	DDL_FILENAME                                   string
+	CONFIG_DIRECTORY_NAME                          string
+	MapSQLTypes                                    map[string]load_configs_mapping.SQLMapping //map[ProtoType]SQLMapping
+	TextEveryTableColumns                          string
+	DB_SCHEMA_NAME                                 string
+	MapMessages                                    map[string]*types.MessageElement
+	MapEnums                                       map[string]*types.EnumElement
+	MassIndexNames                                 []string
+	PRIMARY_KEY_NAMES_FILENAME                     string
+	FILE_PERMISSIONS                               fs.FileMode //= 0666
+	ENUMS_ID_COLUMN_NAME                           string
+	ENUMS_NAME_COLUMN_NAME                         string
+	REPOSITORY_PROTO_URL                           string
+	CONVERT_FOLDER_NAME                            string
+	NEED_CREATE_CONVERT_FILES                      bool
+	FILTER_MESSAGE_NAME                            string
+	FILTER_ENUM_NAME                               string
+	SUFFIX_CONVERT                                 string
+	EXCLUDE_MESSAGE_NAME                           string
+	NEED_IGNORE_MESSAGES_WITHOUT_PRIMARY_KEY       bool
+	NEED_CREATE_ENUM_TABLES                        bool
+	NEED_CREATE_MESSAGE_TABLES                     bool
+	NEED_CREATE_MESSAGE_TABLES_WITH_PRIMARY_KEY    bool
+	NEED_CREATE_MESSAGE_TABLES_WITHOUT_PRIMARY_KEY bool
 }
 
 // CreateSettings - создает структуру типа SettingsINI
@@ -145,6 +149,26 @@ func FillSettings() {
 	Name = "NEED_IGNORE_MESSAGES_WITHOUT_PRIMARY_KEY"
 	s = Getenv(Name, true)
 	Settings.NEED_IGNORE_MESSAGES_WITHOUT_PRIMARY_KEY = micro.BoolFromString(s)
+
+	//
+	Name = "NEED_CREATE_ENUM_TABLES"
+	s = Getenv(Name, true)
+	Settings.NEED_CREATE_ENUM_TABLES = micro.BoolFromString(s)
+
+	//
+	Name = "NEED_CREATE_MESSAGE_TABLES"
+	s = Getenv(Name, true)
+	Settings.NEED_CREATE_MESSAGE_TABLES = micro.BoolFromString(s)
+
+	//
+	Name = "NEED_CREATE_MESSAGE_TABLES_WITH_PRIMARY_KEY"
+	s = Getenv(Name, true)
+	Settings.NEED_CREATE_MESSAGE_TABLES_WITH_PRIMARY_KEY = micro.BoolFromString(s)
+
+	//
+	Name = "NEED_CREATE_MESSAGE_TABLES_WITHOUT_PRIMARY_KEY"
+	s = Getenv(Name, true)
+	Settings.NEED_CREATE_MESSAGE_TABLES_WITHOUT_PRIMARY_KEY = micro.BoolFromString(s)
 
 }
 
