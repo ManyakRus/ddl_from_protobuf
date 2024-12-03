@@ -5,7 +5,7 @@ import (
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *TinkoffAsset) ConvertFromProtobuf(i proto.TinkoffAsset)  {
+func (m *Asset) ConvertFromProtobuf(i proto.Asset)  {
 	m.Name = i.Name
 	m.TypeID = int64(i.Type.Number())
 	m.Uid = i.Uid

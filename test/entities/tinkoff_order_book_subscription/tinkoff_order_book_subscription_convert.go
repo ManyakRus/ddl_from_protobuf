@@ -5,7 +5,7 @@ import (
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *TinkoffOrderBookSubscription) ConvertFromProtobuf(i proto.TinkoffOrderBookSubscription)  {
+func (m *OrderBookSubscription) ConvertFromProtobuf(i proto.OrderBookSubscription)  {
 	m.Depth = i.Depth
 	m.Figi = i.Figi
 	m.InstrumentUid = i.InstrumentUid

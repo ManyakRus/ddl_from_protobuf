@@ -6,7 +6,7 @@ import (
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *TinkoffOrderTrades) ConvertFromProtobuf(i proto.TinkoffOrderTrades)  {
+func (m *OrderTrades) ConvertFromProtobuf(i proto.OrderTrades)  {
 	m.AccountID = i.AccountId
 	m.CreatedAt = micro.Date_from_TimestampReference(i.CreatedAt)
 	m.DirectionID = int64(i.Direction.Number())

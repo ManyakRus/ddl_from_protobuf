@@ -6,7 +6,7 @@ import (
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *TinkoffCandle) ConvertFromProtobuf(i proto.TinkoffCandle)  {
+func (m *Candle) ConvertFromProtobuf(i proto.Candle)  {
 
 	if i.Close != nil {
 		m.CloseNano = i.Close.Nano

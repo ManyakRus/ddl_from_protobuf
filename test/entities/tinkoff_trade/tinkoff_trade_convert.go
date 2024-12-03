@@ -6,7 +6,7 @@ import (
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *TinkoffTrade) ConvertFromProtobuf(i proto.TinkoffTrade)  {
+func (m *Trade) ConvertFromProtobuf(i proto.Trade)  {
 	m.DirectionID = int64(i.Direction.Number())
 	m.Figi = i.Figi
 	m.InstrumentUid = i.InstrumentUid

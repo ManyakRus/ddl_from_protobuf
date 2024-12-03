@@ -6,7 +6,7 @@ import (
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *TinkoffAccount) ConvertFromProtobuf(i proto.TinkoffAccount)  {
+func (m *Account) ConvertFromProtobuf(i proto.Account)  {
 	m.AccessLevelID = int64(i.AccessLevel.Number())
 	m.ClosedDate = micro.Date_from_TimestampReference(i.ClosedDate)
 	m.ID = i.Id

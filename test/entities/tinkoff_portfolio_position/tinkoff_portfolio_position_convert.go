@@ -5,7 +5,7 @@ import (
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *TinkoffPortfolioPosition) ConvertFromProtobuf(i proto.TinkoffPortfolioPosition)  {
+func (m *PortfolioPosition) ConvertFromProtobuf(i proto.PortfolioPosition)  {
 
 	if i.AveragePositionPrice != nil {
 		m.AveragePositionPriceCurrency = i.AveragePositionPrice.Currency

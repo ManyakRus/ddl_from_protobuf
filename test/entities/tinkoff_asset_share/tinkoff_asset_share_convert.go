@@ -6,7 +6,7 @@ import (
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *TinkoffAssetShare) ConvertFromProtobuf(i proto.TinkoffAssetShare)  {
+func (m *AssetShare) ConvertFromProtobuf(i proto.AssetShare)  {
 	m.DivYieldFlag = i.DivYieldFlag
 
 	if i.DividendRate != nil {

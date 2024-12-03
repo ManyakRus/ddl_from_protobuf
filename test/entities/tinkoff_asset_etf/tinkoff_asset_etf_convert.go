@@ -6,7 +6,7 @@ import (
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *TinkoffAssetEtf) ConvertFromProtobuf(i proto.TinkoffAssetEtf)  {
+func (m *AssetEtf) ConvertFromProtobuf(i proto.AssetEtf)  {
 
 	if i.BuyPremium != nil {
 		m.BuyPremiumNano = i.BuyPremium.Nano

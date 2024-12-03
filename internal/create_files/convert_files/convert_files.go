@@ -32,7 +32,7 @@ func CreateFiles_Message1(Settings *config.SettingsINI, MapTables map[string]*ty
 
 	dir := micro.ProgramDir()
 	DirReady := dir + Settings.CONVERT_FOLDER_NAME
-	TableName := Table1.NameGo
+	TableName := Table1.NameProtobuf
 	TableNameSQL := Table1.NameSQL
 
 	DirReadyEntity := DirReady + micro.SeparatorFile() + TableNameSQL

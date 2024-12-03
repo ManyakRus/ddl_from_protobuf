@@ -5,7 +5,7 @@ import (
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *TinkoffCandleSubscription) ConvertFromProtobuf(i proto.TinkoffCandleSubscription)  {
+func (m *CandleSubscription) ConvertFromProtobuf(i proto.CandleSubscription)  {
 	m.Figi = i.Figi
 	m.InstrumentUid = i.InstrumentUid
 	m.IntervalID = int64(i.Interval.Number())

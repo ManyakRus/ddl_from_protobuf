@@ -6,7 +6,7 @@ import (
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *TinkoffBond) ConvertFromProtobuf(i proto.TinkoffBond)  {
+func (m *Bond) ConvertFromProtobuf(i proto.Bond)  {
 
 	if i.AciValue != nil {
 		m.AciValueCurrency = i.AciValue.Currency

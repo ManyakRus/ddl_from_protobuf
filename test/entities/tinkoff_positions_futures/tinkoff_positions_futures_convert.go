@@ -5,7 +5,7 @@ import (
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *TinkoffPositionsFutures) ConvertFromProtobuf(i proto.TinkoffPositionsFutures)  {
+func (m *PositionsFutures) ConvertFromProtobuf(i proto.PositionsFutures)  {
 	m.Balance = i.Balance
 	m.Blocked = i.Blocked
 	m.Figi = i.Figi

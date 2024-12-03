@@ -6,7 +6,7 @@ import (
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *TinkoffInstrument) ConvertFromProtobuf(i proto.TinkoffInstrument)  {
+func (m *Instrument) ConvertFromProtobuf(i proto.Instrument)  {
 	m.ApiTradeAvailableFlag = i.ApiTradeAvailableFlag
 	m.BlockedTcaFlag = i.BlockedTcaFlag
 	m.BuyAvailableFlag = i.BuyAvailableFlag

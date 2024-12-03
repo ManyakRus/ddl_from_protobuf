@@ -6,7 +6,7 @@ import (
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *TinkoffAssetFull) ConvertFromProtobuf(i proto.TinkoffAssetFull)  {
+func (m *AssetFull) ConvertFromProtobuf(i proto.AssetFull)  {
 	m.BrCode = i.BrCode
 	m.BrCodeName = i.BrCodeName
 

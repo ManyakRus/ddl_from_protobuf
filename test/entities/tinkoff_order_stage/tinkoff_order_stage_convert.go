@@ -5,7 +5,7 @@ import (
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *TinkoffOrderStage) ConvertFromProtobuf(i proto.TinkoffOrderStage)  {
+func (m *OrderStage) ConvertFromProtobuf(i proto.OrderStage)  {
 
 	if i.Price != nil {
 		m.PriceCurrency = i.Price.Currency

@@ -5,7 +5,7 @@ import (
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *TinkoffBrand) ConvertFromProtobuf(i proto.TinkoffBrand)  {
+func (m *Brand) ConvertFromProtobuf(i proto.Brand)  {
 	m.Company = i.Company
 	m.CountryOfRisk = i.CountryOfRisk
 	m.CountryOfRiskName = i.CountryOfRiskName

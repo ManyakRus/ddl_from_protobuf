@@ -6,7 +6,7 @@ import (
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *TinkoffOperationItem) ConvertFromProtobuf(i proto.TinkoffOperationItem)  {
+func (m *OperationItem) ConvertFromProtobuf(i proto.OperationItem)  {
 
 	if i.AccruedInt != nil {
 		m.AccruedIntCurrency = i.AccruedInt.Currency

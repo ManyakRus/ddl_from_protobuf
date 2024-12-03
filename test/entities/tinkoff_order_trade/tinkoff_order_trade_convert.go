@@ -6,7 +6,7 @@ import (
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *TinkoffOrderTrade) ConvertFromProtobuf(i proto.TinkoffOrderTrade)  {
+func (m *OrderTrade) ConvertFromProtobuf(i proto.OrderTrade)  {
 	m.DateTime = micro.Date_from_TimestampReference(i.DateTime)
 
 	if i.Price != nil {

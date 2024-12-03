@@ -6,7 +6,7 @@ import (
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *TinkoffCoupon) ConvertFromProtobuf(i proto.TinkoffCoupon)  {
+func (m *Coupon) ConvertFromProtobuf(i proto.Coupon)  {
 	m.CouponDate = micro.Date_from_TimestampReference(i.CouponDate)
 	m.CouponEndDate = micro.Date_from_TimestampReference(i.CouponEndDate)
 	m.CouponNumber = i.CouponNumber

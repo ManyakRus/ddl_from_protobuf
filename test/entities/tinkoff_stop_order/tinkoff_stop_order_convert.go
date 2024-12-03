@@ -6,7 +6,7 @@ import (
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *TinkoffStopOrder) ConvertFromProtobuf(i proto.TinkoffStopOrder)  {
+func (m *StopOrder) ConvertFromProtobuf(i proto.StopOrder)  {
 	m.ActivationDateTime = micro.Date_from_TimestampReference(i.ActivationDateTime)
 	m.CreateDate = micro.Date_from_TimestampReference(i.CreateDate)
 	m.Currency = i.Currency

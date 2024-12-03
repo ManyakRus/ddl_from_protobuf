@@ -6,7 +6,7 @@ import (
 )
 
 // ConvertFromProtobuf - создаёт модель protobuf из модели crud
-func (m *TinkoffBrokerReport) ConvertFromProtobuf(i proto.TinkoffBrokerReport)  {
+func (m *BrokerReport) ConvertFromProtobuf(i proto.BrokerReport)  {
 
 	if i.AciValue != nil {
 		m.AciValueNano = i.AciValue.Nano
