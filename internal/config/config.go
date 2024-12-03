@@ -5,6 +5,7 @@ import (
 	"github.com/ManyakRus/ddl_from_protobuf/internal/types"
 	"github.com/ManyakRus/starter/log"
 	"github.com/ManyakRus/starter/micro"
+	"github.com/ManyakRus/starter/microl"
 	"io/fs"
 	"os"
 	"strconv"
@@ -42,6 +43,7 @@ type SettingsINI struct {
 	NEED_CREATE_MESSAGE_TABLES                     bool
 	NEED_CREATE_MESSAGE_TABLES_WITH_PRIMARY_KEY    bool
 	NEED_CREATE_MESSAGE_TABLES_WITHOUT_PRIMARY_KEY bool
+	PREFIX_TABLE_NAMES                             string
 }
 
 // CreateSettings - создает структуру типа SettingsINI
@@ -170,6 +172,9 @@ func FillSettings() {
 	s = Getenv(Name, true)
 	Settings.NEED_CREATE_MESSAGE_TABLES_WITHOUT_PRIMARY_KEY = micro.BoolFromString(s)
 
+	//
+	Name = "PREFIX_TABLE_NAMES"
+	microl.Set_FieldFromEnv_String(&Settings, Name, false)
 }
 
 // ChangeCurrentDirectory - устанавливает текущую директорию на директорию откуда запущена программа

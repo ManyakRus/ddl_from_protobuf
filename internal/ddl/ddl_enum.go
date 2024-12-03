@@ -20,7 +20,7 @@ func CreateFiles_Enum(Settings *config.SettingsINI, MapTables map[string]*types.
 
 	//
 	TableName := enum1.Name
-	TableNameSQL := FormatNameSQL(TableName)
+	TableNameSQL := FormatTableNameSQL(Settings, TableName)
 	TableComments := enum1.Documentation
 
 	//фильтр

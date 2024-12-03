@@ -27,7 +27,7 @@ func CreateFile_Message(Settings *config.SettingsINI, MapTables map[string]*type
 	TableName := message1.Name
 	TableComments := message1.Documentation
 	TextColumnComment := ""
-	TableNameSQL := FormatNameSQL(TableName)
+	TableNameSQL := FormatTableNameSQL(Settings, TableName)
 
 	//фильтр
 	Filter := Settings.FILTER_MESSAGE_NAME
@@ -215,14 +215,14 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 		Otvet = Otvet + "\t" + `"` + FieldNameSQL + `"` + " " + SQLType + " " + TextNullable + ",\n"
 
 		//CONSTRAINT
-		TextConstraint1 := FillTextConstraint1(Settings, message1, field1, FieldNameSQL)
+		TextConstraint1 := FillTextConstraint1(Settings, message1, field1, TableNameSQL, FieldNameSQL)
 		TextConstraint = TextConstraint + TextConstraint1
 		if TextConstraint1 != "" {
 			ForeignCount = ForeignCount + 1
 		}
 
 		//INDEX
-		TextIndex1 := FillTextIndex1(Settings, message1, field1, FieldNameSQL)
+		TextIndex1 := FillTextIndex1(Settings, message1, field1, TableNameSQL, FieldNameSQL)
 		TextIndex = TextIndex + TextIndex1
 
 		//COLUMN COMMENTS
@@ -288,11 +288,11 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 }
 
 // FillTextConstraint1 - возвращает текст SQL ограничений
-func FillTextConstraint1(Settings *config.SettingsINI, message1 *types.MessageElement, field1 *types.FieldElement, FieldNameSQL string) string {
+func FillTextConstraint1(Settings *config.SettingsINI, message1 *types.MessageElement, field1 *types.FieldElement, TableNameSQL, FieldNameSQL string) string {
 	Otvet := ""
 
-	TableName := message1.Name
-	TableNameSQL := FormatNameSQL(TableName)
+	//TableName := message1.Name
+	//TableNameSQL := FormatNameSQL(TableName)
 	//FieldName := FindFieldName(Settings, field1)
 	//FieldNameSQL := FormatNameSQL(FieldName)
 	IsIdentifier := IsIdentifierField(Settings, field1)
@@ -302,7 +302,7 @@ func FillTextConstraint1(Settings *config.SettingsINI, message1 *types.MessageEl
 
 	IdentifierName := ""
 	ForeignTableName, ForeignTableColumnName := FindForeignTableNameAndColumnName(Settings, field1)
-	ForeignTableNameSQL := FormatNameSQL(ForeignTableName)
+	ForeignTableNameSQL := FormatTableNameSQL(Settings, ForeignTableName)
 	ForeignTableColumnNameSQL := FormatNameSQL(ForeignTableColumnName)
 	if ForeignTableName == "" || ForeignTableColumnName == "" {
 		return Otvet
@@ -327,11 +327,11 @@ func FillTextConstraint1(Settings *config.SettingsINI, message1 *types.MessageEl
 }
 
 // FillTextIndex1 - возвращает текст SQL ограничений
-func FillTextIndex1(Settings *config.SettingsINI, message1 *types.MessageElement, field1 *types.FieldElement, FieldNameSQL string) string {
+func FillTextIndex1(Settings *config.SettingsINI, message1 *types.MessageElement, field1 *types.FieldElement, TableNameSQL, FieldNameSQL string) string {
 	Otvet := ""
 
-	TableName := message1.Name
-	TableNameSQL := FormatNameSQL(TableName)
+	//TableName := message1.Name
+	//TableNameSQL := FormatNameSQL(TableName)
 	//FieldName := FindFieldName(Settings, field1)
 	//FieldNameSQL := FormatNameSQL(FieldName)
 	IsIdentifier := IsIdentifierField(Settings, field1)

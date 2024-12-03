@@ -275,3 +275,13 @@ func FormatNameSQL(Name string) string {
 
 	return Otvet
 }
+
+// FormatTableNameSQL - возвращает наименование в формате snake_case
+func FormatTableNameSQL(Settings *config.SettingsINI, Name string) string {
+	Otvet := Name
+
+	Otvet = FormatNameSQL(Name)
+	Otvet = Settings.PREFIX_TABLE_NAMES + Otvet
+
+	return Otvet
+}

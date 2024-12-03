@@ -46,6 +46,9 @@ NEED_CREATE_MESSAGE_TABLES_WITH_PRIMARY_KEY=true
 #NEED_CREATE_MESSAGE_TABLES_WITHOUT_PRIMARY_KEY - need create ddl .sql tables from protobuf messages without primary key
 NEED_CREATE_MESSAGE_TABLES_WITHOUT_PRIMARY_KEY=false
 
+#PREFIX_TABLE_NAMES - prefix add for all table names
+PREFIX_TABLE_NAMES=""
+
 
 #---------------------------- convert files --------------------------------------------------------
 
