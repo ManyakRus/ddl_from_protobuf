@@ -49,6 +49,13 @@ NEED_CREATE_MESSAGE_TABLES_WITHOUT_PRIMARY_KEY=false
 #PREFIX_TABLE_NAMES - prefix add for all table names
 PREFIX_TABLE_NAMES=""
 
+#TEXT_EVERY_TABLE_FILENAME - filename of "text_every_table.sql" file
+TEXT_EVERY_TABLE_FILENAME="text_every_table.sql"
+
+#TEXT_AFTER_EVERY_TABLE_FILENAME - filename of "text_after_every_table.sql" file
+TEXT_AFTER_EVERY_TABLE_FILENAME="text_after_every_table.sql"
+
+
 
 #---------------------------- convert files --------------------------------------------------------
 

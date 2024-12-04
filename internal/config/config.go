@@ -22,7 +22,6 @@ type SettingsINI struct {
 	DDL_FILENAME                                   string
 	CONFIG_DIRECTORY_NAME                          string
 	MapSQLTypes                                    map[string]load_configs_mapping.SQLMapping //map[ProtoType]SQLMapping
-	TextEveryTableColumns                          string
 	DB_SCHEMA_NAME                                 string
 	MapMessages                                    map[string]*types.MessageElement
 	MapEnums                                       map[string]*types.EnumElement
@@ -44,6 +43,10 @@ type SettingsINI struct {
 	NEED_CREATE_MESSAGE_TABLES_WITH_PRIMARY_KEY    bool
 	NEED_CREATE_MESSAGE_TABLES_WITHOUT_PRIMARY_KEY bool
 	PREFIX_TABLE_NAMES                             string
+	TEXT_EVERY_TABLE_FILENAME                      string
+	TEXT_AFTER_EVERY_TABLE_FILENAME                string
+	TEXT_EVERY_TABLE                               string
+	TEXT_AFTER_EVERY_TABLE                         string
 }
 
 // CreateSettings - создает структуру типа SettingsINI
@@ -175,6 +178,17 @@ func FillSettings() {
 	//
 	Name = "PREFIX_TABLE_NAMES"
 	microl.Set_FieldFromEnv_String(&Settings, Name, false)
+
+	//
+	Name = "TEXT_EVERY_TABLE_FILENAME"
+	microl.Set_FieldFromEnv_String(&Settings, Name, false)
+
+	//
+	Name = "TEXT_AFTER_EVERY_TABLE_FILENAME"
+	microl.Set_FieldFromEnv_String(&Settings, Name, false)
+
+	//
+	LoadFiles(&Settings)
 }
 
 // ChangeCurrentDirectory - устанавливает текущую директорию на директорию откуда запущена программа

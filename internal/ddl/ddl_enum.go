@@ -6,6 +6,7 @@ import (
 	"github.com/ManyakRus/ddl_from_protobuf/internal/types"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 // CreateFiles_Enum - создание одного файла ddl .sql, для enum
@@ -45,7 +46,7 @@ func CreateFiles_Enum(Settings *config.SettingsINI, MapTables map[string]*types.
 	Otvet = `
 CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL + `" (
 `
-	Otvet = Otvet + Settings.TextEveryTableColumns
+	Otvet = Otvet + Settings.TEXT_EVERY_TABLE
 
 	ID_Name := "id"
 	ID_SQL_TYPE := "int8"
@@ -66,6 +67,14 @@ CREATE TABLE IF NOT EXISTS "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL +
 
 	//COMMENT ON TABLE
 	Otvet = Otvet + `COMMENT ON TABLE "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL + `" IS '` + TableComments + `';` + "\n"
+
+	//текст после таблицы
+	TextAfterEveryTable := Settings.TEXT_AFTER_EVERY_TABLE
+	if TextAfterEveryTable != "" {
+		TextAfterEveryTable = strings.ReplaceAll(TextAfterEveryTable, `"TableName"`, `"`+TableNameSQL+`"`)
+		TextAfterEveryTable = strings.ReplaceAll(TextAfterEveryTable, `"public".`, `"`+Settings.DB_SCHEMA_NAME+`".`)
+		Otvet = Otvet + TextAfterEveryTable
+	}
 
 	//COMMENT ON ID
 	Otvet = Otvet + `COMMENT ON COLUMN "` + Settings.DB_SCHEMA_NAME + `"."` + TableNameSQL + `"."id" IS '` + "Уникальный технический идентификатор" + `';` + "\n"
